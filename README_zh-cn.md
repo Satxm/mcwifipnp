@@ -2,7 +2,7 @@
 
 [English](README.md) | **简体中文**
 
-**For Minecraft 1.16.5**
+**For Minecraft 1.17-21w20a**
 
 **需要[Fabric API](https://www.curseforge.com/minecraft/mc-mods/fabric-api)和[Fabric Loader](https://fabricmc.net/use/)**
 

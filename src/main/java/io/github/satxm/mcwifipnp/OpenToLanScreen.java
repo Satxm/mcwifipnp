@@ -5,21 +5,17 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.ScreenTexts;
 import net.minecraft.client.gui.widget.ButtonWidget;
+import net.minecraft.client.gui.widget.CyclingButtonWidget;
 import net.minecraft.client.gui.widget.TextFieldWidget;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.server.integrated.IntegratedServer;
-import net.minecraft.text.LiteralText;
 import net.minecraft.text.TranslatableText;
+import net.minecraft.world.GameMode;
 
 public class OpenToLanScreen extends Screen {
 	private final MCWiFiPnP.Config cfg;
 	private final Screen parent;
 	private ButtonWidget buttonStartLanServer;
-	private ButtonWidget buttonAllowCommands;
-	private ButtonWidget buttonGameMode;
-	private ButtonWidget buttonOnlineMode;
-	private ButtonWidget buttonUseUPnP;
-	private ButtonWidget buttonCopyToClipboard;
 	private TextFieldWidget portField;
 	private String portinfo = "info";
 
@@ -41,7 +37,7 @@ public class OpenToLanScreen extends Screen {
 	}
 
 	protected void init() {
-		this.buttonStartLanServer = (ButtonWidget)this.addButton(new ButtonWidget(this.width / 2 - 155, this.height - 28, 150, 20, new TranslatableText("lanServer.start"), (buttonWidget) -> {
+		this.buttonStartLanServer = this.addDrawableChild(new ButtonWidget(this.width / 2 - 155, this.height - 28, 150, 20, new TranslatableText("lanServer.start"), (button) -> {
 			IntegratedServer server = client.getServer();
 			cfg.port = Integer.parseInt(portField.getText());
 			MCWiFiPnP.openToLan(server);
@@ -49,32 +45,22 @@ public class OpenToLanScreen extends Screen {
 			this.client.openScreen((Screen) null);
 		}));
 
-		this.addButton(new ButtonWidget(this.width / 2 + 5, this.height - 28, 150, 20, ScreenTexts.CANCEL, (buttonWidget) -> {
+		this.addDrawableChild(new ButtonWidget(this.width / 2 + 5, this.height - 28, 150, 20, ScreenTexts.CANCEL, (button) -> {
 			this.client.openScreen(this.parent);
 		}));
 
-		this.buttonGameMode = (ButtonWidget)this.addButton(new ButtonWidget(this.width / 2 - 155, 100, 150, 20, LiteralText.EMPTY, (buttonWidget) -> {
-			if ("spectator".equals(cfg.GameMode)) {
-				cfg.GameMode = "creative";
-			} else if ("creative".equals(cfg.GameMode)) {
-				cfg.GameMode = "adventure";
-			} else if ("adventure".equals(cfg.GameMode)) {
-				cfg.GameMode = "survival";
-			} else {
-				cfg.GameMode = "spectator";
-			}
-			this.updateButtonText();
+		this.addDrawableChild(CyclingButtonWidget.builder(GameMode::getSimpleTranslatableName).values(GameMode.SURVIVAL, GameMode.SPECTATOR, GameMode.CREATIVE, GameMode.ADVENTURE).initially(GameMode.byName(cfg.GameMode)).build(this.width / 2 - 155, 100, 150, 20, new TranslatableText("selectWorld.gameMode"), (button, gameMode) -> {
+			cfg.GameMode = gameMode.getName();
 		}));
 
-		this.buttonAllowCommands = (ButtonWidget)this.addButton(new ButtonWidget(this.width / 2 + 5, 100, 150, 20, new TranslatableText("selectWorld.AllowCommands"), (buttonWidget) -> {
-			cfg.AllowCommands = !cfg.AllowCommands;
-			this.updateButtonText();
+		this.addDrawableChild(CyclingButtonWidget.onOffBuilder(cfg.AllowCommands).build(this.width / 2 + 5, 100, 150, 20, new TranslatableText("selectWorld.allowCommands"), (button, AllowCommands) -> {
+			cfg.AllowCommands = AllowCommands;
 		}));
 
-		this.portField=new TextFieldWidget(this.client.textRenderer,this.width / 2 - 155,134,150,20,new TranslatableText("mcwifipnp.gui.port"));
+		this.portField=new TextFieldWidget(this.client.textRenderer,this.width / 2 - 155 , 134 , 150 , 20 , new TranslatableText("mcwifipnp.gui.port"));
 		this.portField.setText(Integer.toString(cfg.port));
 		this.portField.setMaxLength(5);
-		this.addChild(portField);
+		this.addDrawableChild(portField);
 
 		portField.setChangedListener((sPort)->{
 			this.buttonStartLanServer.active = !this.portField.getText().isEmpty();
@@ -95,30 +81,18 @@ public class OpenToLanScreen extends Screen {
 			}
 		});
 
-		this.buttonOnlineMode = (ButtonWidget)this.addButton(new ButtonWidget(this.width / 2 + 5, 134, 150, 20, new TranslatableText("mcwifipnp.gui.OnlineMode"), (buttonWidget) -> {
-			cfg.OnlineMode = !cfg.OnlineMode;
-			this.updateButtonText();
+		this.addDrawableChild(CyclingButtonWidget.onOffBuilder(cfg.OnlineMode).build(this.width / 2 + 5, 134, 150, 20, new TranslatableText("mcwifipnp.gui.OnlineMode"), (button, OnlineMode) -> {
+			cfg.OnlineMode = OnlineMode;
 		}));
 
-		this.buttonUseUPnP = (ButtonWidget)this.addButton(new ButtonWidget(this.width / 2 - 155, 168, 150, 20, new TranslatableText("mcwifipnp.gui.forwardport"), (buttonWidget) -> {
-			cfg.UseUPnP = !cfg.UseUPnP;
-			this.updateButtonText();
+		this.addDrawableChild(CyclingButtonWidget.onOffBuilder(cfg.UseUPnP).build(this.width / 2 - 155, 168, 150, 20, new TranslatableText("mcwifipnp.gui.forwardport"), (button, UseUPnP) -> {
+			cfg.UseUPnP = UseUPnP;
 		}));
 
-		this.buttonCopyToClipboard = (ButtonWidget)this.addButton(new ButtonWidget(this.width / 2 + 5, 168, 150, 20, new TranslatableText("mcwifipnp.gui.CopyIP"), (buttonWidget) -> {
-			cfg.CopyToClipboard = !cfg.CopyToClipboard;
-			this.updateButtonText();
+		this.addDrawableChild(CyclingButtonWidget.onOffBuilder(cfg.CopyToClipboard).build(this.width / 2 + 5, 168, 150, 20, new TranslatableText("mcwifipnp.gui.CopyIP"), (button, CopyToClipboard) -> {
+			cfg.CopyToClipboard = CopyToClipboard;
 		}));
 		
-		this.updateButtonText();
-	}
-
-	private void updateButtonText() {
-		this.buttonGameMode.setMessage(new TranslatableText("options.generic_value", new Object[]{new TranslatableText("selectWorld.gameMode"), new TranslatableText("selectWorld.gameMode." + cfg.GameMode)}));
-		this.buttonAllowCommands.setMessage(ScreenTexts.composeToggleText(new TranslatableText("selectWorld.allowCommands"), cfg.AllowCommands));
-		this.buttonOnlineMode.setMessage(ScreenTexts.composeToggleText(new TranslatableText("mcwifipnp.gui.OnlineMode"), cfg.OnlineMode));
-		this.buttonUseUPnP.setMessage(ScreenTexts.composeToggleText(new TranslatableText("mcwifipnp.gui.forwardport"), cfg.UseUPnP));
-		this.buttonCopyToClipboard.setMessage(ScreenTexts.composeToggleText(new TranslatableText("mcwifipnp.gui.CopyIP"), cfg.CopyToClipboard));
 	}
 
 	public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
