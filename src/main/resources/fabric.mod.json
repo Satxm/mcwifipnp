@@ -1,0 +1,31 @@
+{
+  "schemaVersion": 1,
+  "id": "mcwifipnp",
+  "version": "${version}",
+  "name": "Minecraft WLAN Plug-n-Play",
+  "description": "A Minecraft LAN World Tool With WLAN UPnP",
+  "authors": [
+    "Satxm , TheGlitch76"
+  ],
+  "contact": {
+    "homepage": "https://www.curseforge.com/minecraft/mc-mods/mcwifipnp",
+    "issues": "https://github.com/satxm/mcwifipnp/issues",
+    "sources": "https://github.com/satxm/mcwifipnp"
+  },
+  "license": "0BSD",
+  "icon": "assets/mcwifipnp/icon.png",
+  "environment": "*",
+  "entrypoints": {
+    "main": [
+      "io.github.satxm.mcwifipnp.MCWiFiPnP"
+    ]
+  },
+  "mixins": [
+    "mcwifipnp.mixins.json"
+  ],
+  "depends": {
+    "fabricloader": ">=0.11.1",
+    "fabric": ">=0.28.5",
+    "minecraft": ">=1.15.2"
+  }
+}
