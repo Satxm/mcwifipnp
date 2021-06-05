@@ -53,7 +53,10 @@ public class MCWiFiPnP implements ModInitializer {
 			saveConfig(cfg);
 
 			server.openToLan(GameMode.byName(cfg.GameMode), cfg.AllowCommands, cfg.port);
+			client.getServer().setOnlineMode(cfg.OnlineMode);
 			client.inGameHud.getChatHud().addMessage(new TranslatableText("commands.publish.started", cfg.port));
+			client.inGameHud.getChatHud().addMessage(new TranslatableText("mcwifipnp.upnp.allowcommands." + cfg.AllowCommands));
+			client.inGameHud.getChatHud().addMessage(new TranslatableText("mcwifipnp.upnp.onlinemode." + cfg.OnlineMode));
 
 			if (cfg.UseUPnP) {
 				UPnPUtil.UPnPResult result = UPnPUtil.init(cfg.port, "Minecraft LAN World");
@@ -73,9 +76,6 @@ public class MCWiFiPnP implements ModInitializer {
 						break;
 				}
 			}
-			
-			client.getServer().setOnlineMode(cfg.OnlineMode);
-			client.inGameHud.getChatHud().addMessage(new TranslatableText("mcwifipnp.upnp.onlinemode."+cfg.OnlineMode));
 
 			if (cfg.CopyToClipboard) {
 				String ip = UPnP.getExternalIP();
