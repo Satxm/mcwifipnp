@@ -1,0 +1,27 @@
+modLoader="javafml"
+loaderVersion="${loader_version}"
+license="All rights reserved"
+issueTrackerURL="https://github.com/Satxm/mcwifipnp/issues"
+
+[[mods]]
+modId="mcwifipnp"
+version="${version}"
+displayName="Minecraft WLAN Plug-n-Play"
+displayURL="https://github.com/Satxm/mcwifipnp"
+logoFile="icon.png"
+authors="Satxm"
+description="A Minecraft LAN World Tool With WLAN UPnP."
+
+[[dependencies.examplemod]]
+    modId="forge"
+    mandatory=true
+    versionRange="${forge_version}"
+    ordering="NONE"
+    side="CLIENT"
+
+[[dependencies.examplemod]]
+    modId="minecraft"
+    mandatory=true
+    versionRange="${mc_version}"
+    ordering="NONE"
+    side="CLIENT"
