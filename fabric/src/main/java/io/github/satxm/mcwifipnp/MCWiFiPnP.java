@@ -46,6 +46,37 @@ public class MCWiFiPnP implements ModInitializer {
 		return Objects.requireNonNull(configMap.get(server), "no config for server???");
 	}
 
+	private void onServerLoad(MinecraftServer server) {
+		Path location = server.getWorldPath(LevelResource.ROOT).resolve("mcwifipnp.json");
+
+		Config cfg;
+
+		try {
+			cfg = gson.fromJson(new String(Files.readAllBytes(location)), Config.class);
+			cfg.location = location;
+		} catch (IOException | JsonParseException e) {
+			try {
+				Files.deleteIfExists(location);
+			} catch (IOException ioException) {
+				//
+			}
+
+			cfg = new Config();
+			cfg.location = location;
+			cfg.needsDefaults = true;
+		}
+
+		configMap.put(server, cfg);
+	}
+
+	private void onServerStop(MinecraftServer server) {
+		Config cfg = configMap.get(server);
+		if (server.isPublished() && cfg.UseUPnP) {
+			UPnP.closePortTCP(cfg.port);
+			LOGGER.info("Stopped forwarded port " + cfg.port +".");
+		}
+	}
+
 	public static void openToLan(MinecraftServer server) {
 		Minecraft client = Minecraft.getInstance();
 		
@@ -91,39 +122,6 @@ public class MCWiFiPnP implements ModInitializer {
 		},"MCWiFiPnP").start();
 	}
 
-	private void onServerLoad(MinecraftServer server) {
-		Path location = server.getWorldPath(LevelResource.ROOT).resolve("mcwifipnp.json");
-
-		Config cfg;
-
-		try {
-			cfg = gson.fromJson(new String(Files.readAllBytes(location)), Config.class);
-			cfg.location = location;
-		} catch (IOException | JsonParseException e) {
-			try {
-				Files.deleteIfExists(location);
-			} catch (IOException ioException) {
-				//
-			}
-
-			cfg = new Config();
-			cfg.location = location;
-			cfg.needsDefaults = true;
-		}
-
-		configMap.put(server, cfg);
-	}
-
-	private void onServerStop(MinecraftServer server) {
-		Config cfg = configMap.get(server);
-		if (cfg.UseUPnP) {
-			UPnP.closePortTCP(cfg.port);
-			LOGGER.info("Stopped forwarded port " + cfg.port +".");
-		}
-
-		
-	}
-
 	private static void saveConfig(Config cfg) {
 		if (!cfg.needsDefaults) {
 			try {
@@ -153,4 +151,5 @@ public class MCWiFiPnP implements ModInitializer {
 		Gson gson = new GsonBuilder().setPrettyPrinting().create();
 		return gson.toJson(jsonObject);
 	}
+
 }

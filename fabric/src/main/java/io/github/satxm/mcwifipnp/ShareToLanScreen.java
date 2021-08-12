@@ -15,7 +15,7 @@ public class ShareToLanScreen extends Screen {
 	private final MCWiFiPnP.Config cfg;
 	private final Screen lastScreen;
 	private EditBox EditPort;
-	private Button buttonStartLanServer;
+	private Button StartLanServer;
 	private String portinfo = "info";
 
 	public ShareToLanScreen(Screen screen) {
@@ -35,7 +35,7 @@ public class ShareToLanScreen extends Screen {
 	}
 
 	protected void init() {
-		this.buttonStartLanServer = this.addRenderableWidget(new Button(this.width / 2 - 155, this.height - 28, 150, 20, new TranslatableComponent("lanServer.start"), (button) -> {
+		this.StartLanServer = this.addRenderableWidget(new Button(this.width / 2 - 155, this.height - 28, 150, 20, new TranslatableComponent("lanServer.start"), (button) -> {
 			cfg.port = Integer.parseInt(EditPort.getValue());
 			MinecraftServer server = Minecraft.getInstance().getSingleplayerServer();
 			MCWiFiPnP.openToLan(server);
@@ -55,26 +55,26 @@ public class ShareToLanScreen extends Screen {
 			cfg.AllowCommands = AllowCommands;
 		}));
 
-		this.EditPort=new EditBox(this.font, this.width / 2 - 155 , 134 , 150 , 20 , new TranslatableComponent("mcwifipnp.gui.port"));
+		this.EditPort = new EditBox(this.font, this.width / 2 - 155 , 134 , 150 , 20 , new TranslatableComponent("mcwifipnp.gui.port"));
 		this.EditPort.setValue(Integer.toString(cfg.port));
 		this.EditPort.setMaxLength(5);
 		this.addRenderableWidget(EditPort);
 
 		EditPort.setResponder((sPort)->{
-			this.buttonStartLanServer.active = !this.EditPort.getValue().isEmpty();
+			this.StartLanServer.active = !this.EditPort.getValue().isEmpty();
 			try {
 				int port =Integer.parseInt(EditPort.getValue());
 				if (port < 1024) {
 					this.portinfo = "small";
-					this.buttonStartLanServer.active = false;
+					this.StartLanServer.active = false;
 				} else if (port > 65535) {
 					this.portinfo = "large";
-					this.buttonStartLanServer.active = false;
+					this.StartLanServer.active = false;
 				} else {
 					this.portinfo = "info";
 				}
 			} catch (NumberFormatException ex) {
-				this.buttonStartLanServer.active = false;
+				this.StartLanServer.active = false;
 				this.portinfo = "null";
 			}
 		});

@@ -1,5 +1,6 @@
 package io.github.satxm.mcwifipnp;
 
+import com.dosse.upnp.UPnP;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -11,25 +12,19 @@ import java.util.WeakHashMap;
 
 import javax.annotation.Nonnull;
 
-import com.dosse.upnp.UPnP;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 import com.google.gson.JsonParser;
-import com.mojang.realmsclient.RealmsMainScreen;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.Button;
-import net.minecraft.client.gui.screens.GenericDirtMessageScreen;
 import net.minecraft.client.gui.screens.PauseScreen;
 import net.minecraft.client.gui.screens.Screen;
-import net.minecraft.client.gui.screens.TitleScreen;
-import net.minecraft.client.gui.screens.multiplayer.JoinMultiplayerScreen;
-import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.HttpUtil;
@@ -64,39 +59,17 @@ public class MCWiFiPnP {
 		Minecraft client = Minecraft.getInstance();
 		Screen gui = event.getGui();
 		if (gui instanceof PauseScreen) {
-			Button button0 = (Button) event.getWidgetList().get(6);
-			event.removeWidget(button0);
-
-			Button button1 = new Button(client.screen.width / 2 + 4, client.screen.height / 4 + 96 + -16, 98, 20, new TranslatableComponent("menu.shareToLan"), (p_96321_) -> {
+			Button ShareToLanNew = new Button(client.screen.width / 2 + 4, client.screen.height / 4 + 96 + -16, 98, 20, new TranslatableComponent("menu.shareToLan"), (p_96321_) -> {
 				client.setScreen(new ShareToLanScreen(gui));
 			});
-			button1.active = client.hasSingleplayerServer() && !client.getSingleplayerServer().isPublished();
-			
-			Component component = client.isLocalServer() ? new TranslatableComponent("menu.returnToMenu") : new TranslatableComponent("menu.disconnect");
-			Button button2 = new Button(client.screen.width / 2 - 102, client.screen.height / 4 + 120 + -16, 204, 20, component, (p_96315_) -> {
-				boolean flag = client.isLocalServer();
-				boolean flag1 = client.isConnectedToRealms();
-				p_96315_.active = false;
-				client.level.disconnect();
-				if (flag) {
-					client.clearLevel(new GenericDirtMessageScreen(new TranslatableComponent("menu.savingLevel")));
-				} else {
-					client.clearLevel();
-				}
-				
-				TitleScreen titlescreen = new TitleScreen();
-				if (flag) {
-					client.setScreen(titlescreen);
-				} else if (flag1) {
-					client.setScreen(new RealmsMainScreen(titlescreen));
-				} else {
-					client.setScreen(new JoinMultiplayerScreen(titlescreen));
-				}
-				
-			});
+			ShareToLanNew.active = client.hasSingleplayerServer() && !client.getSingleplayerServer().isPublished();
+			Button ShareToLanOld = (Button) event.getWidgetList().get(6);
+			Button SaveAndExit = (Button) event.getWidgetList().get(7);
 
-			event.addWidget(button1);
-			event.addWidget(button2);
+			event.removeWidget(ShareToLanOld);
+			event.addWidget(ShareToLanNew);
+			event.addWidget(SaveAndExit);
+
         }
 	}
 
@@ -128,13 +101,11 @@ public class MCWiFiPnP {
 	@SubscribeEvent
 	public void onServerStopping(FMLServerStoppingEvent event){
 		MinecraftServer server = event.getServer();
-
 		Config cfg = configMap.get(server);
-		if (cfg.UseUPnP) {
-		UPnP.closePortTCP(cfg.port);
-		LOGGER.info("Stopped forwarded port " + cfg.port +".");
+		if (server.isPublished() && cfg.UseUPnP) {
+			UPnP.closePortTCP(cfg.port);
+			LOGGER.info("Stopped forwarded port " + cfg.port +".");
 		}
-
 	}
 
 	public static void openToLan(MinecraftServer server) {
