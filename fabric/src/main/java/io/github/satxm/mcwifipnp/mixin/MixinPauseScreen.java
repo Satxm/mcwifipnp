@@ -11,8 +11,8 @@ import net.minecraft.client.gui.screens.Screen;
 
 @Mixin(PauseScreen.class)
 public class MixinPauseScreen {
-	@Dynamic("lambda in initWidgets")
-	@Redirect(method = "method_19838", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/Minecraft;setScreen(Lnet/minecraft/client/gui/screens/Screen;)V"))
+	@Dynamic("lambda in init")
+	@Redirect(method = "lambda$createPauseMenu$8" , at = @At(value = "INVOKE", target = "Lnet/minecraft/client/Minecraft;setScreen(Lnet/minecraft/client/gui/screens/Screen;)V") , remap = false)
 	private void replaceOpenToLAN(Minecraft client, Screen toOpen) {
 		client.setScreen(new ShareToLanScreen((Screen) (Object) this));
 	}
