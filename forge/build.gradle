@@ -16,7 +16,7 @@ archivesBaseName = project.archives_base_name
 version = project.mod_version + "-" + project.minecraft_version + "-forge"
 group = project.maven_group
 
-java.toolchain.languageVersion = JavaLanguageVersion.of(16)
+java.toolchain.languageVersion = JavaLanguageVersion.of(8)
 
 println('Java: ' + System.getProperty('java.version') + ' JVM: ' + System.getProperty('java.vm.version') + '(' + System.getProperty('java.vendor') + ') Arch: ' + System.getProperty('os.arch'))
 
@@ -72,8 +72,8 @@ jar {
                 "Implementation-Timestamp": new Date().format("yyyy-MM-dd'T'HH:mm:ssZ"),
         ])
     }
-    from("../LICENSE") {
-	}
+	from("../LICENSE") {
+}
 }
 
 def replaceResources = tasks.register("replaceResources", Copy) {

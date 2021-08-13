@@ -1,6 +1,5 @@
 package io.github.satxm.mcwifipnp;
 
-import com.dosse.upnp.UPnP;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -12,6 +11,7 @@ import java.util.WeakHashMap;
 
 import javax.annotation.Nonnull;
 
+import com.dosse.upnp.UPnP;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
@@ -22,20 +22,20 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.components.Button;
-import net.minecraft.client.gui.screens.PauseScreen;
-import net.minecraft.client.gui.screens.Screen;
-import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.client.gui.screen.IngameMenuScreen;
+import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.client.gui.widget.button.Button;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.util.HttpUtil;
-import net.minecraft.world.level.GameType;
-import net.minecraft.world.level.storage.LevelResource;
+import net.minecraft.util.HTTPUtil;
+import net.minecraft.util.text.TranslationTextComponent;
+import net.minecraft.world.GameType;
+import net.minecraft.world.storage.FolderName;
 import net.minecraftforge.client.event.GuiScreenEvent;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fmlserverevents.FMLServerStartingEvent;
-import net.minecraftforge.fmlserverevents.FMLServerStoppingEvent;
+import net.minecraftforge.fml.event.server.FMLServerStartingEvent;
+import net.minecraftforge.fml.event.server.FMLServerStoppingEvent;
 
 @Mod(MCWiFiPnP.MODID)
 public class MCWiFiPnP {
@@ -58,8 +58,8 @@ public class MCWiFiPnP {
 	public void ChangeButton(GuiScreenEvent.InitGuiEvent.Post event) {
 		Minecraft client = Minecraft.getInstance();
 		Screen gui = event.getGui();
-		if (gui instanceof PauseScreen) {
-			Button ShareToLanNew = new Button(client.screen.width / 2 + 4, client.screen.height / 4 + 96 + -16, 98, 20, new TranslatableComponent("menu.shareToLan"), (p_96321_) -> {
+		if (gui instanceof IngameMenuScreen) {
+			Button ShareToLanNew = new Button(client.screen.width / 2 + 4, client.screen.height / 4 + 96 + -16, 98, 20, new TranslationTextComponent("menu.shareToLan"), (p_96321_) -> {
 				client.setScreen(new ShareToLanScreen(gui));
 			});
 			ShareToLanNew.active = client.hasSingleplayerServer() && !client.getSingleplayerServer().isPublished();
@@ -76,7 +76,7 @@ public class MCWiFiPnP {
 	@SubscribeEvent
     public void onServerStarting(FMLServerStartingEvent event) {
 		MinecraftServer server = event.getServer();
-		Path location = server.getWorldPath(LevelResource.ROOT).resolve("mcwifipnp.json");
+		Path location = server.getWorldPath(FolderName.ROOT).resolve("mcwifipnp.json");
 
 		Config cfg;
 
@@ -116,9 +116,9 @@ public class MCWiFiPnP {
 
 		client.getSingleplayerServer().publishServer(GameType.byName(cfg.GameMode), cfg.AllowCommands, cfg.port);
 		client.getSingleplayerServer().setUsesAuthentication(cfg.OnlineMode);
-		client.gui.getChat().addMessage(new TranslatableComponent("commands.publish.started", cfg.port));
-		client.gui.getChat().addMessage(new TranslatableComponent("mcwifipnp.upnp.allowcommands." + cfg.AllowCommands));
-		client.gui.getChat().addMessage(new TranslatableComponent("mcwifipnp.upnp.onlinemode." + cfg.OnlineMode));
+		client.gui.getChat().addMessage(new TranslationTextComponent("commands.publish.started", cfg.port));
+		client.gui.getChat().addMessage(new TranslationTextComponent("mcwifipnp.upnp.allowcommands." + cfg.AllowCommands));
+		client.gui.getChat().addMessage(new TranslationTextComponent("mcwifipnp.upnp.onlinemode." + cfg.OnlineMode));
 
 		new Thread(() -> {
 
@@ -126,17 +126,17 @@ public class MCWiFiPnP {
 				UPnPUtil.UPnPResult result = UPnPUtil.init(cfg.port, "Minecraft LAN World");
 				switch (result) {
 					case SUCCESS:
-						client.gui.getChat().addMessage(new TranslatableComponent("mcwifipnp.upnp.success", cfg.port));
+						client.gui.getChat().addMessage(new TranslationTextComponent("mcwifipnp.upnp.success", cfg.port));
 						LOGGER.info("Started forwarded port " + cfg.port + ".");
 						break;
 					case FAILED_GENERIC:
-						client.gui.getChat().addMessage(new TranslatableComponent("mcwifipnp.upnp.failed", cfg.port));
+						client.gui.getChat().addMessage(new TranslationTextComponent("mcwifipnp.upnp.failed", cfg.port));
 						break;
 					case FAILED_MAPPED:
-						client.gui.getChat().addMessage(new TranslatableComponent("mcwifipnp.upnp.failed.mapped", cfg.port));
+						client.gui.getChat().addMessage(new TranslationTextComponent("mcwifipnp.upnp.failed.mapped", cfg.port));
 						break;
 					case FAILED_DISABLED:
-						client.gui.getChat().addMessage(new TranslatableComponent("mcwifipnp.upnp.failed.disabled", cfg.port));
+						client.gui.getChat().addMessage(new TranslationTextComponent("mcwifipnp.upnp.failed.disabled", cfg.port));
 						break;
 				}
 			}
@@ -144,10 +144,10 @@ public class MCWiFiPnP {
 			if (cfg.CopyToClipboard) {
 				String ip = UPnP.getExternalIP();
 				if (ip == null || ip.equals("0.0.0.0")) {
-					client.gui.getChat().addMessage(new TranslatableComponent("mcwifipnp.upnp.success.cantgetip"));
+					client.gui.getChat().addMessage(new TranslationTextComponent("mcwifipnp.upnp.success.cantgetip"));
 				} else {
 					client.keyboardHandler.setClipboard(ip + ":" + cfg.port);
-					client.gui.getChat().addMessage(new TranslatableComponent("mcwifipnp.upnp.success.clipboard", ip + ":" + cfg.port));
+					client.gui.getChat().addMessage(new TranslationTextComponent("mcwifipnp.upnp.success.clipboard", ip + ":" + cfg.port));
 				}
 			}
 		},"MCWiFiPnP").start();
@@ -165,7 +165,7 @@ public class MCWiFiPnP {
 
 	public static class Config {
 		public int version = 2;
-		public int port = HttpUtil.getAvailablePort();
+		public int port = HTTPUtil.getAvailablePort();
 		public String GameMode = "survival";
 		public boolean UseUPnP = true;
 		public boolean AllowCommands = false;
