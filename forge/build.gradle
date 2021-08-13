@@ -72,6 +72,8 @@ jar {
                 "Implementation-Timestamp": new Date().format("yyyy-MM-dd'T'HH:mm:ssZ"),
         ])
     }
+    from("../LICENSE") {
+	}
 }
 
 def replaceResources = tasks.register("replaceResources", Copy) {

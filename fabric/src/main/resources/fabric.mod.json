@@ -12,7 +12,7 @@
     "issues": "https://github.com/satxm/mcwifipnp/issues",
     "sources": "https://github.com/satxm/mcwifipnp"
   },
-  "license": "All rights reserved",
+  "license": "Apache License 2.0",
   "icon": "icon.png",
   "environment": "*",
   "entrypoints": {

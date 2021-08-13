@@ -1,6 +1,6 @@
 modLoader="javafml"
 loaderVersion="${loader_version}"
-license="All rights reserved"
+license="Apache License 2.0"
 issueTrackerURL="https://github.com/Satxm/mcwifipnp/issues"
 
 [[mods]]
