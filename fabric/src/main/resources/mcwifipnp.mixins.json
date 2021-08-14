@@ -2,14 +2,16 @@
   "required": true,
   "minVersion": "0.8",
   "package": "io.github.satxm.mcwifipnp.mixin",
-  "compatibilityLevel": "JAVA_16",
-  "mixins": [],
-  "client": [
-    "MixinPauseScreen"
+  "compatibilityLevel": "JAVA_8",
+  "mixins": [
+
   ],
-  "server": [],
+  "client": [
+    "MixinGameMenuScreen"
+  ],
+  "server": [
+  ],
   "injectors": {
     "defaultRequire": 1
-  },
-  "refmap": "mcwifipnp-refmap.json"
+  }
 }

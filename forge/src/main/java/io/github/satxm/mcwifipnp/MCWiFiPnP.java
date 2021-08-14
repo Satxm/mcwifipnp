@@ -1,5 +1,6 @@
 package io.github.satxm.mcwifipnp;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -25,11 +26,12 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screen.IngameMenuScreen;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.button.Button;
+import net.minecraft.client.resources.I18n;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.HTTPUtil;
 import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.GameType;
-import net.minecraft.world.storage.FolderName;
+import net.minecraft.world.dimension.DimensionType;
 import net.minecraftforge.client.event.GuiScreenEvent;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -59,10 +61,10 @@ public class MCWiFiPnP {
 		Minecraft client = Minecraft.getInstance();
 		Screen gui = event.getGui();
 		if (gui instanceof IngameMenuScreen) {
-			Button ShareToLanNew = new Button(client.screen.width / 2 + 4, client.screen.height / 4 + 96 + -16, 98, 20, new TranslationTextComponent("menu.shareToLan"), (p_96321_) -> {
-				client.setScreen(new ShareToLanScreen(gui));
+			Button ShareToLanNew = new Button(client.currentScreen.width / 2 + 4, client.currentScreen.height / 4 + 96 + -16, 98, 20, I18n.format("menu.shareToLan"), (button) -> {
+				client.displayGuiScreen(new ShareToLanScreen(gui));
 			});
-			ShareToLanNew.active = client.hasSingleplayerServer() && !client.getSingleplayerServer().isPublished();
+			ShareToLanNew.active = client.isSingleplayer() && !client.getIntegratedServer().getPublic();
 			Button ShareToLanOld = (Button) event.getWidgetList().get(6);
 			Button SaveAndExit = (Button) event.getWidgetList().get(7);
 
@@ -76,7 +78,8 @@ public class MCWiFiPnP {
 	@SubscribeEvent
     public void onServerStarting(FMLServerStartingEvent event) {
 		MinecraftServer server = event.getServer();
-		Path location = server.getWorldPath(FolderName.ROOT).resolve("mcwifipnp.json");
+		File cfgfile = new File(server.getWorld(DimensionType.OVERWORLD).getSaveHandler().getWorldDirectory(), "mcwifipnp.json");
+		Path location = cfgfile.toPath();
 
 		Config cfg;
 
@@ -102,7 +105,7 @@ public class MCWiFiPnP {
 	public void onServerStopping(FMLServerStoppingEvent event){
 		MinecraftServer server = event.getServer();
 		Config cfg = configMap.get(server);
-		if (server.isPublished() && cfg.UseUPnP) {
+		if (server.getPublic() && cfg.UseUPnP) {
 			UPnP.closePortTCP(cfg.port);
 			LOGGER.info("Stopped forwarded port " + cfg.port +".");
 		}
@@ -114,11 +117,11 @@ public class MCWiFiPnP {
 		Config cfg = configMap.get(server);
 		saveConfig(cfg);
 
-		client.getSingleplayerServer().publishServer(GameType.byName(cfg.GameMode), cfg.AllowCommands, cfg.port);
-		client.getSingleplayerServer().setUsesAuthentication(cfg.OnlineMode);
-		client.gui.getChat().addMessage(new TranslationTextComponent("commands.publish.started", cfg.port));
-		client.gui.getChat().addMessage(new TranslationTextComponent("mcwifipnp.upnp.allowcommands." + cfg.AllowCommands));
-		client.gui.getChat().addMessage(new TranslationTextComponent("mcwifipnp.upnp.onlinemode." + cfg.OnlineMode));
+		client.getIntegratedServer().shareToLAN(GameType.getByName(cfg.GameMode), cfg.AllowCommands, cfg.port);
+		client.getIntegratedServer().setOnlineMode(cfg.OnlineMode);
+		client.ingameGUI.getChatGUI().printChatMessage(new TranslationTextComponent("commands.publish.started", cfg.port));
+		client.ingameGUI.getChatGUI().printChatMessage(new TranslationTextComponent("mcwifipnp.upnp.allowcommands." + cfg.AllowCommands));
+		client.ingameGUI.getChatGUI().printChatMessage(new TranslationTextComponent("mcwifipnp.upnp.onlinemode." + cfg.OnlineMode));
 
 		new Thread(() -> {
 
@@ -126,17 +129,17 @@ public class MCWiFiPnP {
 				UPnPUtil.UPnPResult result = UPnPUtil.init(cfg.port, "Minecraft LAN World");
 				switch (result) {
 					case SUCCESS:
-						client.gui.getChat().addMessage(new TranslationTextComponent("mcwifipnp.upnp.success", cfg.port));
+						client.ingameGUI.getChatGUI().printChatMessage(new TranslationTextComponent("mcwifipnp.upnp.success", cfg.port));
 						LOGGER.info("Started forwarded port " + cfg.port + ".");
 						break;
 					case FAILED_GENERIC:
-						client.gui.getChat().addMessage(new TranslationTextComponent("mcwifipnp.upnp.failed", cfg.port));
+						client.ingameGUI.getChatGUI().printChatMessage(new TranslationTextComponent("mcwifipnp.upnp.failed", cfg.port));
 						break;
 					case FAILED_MAPPED:
-						client.gui.getChat().addMessage(new TranslationTextComponent("mcwifipnp.upnp.failed.mapped", cfg.port));
+						client.ingameGUI.getChatGUI().printChatMessage(new TranslationTextComponent("mcwifipnp.upnp.failed.mapped", cfg.port));
 						break;
 					case FAILED_DISABLED:
-						client.gui.getChat().addMessage(new TranslationTextComponent("mcwifipnp.upnp.failed.disabled", cfg.port));
+						client.ingameGUI.getChatGUI().printChatMessage(new TranslationTextComponent("mcwifipnp.upnp.failed.disabled", cfg.port));
 						break;
 				}
 			}
@@ -144,10 +147,10 @@ public class MCWiFiPnP {
 			if (cfg.CopyToClipboard) {
 				String ip = UPnP.getExternalIP();
 				if (ip == null || ip.equals("0.0.0.0")) {
-					client.gui.getChat().addMessage(new TranslationTextComponent("mcwifipnp.upnp.success.cantgetip"));
+					client.ingameGUI.getChatGUI().printChatMessage(new TranslationTextComponent("mcwifipnp.upnp.success.cantgetip"));
 				} else {
-					client.keyboardHandler.setClipboard(ip + ":" + cfg.port);
-					client.gui.getChat().addMessage(new TranslationTextComponent("mcwifipnp.upnp.success.clipboard", ip + ":" + cfg.port));
+					client.keyboardListener.setClipboardString(ip + ":" + cfg.port);
+					client.ingameGUI.getChatGUI().printChatMessage(new TranslationTextComponent("mcwifipnp.upnp.success.clipboard", ip + ":" + cfg.port));
 				}
 			}
 		},"MCWiFiPnP").start();
@@ -165,7 +168,7 @@ public class MCWiFiPnP {
 
 	public static class Config {
 		public int version = 2;
-		public int port = HTTPUtil.getAvailablePort();
+		public int port = HTTPUtil.getSuitableLanPort();
 		public String GameMode = "survival";
 		public boolean UseUPnP = true;
 		public boolean AllowCommands = false;
