@@ -59,7 +59,7 @@ public class MCWiFiPnP {
 		Minecraft client = Minecraft.getInstance();
 		Screen gui = event.getGui();
 		if (gui instanceof IngameMenuScreen) {
-			Button ShareToLanNew = new Button(client.screen.width / 2 + 4, client.screen.height / 4 + 96 + -16, 98, 20, new TranslationTextComponent("menu.shareToLan"), (p_96321_) -> {
+			Button ShareToLanNew = new Button(client.screen.width / 2 + 4, client.screen.height / 4 + 96 + -16, 98, 20, new TranslationTextComponent("menu.shareToLan"), (button) -> {
 				client.setScreen(new ShareToLanScreen(gui));
 			});
 			ShareToLanNew.active = client.hasSingleplayerServer() && !client.getSingleplayerServer().isPublished();
