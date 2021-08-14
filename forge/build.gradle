@@ -95,3 +95,10 @@ processResources {
 classes.configure {
 	dependsOn(replaceResources)
 }
+
+task sourcesJar(type: Jar) {
+    from sourceSets.main.allJava
+    classifier = 'sources'
+}
+
+artifacts { archives sourcesJar }
