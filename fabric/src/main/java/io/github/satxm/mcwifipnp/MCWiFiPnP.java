@@ -11,6 +11,7 @@ import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.util.NetworkUtils;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.text.LiteralText;
 import net.minecraft.text.TranslatableText;
 import net.minecraft.world.GameMode;
 
@@ -51,16 +52,20 @@ public class MCWiFiPnP implements ModInitializer {
 		Config cfg = configMap.get(server);
 		saveConfig(cfg);
 
+		server.setMotd(cfg.motd);
+		server.getServerMetadata().setDescription(new LiteralText(cfg.motd));
 		server.openToLan(GameMode.byName(cfg.GameMode), cfg.AllowCommands, cfg.port);
-		client.getServer().setOnlineMode(cfg.OnlineMode);
+		server.setOnlineMode(cfg.OnlineMode);
+		server.setPvpEnabled(cfg.EnablePvP);
 		client.inGameHud.getChatHud().addMessage(new TranslatableText("commands.publish.started", cfg.port));
 		client.inGameHud.getChatHud().addMessage(new TranslatableText("mcwifipnp.upnp.allowcommands." + cfg.AllowCommands));
 		client.inGameHud.getChatHud().addMessage(new TranslatableText("mcwifipnp.upnp.onlinemode." + cfg.OnlineMode));
+		client.inGameHud.getChatHud().addMessage(new TranslatableText("mcwifipnp.upnp.enablepvp." + cfg.EnablePvP));
 
 		new Thread(() -> {
 
 			if (cfg.UseUPnP) {
-				UPnPUtil.UPnPResult result = UPnPUtil.init(cfg.port, "Minecraft LAN World");
+				UPnPUtil.UPnPResult result = UPnPUtil.init(cfg.port, "Minecraft LAN Server");
 				switch (result) {
 					case SUCCESS:
 						client.inGameHud.getChatHud()
@@ -145,9 +150,11 @@ public class MCWiFiPnP implements ModInitializer {
 		public int version = 2;
 		public int port = NetworkUtils.findLocalPort();
 		public String GameMode = "survival";
+		public String motd = "A Minecraft LAN Server";
 		public boolean UseUPnP = true;
 		public boolean AllowCommands = false;
 		public boolean OnlineMode = true;
+		public boolean EnablePvP = true;
 		public boolean CopyToClipboard = true;
 		public transient Path location;
 		public transient boolean needsDefaults = false;

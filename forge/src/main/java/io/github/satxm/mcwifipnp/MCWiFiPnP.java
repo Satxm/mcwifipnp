@@ -29,6 +29,7 @@ import net.minecraft.client.gui.widget.button.Button;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.HTTPUtil;
+import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.GameType;
 import net.minecraft.world.dimension.DimensionType;
@@ -117,16 +118,20 @@ public class MCWiFiPnP {
 		Config cfg = configMap.get(server);
 		saveConfig(cfg);
 
+		server.setMOTD(cfg.motd);
+		server.getServerStatusResponse().setServerDescription(new StringTextComponent(cfg.motd));
 		client.getIntegratedServer().shareToLAN(GameType.getByName(cfg.GameMode), cfg.AllowCommands, cfg.port);
-		client.getIntegratedServer().setOnlineMode(cfg.OnlineMode);
+		server.setOnlineMode(cfg.OnlineMode);
+		server.setAllowPvp(cfg.EnablePvP);
 		client.ingameGUI.getChatGUI().printChatMessage(new TranslationTextComponent("commands.publish.started", cfg.port));
 		client.ingameGUI.getChatGUI().printChatMessage(new TranslationTextComponent("mcwifipnp.upnp.allowcommands." + cfg.AllowCommands));
 		client.ingameGUI.getChatGUI().printChatMessage(new TranslationTextComponent("mcwifipnp.upnp.onlinemode." + cfg.OnlineMode));
+		client.ingameGUI.getChatGUI().printChatMessage(new TranslationTextComponent("mcwifipnp.upnp.enablepvp." + cfg.EnablePvP));
 
 		new Thread(() -> {
 
 			if (cfg.UseUPnP) {
-				UPnPUtil.UPnPResult result = UPnPUtil.init(cfg.port, "Minecraft LAN World");
+				UPnPUtil.UPnPResult result = UPnPUtil.init(cfg.port, "Minecraft LAN Server");
 				switch (result) {
 					case SUCCESS:
 						client.ingameGUI.getChatGUI().printChatMessage(new TranslationTextComponent("mcwifipnp.upnp.success", cfg.port));
@@ -170,9 +175,11 @@ public class MCWiFiPnP {
 		public int version = 2;
 		public int port = HTTPUtil.getSuitableLanPort();
 		public String GameMode = "survival";
+		public String motd = "A Minecraft LAN Server";
 		public boolean UseUPnP = true;
 		public boolean AllowCommands = false;
 		public boolean OnlineMode = true;
+		public boolean EnablePvP = true;
 		public boolean CopyToClipboard = true;
 		public transient Path location;
 		public transient boolean needsDefaults = false;

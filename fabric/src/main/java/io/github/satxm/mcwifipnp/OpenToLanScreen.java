@@ -16,10 +16,13 @@ public class OpenToLanScreen extends Screen {
 	private ButtonWidget buttonAllowCommands;
 	private ButtonWidget buttonGameMode;
 	private ButtonWidget buttonOnlineMode;
+	private ButtonWidget buttonEnablePvP;
 	private ButtonWidget buttonUseUPnP;
 	private ButtonWidget buttonCopyToClipboard;
-	private TextFieldWidget portField;
+	private TextFieldWidget PortField;
+	private TextFieldWidget MotdField;
 	private String portinfo = "info";
+	private String pvpinfo = "info";
 
 
 	public OpenToLanScreen(Screen parent) {
@@ -43,7 +46,8 @@ public class OpenToLanScreen extends Screen {
 		this.buttonStartLanServer = (ButtonWidget)this.addButton(new ButtonWidget(this.width / 2 - 155, this.height - 28, 150, 20, I18n.translate("lanServer.start"), (buttonWidget) -> {
 			MinecraftClient client = MinecraftClient.getInstance();
 			IntegratedServer server = client.getServer();
-			cfg.port = Integer.parseInt(portField.getText());
+			cfg.port = Integer.parseInt(PortField.getText());
+			cfg.motd = MotdField.getText();
 			MCWiFiPnP.openToLan(server);
 			this.minecraft.updateWindowTitle();
 			this.minecraft.openScreen((Screen) null);
@@ -53,7 +57,7 @@ public class OpenToLanScreen extends Screen {
 			this.minecraft.openScreen(this.parent);
 		}));
 
-		this.buttonGameMode = (ButtonWidget)this.addButton(new ButtonWidget(this.width / 2 - 155, 100, 150, 20, I18n.translate("selectWorld.gameMode"), (buttonWidget) -> {
+		this.buttonGameMode = (ButtonWidget)this.addButton(new ButtonWidget(this.width / 2 - 155, 32, 150, 20, I18n.translate("selectWorld.gameMode"), (buttonWidget) -> {
 			if ("spectator".equals(cfg.GameMode)) {
 				cfg.GameMode = "creative";
 			} else if ("creative".equals(cfg.GameMode)) {
@@ -66,18 +70,18 @@ public class OpenToLanScreen extends Screen {
 			this.updateButtonText();
 		}));
 
-		this.buttonAllowCommands = (ButtonWidget)this.addButton(new ButtonWidget(this.width / 2 + 5, 100, 150, 20, I18n.translate("selectWorld.AllowCommands"), (buttonWidget) -> {
+		this.buttonAllowCommands = (ButtonWidget)this.addButton(new ButtonWidget(this.width / 2 + 5, 32, 150, 20, I18n.translate("selectWorld.AllowCommands"), (buttonWidget) -> {
 			cfg.AllowCommands = !cfg.AllowCommands;
 			this.updateButtonText();
 		}));
 
-		this.portField=new TextFieldWidget(this.font, this.width / 2 - 155 , 134 , 150 , 20,I18n.translate("mcwifipnp.gui.port"));
-		this.portField.setText(Integer.toString(cfg.port));
-		this.portField.setMaxLength(5);
-		this.portField.setChangedListener((sPort) -> {
-			this.buttonStartLanServer.active = !this.portField.getText().isEmpty();
+		this.PortField = new TextFieldWidget(this.font, this.width / 2 - 155 , 66 , 150 , 20, I18n.translate("mcwifipnp.gui.port"));
+		this.PortField.setText(Integer.toString(cfg.port));
+		this.PortField.setMaxLength(5);
+		this.PortField.setChangedListener((sPort) -> {
+			this.buttonStartLanServer.active = !sPort.isEmpty();
 			try {
-				int port =Integer.parseInt(portField.getText());
+				int port =Integer.parseInt(sPort);
 				if (port < 1024) {
 					this.portinfo = "small";
 					this.buttonStartLanServer.active = false;
@@ -92,18 +96,36 @@ public class OpenToLanScreen extends Screen {
 				this.portinfo = "null";
 			}
 		});
+		this.children.add(this.PortField);
 
-		this.buttonOnlineMode = (ButtonWidget)this.addButton(new ButtonWidget(this.width / 2 + 5, 134, 150, 20, I18n.translate("mcwifipnp.gui.OnlineMode"), (buttonWidget) -> {
+		this.MotdField = new TextFieldWidget(this.font, this.width / 2 + 5 , 66 , 150 , 20, I18n.translate("mcwifipnp.gui.motd"));
+		this.MotdField.setText(cfg.motd);
+		this.MotdField.setChangedListener((sMotd) -> {
+			this.buttonStartLanServer.active = !sMotd.isEmpty();
+		});
+		this.children.add(this.MotdField);
+
+		this.buttonOnlineMode = (ButtonWidget)this.addButton(new ButtonWidget(this.width / 2 - 155, 130, 150, 20, I18n.translate("mcwifipnp.gui.OnlineMode"), (buttonWidget) -> {
 			cfg.OnlineMode = !cfg.OnlineMode;
 			this.updateButtonText();
 		}));
 
-		this.buttonUseUPnP = (ButtonWidget)this.addButton(new ButtonWidget(this.width / 2 - 155, 168, 150, 20, I18n.translate("mcwifipnp.gui.forwardport"), (buttonWidget) -> {
+		this.buttonEnablePvP = (ButtonWidget)this.addButton(new ButtonWidget(this.width / 2 + 5, 130, 150, 20, I18n.translate("mcwifipnp.gui.EnablePvP"), (buttonWidget) -> {
+			cfg.EnablePvP = !cfg.EnablePvP;
+			if (cfg.EnablePvP) {
+				this.pvpinfo = "ture";
+			} else {
+				this.pvpinfo = "false";
+			}
+			this.updateButtonText();
+		}));
+
+		this.buttonUseUPnP = (ButtonWidget)this.addButton(new ButtonWidget(this.width / 2 - 155, 164, 150, 20, I18n.translate("mcwifipnp.gui.UseUPnP"), (buttonWidget) -> {
 			cfg.UseUPnP = !cfg.UseUPnP;
 			this.updateButtonText();
 		}));
 
-		this.buttonCopyToClipboard = (ButtonWidget)this.addButton(new ButtonWidget(this.width / 2 + 5, 168, 150, 20, I18n.translate("mcwifipnp.gui.CopyIP"), (buttonWidget) -> {
+		this.buttonCopyToClipboard = (ButtonWidget)this.addButton(new ButtonWidget(this.width / 2 + 5, 164, 150, 20, I18n.translate("mcwifipnp.gui.CopyIP"), (buttonWidget) -> {
 			cfg.CopyToClipboard = !cfg.CopyToClipboard;
 			this.updateButtonText();
 		}));
@@ -111,25 +133,29 @@ public class OpenToLanScreen extends Screen {
 		this.updateButtonText();
 	}
 
-	private void updateButtonText() {
+    private void updateButtonText() {
 		this.buttonGameMode.setMessage(I18n.translate("selectWorld.gameMode") + ": " + I18n.translate("selectWorld.gameMode." + cfg.GameMode));
 		this.buttonAllowCommands.setMessage(I18n.translate("selectWorld.allowCommands") + ' ' + I18n.translate(cfg.AllowCommands ? "options.on" : "options.off"));
 		this.buttonOnlineMode.setMessage(I18n.translate("mcwifipnp.gui.OnlineMode") + ": " + I18n.translate(cfg.OnlineMode ? "options.on" : "options.off"));
-		this.buttonUseUPnP.setMessage(I18n.translate("mcwifipnp.gui.forwardport") + ": " + I18n.translate(cfg.UseUPnP ? "options.on" : "options.off"));
+		this.buttonEnablePvP.setMessage(I18n.translate("mcwifipnp.gui.EnablePvP") + ": " + I18n.translate(cfg.EnablePvP ? "options.on" : "options.off"));
+		this.buttonUseUPnP.setMessage(I18n.translate("mcwifipnp.gui.UseUPnP") + ": " + I18n.translate(cfg.UseUPnP ? "options.on" : "options.off"));
 		this.buttonCopyToClipboard.setMessage(I18n.translate("mcwifipnp.gui.CopyIP") + ": " + I18n.translate(cfg.CopyToClipboard ? "options.on" : "options.off"));
 	}
 
 	public void render(int mouseX, int mouseY, float delta) {
 		this.renderBackground();
-		this.drawCenteredString(this.font, this.title.asFormattedString(), this.width / 2, 50, 16777215);
-		this.drawCenteredString(this.font, I18n.translate("lanServer.otherPlayers"), this.width / 2, 82, 16777215);
-		this.drawString(this.font, I18n.translate("mcwifipnp.gui.port"), this.width / 2 - 150, 122, 16777215);
-		this.drawString(this.font, I18n.translate("selectWorld.allowCommands.info"), this.width / 2 + 10, 122, -6250336);
-		this.drawString(this.font, I18n.translate("mcwifipnp.gui.port." + this.portinfo), this.width / 2 - 150, 156, -6250336);
-		this.drawString(this.font, I18n.translate("mcwifipnp.gui.OnlineMode.info"), this.width / 2 + 10, 156, -6250336);
-		this.drawString(this.font, I18n.translate("mcwifipnp.gui.UseUPnP"), this.width / 2 - 150, 190, -6250336);
-		this.drawString(this.font, I18n.translate("mcwifipnp.gui.CopyToClipboard"), this.width / 2 + 10, 190, -6250336);
-		portField.render(mouseX, mouseY, delta);
+		this.drawCenteredString(this.font, this.title.asFormattedString(), this.width / 2, 15, 16777215);
+		this.drawString(this.font, I18n.translate("mcwifipnp.gui.port"), this.width / 2 - 150, 54, 16777215);
+		this.drawString(this.font, I18n.translate("mcwifipnp.gui.motd"), this.width / 2 + 10, 54, 16777215);
+		this.drawString(this.font, I18n.translate("mcwifipnp.gui.port." + this.portinfo), this.width / 2 - 150, 88, -6250336);
+		this.drawString(this.font, I18n.translate("mcwifipnp.gui.motd.info"), this.width / 2 + 10, 88, -6250336);
+		this.drawCenteredString(this.font, I18n.translate("lanServer.otherPlayers"), this.width / 2, 112, 16777215);
+		this.drawString(this.font, I18n.translate("mcwifipnp.gui.OnlineMode.info"), this.width / 2 - 150, 152, -6250336);
+		this.drawString(this.font, I18n.translate("mcwifipnp.gui.EnablePvP." + this.pvpinfo), this.width / 2 + 10, 152, -6250336);
+		this.drawString(this.font, I18n.translate("mcwifipnp.gui.UseUPnP.info"), this.width / 2 - 150, 186, -6250336);
+		this.drawString(this.font, I18n.translate("mcwifipnp.gui.CopyToClipboard"), this.width / 2 + 10, 186, -6250336);
+		PortField.render(mouseX, mouseY, delta);
+		MotdField.render(mouseX, mouseY, delta);
 		super.render(mouseX, mouseY, delta);
 	}
 
