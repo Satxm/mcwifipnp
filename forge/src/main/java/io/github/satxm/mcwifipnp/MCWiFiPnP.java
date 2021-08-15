@@ -128,7 +128,7 @@ public class MCWiFiPnP {
 		new Thread(() -> {
 
 			if (cfg.UseUPnP) {
-				UPnPUtil.UPnPResult result = UPnPUtil.init(cfg.port, "Minecraft LAN World");
+				UPnPUtil.UPnPResult result = UPnPUtil.init(cfg.port, "Minecraft LAN Server");
 				switch (result) {
 					case SUCCESS:
 						client.gui.getChat().addMessage(new TranslatableComponent("mcwifipnp.upnp.success", cfg.port));
@@ -172,7 +172,7 @@ public class MCWiFiPnP {
 		public int version = 2;
 		public int port = HttpUtil.getAvailablePort();
 		public String GameMode = "survival";
-		public String motd = "A New Minecraft LAN Server!";
+		public String motd = "A Minecraft LAN Server";
 		public boolean UseUPnP = true;
 		public boolean AllowCommands = false;
 		public boolean OnlineMode = true;

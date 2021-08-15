@@ -123,7 +123,7 @@ public class ShareToLanScreen extends Screen {
 		drawString(poseStack, this.font, new TranslatableComponent("mcwifipnp.gui.port." + this.portinfo), this.width / 2 - 150, 88, -6250336);
 		drawString(poseStack, this.font, new TranslatableComponent("mcwifipnp.gui.motd.info"), this.width / 2 + 10, 88, -6250336);
 		drawCenteredString(poseStack, this.font, new TranslatableComponent("lanServer.otherPlayers"), this.width / 2, 112, 16777215);
-		drawString(poseStack, this.font, new TranslatableComponent("mcwifipnp.gui.OnlineMode.info"), this.width / 2 + -150, 152, -6250336);
+		drawString(poseStack, this.font, new TranslatableComponent("mcwifipnp.gui.OnlineMode.info"), this.width / 2 -150, 152, -6250336);
 		drawString(poseStack, this.font, new TranslatableComponent("mcwifipnp.gui.EnablePvP." + this.pvpinfo), this.width / 2 + 10, 152, -6250336);
 		drawString(poseStack, this.font, new TranslatableComponent("mcwifipnp.gui.UseUPnP.info"), this.width / 2 - 150, 186, -6250336);
 		drawString(poseStack, this.font, new TranslatableComponent("mcwifipnp.gui.CopyToClipboard"), this.width / 2 + 10, 186, -6250336);
