@@ -25,6 +25,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.PauseScreen;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.network.chat.TextComponent;
 import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.HttpUtil;
@@ -114,11 +115,15 @@ public class MCWiFiPnP {
 		Config cfg = configMap.get(server);
 		saveConfig(cfg);
 
+		client.getSingleplayerServer().setMotd(cfg.motd);
+		client.getSingleplayerServer().getStatus().setDescription(new TextComponent(cfg.motd));
 		client.getSingleplayerServer().publishServer(GameType.byName(cfg.GameMode), cfg.AllowCommands, cfg.port);
 		client.getSingleplayerServer().setUsesAuthentication(cfg.OnlineMode);
+		client.getSingleplayerServer().setPvpAllowed(cfg.EnablePvP);
 		client.gui.getChat().addMessage(new TranslatableComponent("commands.publish.started", cfg.port));
 		client.gui.getChat().addMessage(new TranslatableComponent("mcwifipnp.upnp.allowcommands." + cfg.AllowCommands));
 		client.gui.getChat().addMessage(new TranslatableComponent("mcwifipnp.upnp.onlinemode." + cfg.OnlineMode));
+		client.gui.getChat().addMessage(new TranslatableComponent("mcwifipnp.upnp.enablepvp." + cfg.EnablePvP));
 
 		new Thread(() -> {
 
@@ -167,9 +172,11 @@ public class MCWiFiPnP {
 		public int version = 2;
 		public int port = HttpUtil.getAvailablePort();
 		public String GameMode = "survival";
+		public String motd = "A New Minecraft LAN Server!";
 		public boolean UseUPnP = true;
 		public boolean AllowCommands = false;
 		public boolean OnlineMode = true;
+		public boolean EnablePvP = true;
 		public boolean CopyToClipboard = true;
 		public transient Path location;
 		public transient boolean needsDefaults = false;
