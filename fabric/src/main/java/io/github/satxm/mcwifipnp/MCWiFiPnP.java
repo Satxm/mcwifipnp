@@ -1,25 +1,6 @@
 package io.github.satxm.mcwifipnp;
 
 import com.dosse.upnp.UPnP;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.JsonParseException;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
-import net.fabricmc.api.ModInitializer;
-import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.util.NetworkUtils;
-import net.minecraft.server.MinecraftServer;
-import net.minecraft.text.LiteralText;
-import net.minecraft.text.TranslatableText;
-import net.minecraft.world.GameMode;
-
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-import org.jetbrains.annotations.NotNull;
-
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -29,12 +10,32 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.WeakHashMap;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParseException;
+import com.google.gson.JsonParser;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.jetbrains.annotations.NotNull;
+
+import net.fabricmc.api.ModInitializer;
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
+import net.minecraft.client.Minecraft;
+import net.minecraft.network.chat.TextComponent;
+import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.server.MinecraftServer;
+import net.minecraft.util.HttpUtil;
+import net.minecraft.world.level.GameType;
+import net.minecraft.world.level.storage.LevelResource;
+
 public class MCWiFiPnP implements ModInitializer {
 	public static final String MODID = "mcwifipnp";
 	private static final Map<MinecraftServer, Config> configMap = Collections.synchronizedMap(new WeakHashMap<>());
 	private static final Gson gson = new GsonBuilder().create();
 	private static final Logger LOGGER = LogManager.getLogger(MCWiFiPnP.class);
-
+	
 	@Override
 	public void onInitialize() {
 		ServerLifecycleEvents.SERVER_STARTING.register(this::onServerLoad);
@@ -46,68 +47,9 @@ public class MCWiFiPnP implements ModInitializer {
 		return Objects.requireNonNull(configMap.get(server), "no config for server???");
 	}
 
-	public static void openToLan(MinecraftServer server) {
-		MinecraftClient client = MinecraftClient.getInstance();
-
-		Config cfg = configMap.get(server);
-		saveConfig(cfg);
-
-		server.setMotd(cfg.motd);
-		server.getServerMetadata().setDescription(new LiteralText(cfg.motd));
-		server.openToLan(GameMode.byName(cfg.GameMode), cfg.AllowCommands, cfg.port);
-		server.setOnlineMode(cfg.OnlineMode);
-		server.setPvpEnabled(cfg.EnablePvP);
-		client.inGameHud.getChatHud().addMessage(new TranslatableText("commands.publish.started", cfg.port));
-		client.inGameHud.getChatHud().addMessage(new TranslatableText("mcwifipnp.upnp.allowcommands." + cfg.AllowCommands));
-		client.inGameHud.getChatHud().addMessage(new TranslatableText("mcwifipnp.upnp.onlinemode." + cfg.OnlineMode));
-		client.inGameHud.getChatHud().addMessage(new TranslatableText("mcwifipnp.upnp.enablepvp." + cfg.EnablePvP));
-
-		new Thread(() -> {
-
-			if (cfg.UseUPnP) {
-				UPnPUtil.UPnPResult result = UPnPUtil.init(cfg.port, "Minecraft LAN Server");
-				switch (result) {
-					case SUCCESS:
-						client.inGameHud.getChatHud()
-								.addMessage(new TranslatableText("mcwifipnp.upnp.success", cfg.port));
-						LOGGER.info("Started forwarded port " + cfg.port + ".");
-						break;
-					case FAILED_GENERIC:
-						client.inGameHud.getChatHud()
-								.addMessage(new TranslatableText("mcwifipnp.upnp.failed", cfg.port));
-						break;
-					case FAILED_MAPPED:
-						client.inGameHud.getChatHud()
-								.addMessage(new TranslatableText("mcwifipnp.upnp.failed.mapped", cfg.port));
-						break;
-					case FAILED_DISABLED:
-						client.inGameHud.getChatHud()
-								.addMessage(new TranslatableText("mcwifipnp.upnp.failed.disabled", cfg.port));
-						break;
-				}
-			}
-
-			if (cfg.CopyToClipboard) {
-				String ip = UPnP.getExternalIP();
-				if (ip == null) {
-					client.inGameHud.getChatHud().addMessage(new TranslatableText("mcwifipnp.upnp.success.cantgetip"));
-				} else {
-					if (ip.equals("0.0.0.0")) {
-						client.inGameHud.getChatHud()
-								.addMessage(new TranslatableText("mcwifipnp.upnp.success.cantgetip"));
-					} else {
-						client.keyboard.setClipboard(ip + ":" + cfg.port);
-						client.inGameHud.getChatHud().addMessage(
-								new TranslatableText("mcwifipnp.upnp.success.clipboard", ip + ":" + cfg.port));
-					}
-				}
-			}
-		}, "MCWiFiPnP").start();
-	}
-
 	private void onServerLoad(MinecraftServer server) {
-		File cfgfile = server.getLevelStorage().resolveFile(server.getLevelName(), "mcwifipnp.json");
-		Path location = cfgfile.toPath();
+		Path location = server.getWorldPath(LevelResource.ROOT).resolve("mcwifipnp.json");
+
 		Config cfg;
 
 		try {
@@ -130,10 +72,59 @@ public class MCWiFiPnP implements ModInitializer {
 
 	private void onServerStop(MinecraftServer server) {
 		Config cfg = configMap.get(server);
-		if (server.isRemote() && cfg.UseUPnP) {
+		if (server.isPublished() && cfg.UseUPnP) {
 			UPnP.closePortTCP(cfg.port);
 			LOGGER.info("Stopped forwarded port " + cfg.port +".");
 		}
+	}
+
+	public static void openToLan(MinecraftServer server) {
+		Minecraft client = Minecraft.getInstance();
+		
+		Config cfg = configMap.get(server);
+		saveConfig(cfg);
+
+		client.getSingleplayerServer().setMotd(cfg.motd);
+		client.getSingleplayerServer().getStatus().setDescription(new TextComponent(cfg.motd));
+		client.getSingleplayerServer().publishServer(GameType.byName(cfg.GameMode), cfg.AllowCommands, cfg.port);
+		client.getSingleplayerServer().setUsesAuthentication(cfg.OnlineMode);
+		client.getSingleplayerServer().setPvpAllowed(cfg.EnablePvP);
+		client.gui.getChat().addMessage(new TranslatableComponent("commands.publish.started", cfg.port));
+		client.gui.getChat().addMessage(new TranslatableComponent("mcwifipnp.upnp.allowcommands." + cfg.AllowCommands));
+		client.gui.getChat().addMessage(new TranslatableComponent("mcwifipnp.upnp.onlinemode." + cfg.OnlineMode));
+		client.gui.getChat().addMessage(new TranslatableComponent("mcwifipnp.upnp.enablepvp." + cfg.EnablePvP));
+
+		new Thread(() -> {
+
+			if (cfg.UseUPnP) {
+				UPnPUtil.UPnPResult result = UPnPUtil.init(cfg.port, "Minecraft LAN Server");
+				switch (result) {
+					case SUCCESS:
+						client.gui.getChat().addMessage(new TranslatableComponent("mcwifipnp.upnp.success", cfg.port));
+						LOGGER.info("Started forwarded port " + cfg.port + ".");
+						break;
+					case FAILED_GENERIC:
+						client.gui.getChat().addMessage(new TranslatableComponent("mcwifipnp.upnp.failed", cfg.port));
+						break;
+					case FAILED_MAPPED:
+						client.gui.getChat().addMessage(new TranslatableComponent("mcwifipnp.upnp.failed.mapped", cfg.port));
+						break;
+					case FAILED_DISABLED:
+						client.gui.getChat().addMessage(new TranslatableComponent("mcwifipnp.upnp.failed.disabled", cfg.port));
+						break;
+				}
+			}
+
+			if (cfg.CopyToClipboard) {
+				String ip = UPnP.getExternalIP();
+				if (ip == null || ip.equals("0.0.0.0")) {
+					client.gui.getChat().addMessage(new TranslatableComponent("mcwifipnp.upnp.success.cantgetip"));
+				} else {
+					client.keyboardHandler.setClipboard(ip + ":" + cfg.port);
+					client.gui.getChat().addMessage(new TranslatableComponent("mcwifipnp.upnp.success.clipboard", ip + ":" + cfg.port));
+				}
+			}
+		},"MCWiFiPnP").start();
 	}
 
 	private static void saveConfig(Config cfg) {
@@ -148,7 +139,7 @@ public class MCWiFiPnP implements ModInitializer {
 
 	public static class Config {
 		public int version = 2;
-		public int port = NetworkUtils.findLocalPort();
+		public int port = HttpUtil.getAvailablePort();
 		public String GameMode = "survival";
 		public String motd = "A Minecraft LAN Server";
 		public boolean UseUPnP = true;

@@ -1,11 +1,11 @@
 buildscript {
     repositories {
-        maven { url = 'https://files.minecraftforge.net/maven' }
+        maven { url = 'https://maven.minecraftforge.net' }
         jcenter()
         mavenCentral()
     }
     dependencies {
-        classpath group: 'net.minecraftforge.gradle', name: 'ForgeGradle', version: '3.+', changing: true
+        classpath group: 'net.minecraftforge.gradle', name: 'ForgeGradle', version: '5.1.+', changing: true
     }
 }
 
@@ -16,12 +16,12 @@ archivesBaseName = project.archives_base_name
 version = project.mod_version + "-" + project.minecraft_version + "-forge"
 group = project.maven_group
 
-sourceCompatibility = targetCompatibility = compileJava.sourceCompatibility = compileJava.targetCompatibility = '1.8'
+java.toolchain.languageVersion = JavaLanguageVersion.of(8)
 
 println('Java: ' + System.getProperty('java.version') + ' JVM: ' + System.getProperty('java.vm.version') + '(' + System.getProperty('java.vendor') + ') Arch: ' + System.getProperty('os.arch'))
 
 minecraft {
-    mappings channel: 'snapshot', version: '20200514-1.15.1'
+    mappings channel: 'official', version: project.minecraft_version
 
     //accessTransformer = file('src/main/resources/META-INF/accesstransformer.cfg')
     
@@ -73,7 +73,7 @@ jar {
         ])
     }
 	from("../LICENSE") {
-    }
+}
 }
 
 def replaceResources = tasks.register("replaceResources", Copy) {
@@ -96,9 +96,6 @@ classes.configure {
 	dependsOn(replaceResources)
 }
 
-task sourcesJar(type: Jar) {
-    from sourceSets.main.allJava
-    classifier = 'sources'
+java {
+    withSourcesJar()
 }
-
-artifacts { archives sourcesJar }

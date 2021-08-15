@@ -1,6 +1,6 @@
 # Minecraft WLAN Plug-n-Play
 
-**Build for Minecraft 1.15.2**
+**Build for Minecraft 1.16.5**
 
 **For Fabric: Requires [Fabric API](https://www.curseforge.com/minecraft/mc-mods/fabric-api) and [Fabric Loader](https://fabricmc.net/use/), For Forge: Requires [Forge Loader](https://files.minecraftforge.net/)**
 
@@ -55,3 +55,5 @@ Your settings will be recorded in a file, and it will be automatically loaded ne
 You can choose whether to copy the IP address to the clipboard.
 
 你可以选择是否复制IP到剪切板。
+
+
