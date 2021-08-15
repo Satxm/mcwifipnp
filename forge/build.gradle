@@ -1,11 +1,11 @@
 buildscript {
     repositories {
-        maven { url = 'https://maven.minecraftforge.net' }
+        maven { url = 'https://files.minecraftforge.net/maven' }
         jcenter()
         mavenCentral()
     }
     dependencies {
-        classpath group: 'net.minecraftforge.gradle', name: 'ForgeGradle', version: '5.1.+', changing: true
+        classpath group: 'net.minecraftforge.gradle', name: 'ForgeGradle', version: '3.+', changing: true
     }
 }
 
@@ -16,12 +16,12 @@ archivesBaseName = project.archives_base_name
 version = project.mod_version + "-" + project.minecraft_version + "-forge"
 group = project.maven_group
 
-java.toolchain.languageVersion = JavaLanguageVersion.of(8)
+sourceCompatibility = targetCompatibility = compileJava.sourceCompatibility = compileJava.targetCompatibility = '1.8'
 
 println('Java: ' + System.getProperty('java.version') + ' JVM: ' + System.getProperty('java.vm.version') + '(' + System.getProperty('java.vendor') + ') Arch: ' + System.getProperty('os.arch'))
 
 minecraft {
-    mappings channel: 'official', version: project.minecraft_version
+    mappings channel: 'snapshot', version: '20200514-1.15.1'
 
     //accessTransformer = file('src/main/resources/META-INF/accesstransformer.cfg')
     
@@ -73,7 +73,7 @@ jar {
         ])
     }
 	from("../LICENSE") {
-}
+    }
 }
 
 def replaceResources = tasks.register("replaceResources", Copy) {
@@ -81,7 +81,7 @@ def replaceResources = tasks.register("replaceResources", Copy) {
 	//Copy it into the build dir
 	it.from(sourceSets.main.resources) {
 		include "META-INF/mods.toml"
-		expand 'version': project.version, 'mc_version': project.minecraft_version_range, 'forge_version': project.forge_version_range, "loader_version": project.loader_version_range
+		expand 'version': project.mod_version, 'mc_version': project.minecraft_version_range, 'forge_version': project.forge_version_range, "loader_version": project.loader_version_range
 	}
 	it.into "$buildDir/resources/main/"
 }
@@ -96,6 +96,9 @@ classes.configure {
 	dependsOn(replaceResources)
 }
 
-java {
-    withSourcesJar()
+task sourcesJar(type: Jar) {
+    from sourceSets.main.allJava
+    classifier = 'sources'
 }
+
+artifacts { archives sourcesJar }
