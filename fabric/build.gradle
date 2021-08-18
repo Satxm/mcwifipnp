@@ -1,9 +1,8 @@
 plugins {
-	id 'fabric-loom' version '0.9.+'
+	id 'fabric-loom' version '0.9-SNAPSHOT'
 }
 
-sourceCompatibility = JavaVersion.VERSION_16
-targetCompatibility = JavaVersion.VERSION_16
+sourceCompatibility = targetCompatibility = JavaVersion.VERSION_16
 
 archivesBaseName = project.archives_base_name
 version = project.mod_version + "-" + project.minecraft_version + "-fabric"
