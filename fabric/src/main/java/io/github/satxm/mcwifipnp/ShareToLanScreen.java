@@ -12,7 +12,7 @@ import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.server.MinecraftServer;
 
 public class ShareToLanScreen extends Screen {
-	private final MCWiFiPnP.Config cfg;
+	private final MCWiFiPnPUnit.Config cfg;
 	private final Screen lastScreen;
 	private EditBox EditPort;
 	private EditBox EditMotd;
@@ -32,7 +32,7 @@ public class ShareToLanScreen extends Screen {
 
 		Minecraft client = Minecraft.getInstance();
 		MinecraftServer server = Minecraft.getInstance().getSingleplayerServer();
-		this.cfg = MCWiFiPnP.getConfig(server);
+		this.cfg = MCWiFiPnPUnit.getConfig(server);
 
 		if (cfg.needsDefaults) {
 			cfg.AllowCommands = client.getSingleplayerServer().getWorldData().getAllowCommands();
@@ -47,7 +47,7 @@ public class ShareToLanScreen extends Screen {
 			cfg.port = Integer.parseInt(EditPort.getValue());
 			cfg.motd = EditMotd.getValue();
 			MinecraftServer server = Minecraft.getInstance().getSingleplayerServer();
-			MCWiFiPnP.openToLan(server);
+			MCWiFiPnPUnit.openToLan(server);
 			this.minecraft.updateTitle();
 			this.minecraft.setScreen((Screen) null);
 		}));
