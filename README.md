@@ -1,6 +1,10 @@
 # Minecraft WLAN Plug-n-Play
 
-**Build for Minecraft 1.17.1**
+
+[![CurseForge](http://cf.way2muchnoise.eu/full_mcwifipnp_downloads.svg)](https://minecraft.curseforge.com/projects/mcwifipnp) 
+[![CurseForge](http://cf.way2muchnoise.eu/versions/mcwifipnp.svg)](https://minecraft.curseforge.com/projects/mcwifipnp) 
+
+**This Branche for Minecraft 1.17.1**
 
 **For Fabric: Requires [Fabric API](https://www.curseforge.com/minecraft/mc-mods/fabric-api) and [Fabric Loader](https://fabricmc.net/use/), For Forge: Requires [Forge Loader](https://files.minecraftforge.net/)**
 
