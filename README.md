@@ -1,7 +1,7 @@
 # Minecraft WLAN Plug-n-Play
 
-[![CurseForge](http://cf.way2muchnoise.eu/full_mcwifipnp_downloads.svg)](https://minecraft.curseforge.com/projects/mcwifipnp) 
-[![CurseForge](http://cf.way2muchnoise.eu/versions/mcwifipnp.svg)](https://minecraft.curseforge.com/projects/mcwifipnp) 
+[![CurseForge](http://cf.way2muchnoise.eu/full_mcwifipnp_downloads.svg)](https://www.curseforge.com/minecraft/mc-mods/mcwifipnp) 
+[![CurseForge](http://cf.way2muchnoise.eu/versions/mcwifipnp.svg)](https://www.curseforge.com/minecraft/mc-mods/mcwifipnp) 
 
 **This Branche for Minecraft 1.16.5**
 
