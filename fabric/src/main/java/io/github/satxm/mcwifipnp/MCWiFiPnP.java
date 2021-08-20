@@ -1,17 +1,18 @@
 package io.github.satxm.mcwifipnp;
 
+import java.util.List;
+
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.client.screen.v1.ScreenEvents;
 import net.fabricmc.fabric.api.client.screen.v1.Screens;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.AbstractWidget;
+import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.PauseScreen;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.server.MinecraftServer;
-import java.util.List;
 
 public class MCWiFiPnP implements ModInitializer {
 	public static final String MODID = "mcwifipnp";
@@ -32,9 +33,10 @@ public class MCWiFiPnP implements ModInitializer {
 
 		if (screen instanceof PauseScreen) {
 			final List<AbstractWidget> buttons = Screens.getButtons(screen);
-
-			buttons.remove(6);
-			buttons.add(ShareToLanNew);
+			if (buttons.size() == 8) {
+				buttons.remove(6);
+				buttons.add(ShareToLanNew);
+			}
 		}
 	}
 

@@ -25,17 +25,17 @@ public class MCWiFiPnP {
 	public void ChangeButton(GuiScreenEvent.InitGuiEvent.Post event) {
 		Minecraft client = Minecraft.getInstance();
 		Screen gui = event.getGui();
-		if (gui instanceof IngameMenuScreen) {
-			Button ShareToLanNew = new Button(client.screen.width / 2 + 4, client.screen.height / 4 + 96 + -16, 98, 20, new TranslationTextComponent("menu.shareToLan"), (button) -> {
-				client.setScreen(new ShareToLanScreen(gui));
-			});
-			ShareToLanNew.active = client.hasSingleplayerServer() && !client.getSingleplayerServer().isPublished();
-			Button ShareToLanOld = (Button) event.getWidgetList().get(6);
-			Button SaveAndExit = (Button) event.getWidgetList().get(7);
+		Button ShareToLanNew = new Button(client.screen.width / 2 + 4, client.screen.height / 4 + 96 + -16, 98, 20, new TranslationTextComponent("menu.shareToLan"), (button) -> {
+			client.setScreen(new ShareToLanScreen(gui));
+		});
+		ShareToLanNew.active = client.hasSingleplayerServer() && !client.getSingleplayerServer().isPublished();
 
-			event.removeWidget(ShareToLanOld);
+		if (gui instanceof IngameMenuScreen) {
+			if(event.getWidgetList().size() == 8) {
+			event.removeWidget((Button) event.getWidgetList().get(6));
 			event.addWidget(ShareToLanNew);
-			event.addWidget(SaveAndExit);
+			event.addWidget((Button) event.getWidgetList().get(7));
+			}
         }
 	}
 
@@ -48,5 +48,4 @@ public class MCWiFiPnP {
 	public void onServerStopping(FMLServerStoppingEvent event){
 		MCWiFiPnPUnit.serverStopping(event.getServer());
 	}
-
 }
