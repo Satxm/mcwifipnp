@@ -39,6 +39,14 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.server.FMLServerStartingEvent;
 import net.minecraftforge.fml.event.server.FMLServerStoppingEvent;
+import net.minecraft.world.GameType;
+import net.minecraft.world.dimension.DimensionType;
+import net.minecraftforge.client.event.GuiScreenEvent;
+import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.event.server.FMLServerStartingEvent;
+import net.minecraftforge.fml.event.server.FMLServerStoppingEvent;
 
 @Mod(MCWiFiPnP.MODID)
 public class MCWiFiPnP {
@@ -61,18 +69,17 @@ public class MCWiFiPnP {
 	public void ChangeButton(GuiScreenEvent.InitGuiEvent.Post event) {
 		Minecraft client = Minecraft.getInstance();
 		Screen gui = event.getGui();
+		Button ShareToLanNew = new Button(client.currentScreen.width / 2 + 4, client.currentScreen.height / 4 + 96 + -16, 98, 20, I18n.format("menu.shareToLan"), (button) -> {
+			client.displayGuiScreen(new ShareToLanScreen(gui));
+		});
+		ShareToLanNew.active = client.isSingleplayer() && !client.getIntegratedServer().getPublic();
+
 		if (gui instanceof IngameMenuScreen) {
-			Button ShareToLanNew = new Button(client.currentScreen.width / 2 + 4, client.currentScreen.height / 4 + 96 + -16, 98, 20, I18n.format("menu.shareToLan"), (button) -> {
-				client.displayGuiScreen(new ShareToLanScreen(gui));
-			});
-			ShareToLanNew.active = client.isSingleplayer() && !client.getIntegratedServer().getPublic();
-			Button ShareToLanOld = (Button) event.getWidgetList().get(6);
-			Button SaveAndExit = (Button) event.getWidgetList().get(7);
-
-			event.removeWidget(ShareToLanOld);
-			event.addWidget(ShareToLanNew);
-			event.addWidget(SaveAndExit);
-
+			if (event.getWidgetList().size() == 8){
+				event.removeWidget((Button) event.getWidgetList().get(6));
+				event.addWidget(ShareToLanNew);
+				event.addWidget((Button) event.getWidgetList().get(7));
+			}
         }
 	}
 
