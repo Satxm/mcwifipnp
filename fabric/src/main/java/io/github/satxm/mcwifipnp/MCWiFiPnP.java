@@ -25,16 +25,17 @@ public class MCWiFiPnP implements ModInitializer {
 	}
 
 	public static void afterScreenInit(Minecraft client, Screen screen, int i, int j) {
-
-		AbstractWidget ShareToLanNew = new Button(client.screen.width / 2 + 4, client.screen.height / 4 + 96 + -16, 98, 20, new TranslatableComponent("menu.shareToLan"), (button) -> {
-			client.setScreen(new ShareToLanScreen(screen));
-		});
-		ShareToLanNew.active = client.hasSingleplayerServer() && !client.getSingleplayerServer().isPublished();
-
 		if (screen instanceof PauseScreen) {
 			final List<AbstractWidget> buttons = Screens.getButtons(screen);
 			if (buttons.size() == 8) {
-				buttons.remove(6);
+				AbstractWidget ShareToLanOld = buttons.get(6);
+				int x = ShareToLanOld.x;
+				int y = ShareToLanOld.y;
+				int w = ShareToLanOld.getWidth();
+				int h = ShareToLanOld.getHeight();
+				AbstractWidget ShareToLanNew = new Button(x, y, w, h, new TranslatableComponent("menu.shareToLan"), (button) -> client.setScreen(new ShareToLanScreen(screen)));
+				ShareToLanNew.active = ShareToLanOld.active;
+				buttons.remove(ShareToLanOld);
 				buttons.add(ShareToLanNew);
 			}
 		}
@@ -47,5 +48,4 @@ public class MCWiFiPnP implements ModInitializer {
 	private void onServerStop(MinecraftServer server) {
 		MCWiFiPnPUnit.serverStopping(server);
 	}
-
 }

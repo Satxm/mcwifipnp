@@ -49,7 +49,3 @@ tasks.withType(JavaCompile).configureEach {
 		it.options.release = targetVersion
 	}
 }
-
-java {
-    withSourcesJar()
-}
