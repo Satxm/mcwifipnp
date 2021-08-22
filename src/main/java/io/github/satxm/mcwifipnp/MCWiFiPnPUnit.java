@@ -38,7 +38,6 @@ public class MCWiFiPnPUnit {
 
     public static void openToLan(MinecraftServer server) {
 		Minecraft client = Minecraft.getInstance();
-		
 		Config cfg = configMap.get(server);
 		saveConfig(cfg);
 
@@ -53,7 +52,6 @@ public class MCWiFiPnPUnit {
 		client.gui.getChat().addMessage(new TranslatableComponent("mcwifipnp.upnp.enablepvp." + cfg.EnablePvP));
 
 		new Thread(() -> {
-
 			if (cfg.UseUPnP) {
 				UPnPUtil.UPnPResult result = UPnPUtil.init(cfg.port, "Minecraft LAN Server");
 				switch (result) {
@@ -72,7 +70,6 @@ public class MCWiFiPnPUnit {
 						break;
 				}
 			}
-
 			if (cfg.CopyToClipboard) {
 				String ip = UPnP.getExternalIP();
 				if (ip == null || ip.equals("0.0.0.0")) {
@@ -86,11 +83,8 @@ public class MCWiFiPnPUnit {
 	}
 
 	public static void serverSatrting(MinecraftServer server){
-		
 		Path location = server.getWorldPath(LevelResource.ROOT).resolve("mcwifipnp.json");
-
 		MCWiFiPnPUnit.Config cfg;
-
 		try {
 			cfg = gson.fromJson(new String(Files.readAllBytes(location)), MCWiFiPnPUnit.Config.class);
 			cfg.location = location;
@@ -100,12 +94,10 @@ public class MCWiFiPnPUnit {
 			} catch (IOException ioException) {
 				//
 			}
-
 			cfg = new MCWiFiPnPUnit.Config();
 			cfg.location = location;
 			cfg.needsDefaults = true;
 		}
-
 		configMap.put(server, cfg);
 	}
 

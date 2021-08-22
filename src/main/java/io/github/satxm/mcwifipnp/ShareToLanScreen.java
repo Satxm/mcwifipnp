@@ -128,6 +128,7 @@ public class ShareToLanScreen extends Screen {
 		drawString(poseStack, this.font, new TranslatableComponent("mcwifipnp.gui.UseUPnP.info"), this.width / 2 - 150, 186, -6250336);
 		drawString(poseStack, this.font, new TranslatableComponent("mcwifipnp.gui.CopyToClipboard"), this.width / 2 + 10, 186, -6250336);
 		EditPort.render(poseStack, i, j, f);
+		EditMotd.render(poseStack, i, j, f);
 		super.render(poseStack, i, j, f);
 	}
 }
