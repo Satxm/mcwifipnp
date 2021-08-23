@@ -25,7 +25,7 @@ public class MCWiFiPnP {
 	public void ChangeButton(GuiScreenEvent.InitGuiEvent.Post event) {
 		Minecraft client = Minecraft.getInstance();
 		Screen screen = event.getGui();
-		if (screen instanceof PauseScreen && event.getWidgetList().size() == 8) {
+		if (screen instanceof PauseScreen && event.getWidgetList().size() != 0) {
 			for (int k = 0;  k < event.getWidgetList().size() ; k++ ){
 				Button ShareToLanOld = (Button) event.getWidgetList().get(k);
 				if (ShareToLanOld.getMessage().getString().equals(new TranslatableComponent("menu.shareToLan").getString())) {

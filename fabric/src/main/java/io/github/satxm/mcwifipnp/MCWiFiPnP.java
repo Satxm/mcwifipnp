@@ -29,7 +29,7 @@ public class MCWiFiPnP implements ModInitializer {
 			final List<AbstractWidget> buttons = Screens.getButtons(screen);
 			for (int k = 0;  k < buttons.size() ; k++ ){
 				AbstractWidget ShareToLanOld = buttons.get(k);
-				if (buttons.size() == 8 && ShareToLanOld.getMessage().getString().equals(new TranslatableComponent("menu.shareToLan").getString())) {
+				if (buttons.size() != 0 && ShareToLanOld.getMessage().getString().equals(new TranslatableComponent("menu.shareToLan").getString())) {
 					int x = ShareToLanOld.x;
 					int y = ShareToLanOld.y;
 					int w = ShareToLanOld.getWidth();
