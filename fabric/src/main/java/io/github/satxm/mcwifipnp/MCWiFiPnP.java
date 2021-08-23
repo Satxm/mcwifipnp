@@ -27,16 +27,18 @@ public class MCWiFiPnP implements ModInitializer {
 	public static void afterScreenInit(Minecraft client, Screen screen, int i, int j) {
 		if (screen instanceof PauseScreen) {
 			final List<AbstractWidget> buttons = Screens.getButtons(screen);
-			if (buttons.size() == 8) {
-				AbstractWidget ShareToLanOld = buttons.get(6);
-				int x = ShareToLanOld.x;
-				int y = ShareToLanOld.y;
-				int w = ShareToLanOld.getWidth();
-				int h = ShareToLanOld.getHeight();
-				AbstractWidget ShareToLanNew = new Button(x, y, w, h, new TranslatableComponent("menu.shareToLan"), (button) -> client.setScreen(new ShareToLanScreen(screen)));
-				ShareToLanNew.active = ShareToLanOld.active;
-				buttons.remove(ShareToLanOld);
-				buttons.add(ShareToLanNew);
+			for (int k = 0;  k < buttons.size() ; k++ ){
+				AbstractWidget ShareToLanOld = buttons.get(k);
+				if (buttons.size() == 8 && ShareToLanOld.getMessage().getString().equals(new TranslatableComponent("menu.shareToLan").getString())) {
+					int x = ShareToLanOld.x;
+					int y = ShareToLanOld.y;
+					int w = ShareToLanOld.getWidth();
+					int h = ShareToLanOld.getHeight();
+					AbstractWidget ShareToLanNew = new Button(x, y, w, h, new TranslatableComponent("menu.shareToLan"), (button) -> client.setScreen(new ShareToLanScreen(screen)));
+					ShareToLanNew.active = ShareToLanOld.active;
+					buttons.remove(ShareToLanOld);
+					buttons.add(ShareToLanNew);
+				}
 			}
 		}
 	}

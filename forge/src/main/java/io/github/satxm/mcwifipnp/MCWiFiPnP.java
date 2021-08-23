@@ -26,16 +26,18 @@ public class MCWiFiPnP {
 		Minecraft client = Minecraft.getInstance();
 		Screen screen = event.getGui();
 		if (screen instanceof IngameMenuScreen && event.getWidgetList().size() == 8) {
-			Button ShareToLanOld = (Button) event.getWidgetList().get(6);
-			if (ShareToLanOld.getMessage().getString().equals(new TranslationTextComponent("menu.shareToLan").getString())) {
-				int x = ShareToLanOld.x;
-				int y = ShareToLanOld.y;
-				int w = ShareToLanOld.getWidth();
-				int h = ShareToLanOld.getHeight();
-				Button ShareToLanNew = new Button(x, y, w, h, new TranslationTextComponent("menu.shareToLan"), (button) -> client.setScreen(new ShareToLanScreen(screen)));
-				ShareToLanNew.active = ShareToLanOld.active;
-				event.removeWidget(ShareToLanOld);
-				event.addWidget(ShareToLanNew);
+			for (int k = 0;  k < event.getWidgetList().size() ; k++ ){
+				Button ShareToLanOld = (Button) event.getWidgetList().get(k);
+				if (ShareToLanOld.getMessage().getString().equals(new TranslationTextComponent("menu.shareToLan").getString())) {
+					int x = ShareToLanOld.x;
+					int y = ShareToLanOld.y;
+					int w = ShareToLanOld.getWidth();
+					int h = ShareToLanOld.getHeight();
+					Button ShareToLanNew = new Button(x, y, w, h, new TranslationTextComponent("menu.shareToLan"), (button) -> client.setScreen(new ShareToLanScreen(screen)));
+					ShareToLanNew.active = ShareToLanOld.active;
+					event.removeWidget(ShareToLanOld);
+					event.addWidget(ShareToLanNew);
+				}
 			}
 		}
 	}
