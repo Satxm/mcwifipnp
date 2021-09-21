@@ -1,6 +1,6 @@
 {
     "pack": {
-        "description": "Minecraft WLAN Plug-n-Play",
+        "description": "LAN World Plug-n-Play",
         "pack_format": 7,
         "_comment": "A Minecraft LAN World Tool With WLAN UPnP."
     }

@@ -33,11 +33,15 @@ jar {
 	}
 }
 
+java {
+    withSourcesJar()
+}
+
 processResources {
 	inputs.property "version", project.version
 
 	filesMatching("fabric.mod.json") {
-		expand "version": project.mod_version,'mc_version': project.minecraft_version_range, 'fabric_version': project.fabric_version_range, "loader_version": project.loader_version_range
+		expand "version": project.mod_version,'mc_version': project.fabric_minecraft_version_range, 'fabric_version': project.fabric_version_range, "loader_version": project.fabric_loader_version_range
 	}
 }
 
