@@ -58,9 +58,6 @@ public class MCWiFiPnP implements ModInitializer {
 		server.setOnlineMode(cfg.OnlineMode);
 		server.setPvpEnabled(cfg.EnablePvP);
 		client.inGameHud.getChatHud().addMessage(new TranslatableText("commands.publish.started", cfg.port));
-		client.inGameHud.getChatHud().addMessage(new TranslatableText("mcwifipnp.upnp.allowcommands." + cfg.AllowCommands));
-		client.inGameHud.getChatHud().addMessage(new TranslatableText("mcwifipnp.upnp.onlinemode." + cfg.OnlineMode));
-		client.inGameHud.getChatHud().addMessage(new TranslatableText("mcwifipnp.upnp.enablepvp." + cfg.EnablePvP));
 
 		new Thread(() -> {
 
@@ -88,18 +85,19 @@ public class MCWiFiPnP implements ModInitializer {
 			}
 
 			if (cfg.CopyToClipboard) {
-				String ip = UPnP.getExternalIP();
+				String ip = null;
+				if (GetIP.GetLocalIPv6() != null && GetIP.GetGlobalIPv6() != null) {
+					ip = "[" + GetIP.GetGlobalIPv6() + "]";
+				} else if (UPnP.getExternalIP() != null && GetIP.GetGlobalIPv4() != null
+						&& UPnP.getExternalIP().equals(GetIP.GetGlobalIPv4())) {
+					ip = GetIP.GetGlobalIPv4();
+				}
 				if (ip == null) {
 					client.inGameHud.getChatHud().addMessage(new TranslatableText("mcwifipnp.upnp.success.cantgetip"));
 				} else {
-					if (ip.equals("0.0.0.0")) {
-						client.inGameHud.getChatHud()
-								.addMessage(new TranslatableText("mcwifipnp.upnp.success.cantgetip"));
-					} else {
-						client.keyboard.setClipboard(ip + ":" + cfg.port);
-						client.inGameHud.getChatHud().addMessage(
-								new TranslatableText("mcwifipnp.upnp.success.clipboard", ip + ":" + cfg.port));
-					}
+					client.keyboard.setClipboard(ip + ":" + cfg.port);
+					client.inGameHud.getChatHud()
+							.addMessage(new TranslatableText("mcwifipnp.upnp.success.clipboard", ip + ":" + cfg.port));
 				}
 			}
 		}, "MCWiFiPnP").start();
@@ -132,14 +130,15 @@ public class MCWiFiPnP implements ModInitializer {
 		Config cfg = configMap.get(server);
 		if (server.isRemote() && cfg.UseUPnP) {
 			UPnP.closePortTCP(cfg.port);
-			LOGGER.info("Stopped forwarded port " + cfg.port +".");
+			LOGGER.info("Stopped forwarded port " + cfg.port + ".");
 		}
 	}
 
 	private static void saveConfig(Config cfg) {
 		if (!cfg.needsDefaults) {
 			try {
-				Files.write(cfg.location, toPrettyFormat(cfg).getBytes(), StandardOpenOption.TRUNCATE_EXISTING, StandardOpenOption.CREATE);
+				Files.write(cfg.location, toPrettyFormat(cfg).getBytes(), StandardOpenOption.TRUNCATE_EXISTING,
+						StandardOpenOption.CREATE);
 			} catch (IOException e) {
 				LOGGER.warn("Unable to write config file!", e);
 			}

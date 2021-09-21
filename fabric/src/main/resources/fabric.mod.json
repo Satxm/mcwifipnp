@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "id": "mcwifipnp",
   "version": "${version}",
-  "name": "Minecraft WLAN Plug-n-Play",
+  "name": "LAN World Plug-n-Play",
   "description": "A Minecraft LAN World Tool With WLAN UPnP.",
   "authors": [
     "Satxm"
@@ -10,10 +10,10 @@
   "contact": {
     "homepage": "https://www.curseforge.com/minecraft/mc-mods/mcwifipnp",
     "issues": "https://github.com/satxm/mcwifipnp/issues",
-    "sources": "https://github.com/satxm/mcwifipnp"
+    "sources": "https://www.curseforge.com/minecraft/mc-mods/mcwifipnp"
   },
   "license": "Apache License 2.0",
-  "icon": "icon.png",
+  "icon": "mcwifipnp.png",
   "environment": "*",
   "entrypoints": {
     "main": [

@@ -17,16 +17,10 @@
 	"mcwifipnp.gui.CopyIP": "复制IP",
 	"mcwifipnp.gui.CopyToClipboard": "复制IP地址到剪切板",
 	"mcwifipnp.upnp.success": "成功转发端口%s",
-	"mcwifipnp.upnp.onlinemode.true": "局域网游戏已启用正版验证",
-	"mcwifipnp.upnp.onlinemode.false": "局域网游戏已禁用正版验证",
-	"mcwifipnp.upnp.allowcommands.true":"局域网游戏允许作弊",
-	"mcwifipnp.upnp.allowcommands.false":"局域网游戏禁止作弊",
-	"mcwifipnp.upnp.enablepvp.true":"局域网游戏已启用PVP",
-	"mcwifipnp.upnp.enablepvp.false":"局域网游戏已禁用PVP",
-	"mcwifipnp.upnp.success.clipboard": "您的IP(%s)地址已复制到剪贴板",
-	"mcwifipnp.upnp.success.cantgetip": "无法获取外部IP！",
-	"mcwifipnp.upnp.failed.mapped": "无法转发端口%s：端口%s已被另一个UPnP服务映射！",
-	"mcwifipnp.upnp.failed.disabled": "无法转发端口%s：路由器上未启用UPnP！",
-	"mcwifipnp.upnp.failed.unknownerror": "无法转发端口%s：添加端口映射时出现未知错误。",
-	"mcwifipnp.upnp.failed": "无法转发端口%s！"
+	"mcwifipnp.upnp.success.clipboard": "您的IP地址和端口已复制到剪贴板，你可以尝试是否可以连接。",
+	"mcwifipnp.upnp.success.cantgetip": "无法获取外部IP！你的网络IPv4可能包含多级NAT或者你无IPv6。",
+	"mcwifipnp.upnp.failed.mapped": "无法转发端口%s：端口%s已被另一个UPnP服务映射，请更换端口或者使用端口映射。",
+	"mcwifipnp.upnp.failed.disabled": "无法转发端口%s：路由器上未启用UPnP。",
+	"mcwifipnp.upnp.failed.unknownerror": "无法转发端口%s：添加端口映射时出现未知错误。请使用端口映射软件。",
+	"mcwifipnp.upnp.failed": "无法转发端口%s！请使用端口映射软件。"
 }

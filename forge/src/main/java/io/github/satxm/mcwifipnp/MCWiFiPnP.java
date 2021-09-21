@@ -39,14 +39,6 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.server.FMLServerStartingEvent;
 import net.minecraftforge.fml.event.server.FMLServerStoppingEvent;
-import net.minecraft.world.GameType;
-import net.minecraft.world.dimension.DimensionType;
-import net.minecraftforge.client.event.GuiScreenEvent;
-import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.event.server.FMLServerStartingEvent;
-import net.minecraftforge.fml.event.server.FMLServerStoppingEvent;
 
 @Mod(MCWiFiPnP.MODID)
 public class MCWiFiPnP {
@@ -70,14 +62,15 @@ public class MCWiFiPnP {
 		Minecraft client = Minecraft.getInstance();
 		Screen screen = event.getGui();
 		if (screen instanceof IngameMenuScreen && event.getWidgetList().size() != 0) {
-			for (int k = 0;  k < event.getWidgetList().size() ; k++ ){
+			for (int k = 0; k < event.getWidgetList().size(); k++) {
 				Button ShareToLanOld = (Button) event.getWidgetList().get(k);
 				if (ShareToLanOld.getMessage().equals(I18n.format("menu.shareToLan"))) {
 					int x = ShareToLanOld.x;
 					int y = ShareToLanOld.y;
 					int w = ShareToLanOld.getWidth();
 					int h = ShareToLanOld.getHeight();
-					Button ShareToLanNew = new Button(x, y, w, h, I18n.format("menu.shareToLan"), (button) -> client.displayGuiScreen(new ShareToLanScreen(screen)));
+					Button ShareToLanNew = new Button(x, y, w, h, I18n.format("menu.shareToLan"),
+							(button) -> client.displayGuiScreen(new ShareToLanScreen(screen)));
 					ShareToLanNew.active = ShareToLanOld.active;
 					event.removeWidget(ShareToLanOld);
 					event.addWidget(ShareToLanNew);
@@ -87,9 +80,10 @@ public class MCWiFiPnP {
 	}
 
 	@SubscribeEvent
-    public void onServerStarting(FMLServerStartingEvent event) {
+	public void onServerStarting(FMLServerStartingEvent event) {
 		MinecraftServer server = event.getServer();
-		File cfgfile = new File(server.getWorld(DimensionType.OVERWORLD).getSaveHandler().getWorldDirectory(), "mcwifipnp.json");
+		File cfgfile = new File(server.getWorld(DimensionType.OVERWORLD).getSaveHandler().getWorldDirectory(),
+				"mcwifipnp.json");
 		Path location = cfgfile.toPath();
 
 		Config cfg;
@@ -113,12 +107,12 @@ public class MCWiFiPnP {
 	}
 
 	@SubscribeEvent
-	public void onServerStopping(FMLServerStoppingEvent event){
+	public void onServerStopping(FMLServerStoppingEvent event) {
 		MinecraftServer server = event.getServer();
 		Config cfg = configMap.get(server);
 		if (server.getPublic() && cfg.UseUPnP) {
 			UPnP.closePortTCP(cfg.port);
-			LOGGER.info("Stopped forwarded port " + cfg.port +".");
+			LOGGER.info("Stopped forwarded port " + cfg.port + ".");
 		}
 	}
 
@@ -133,10 +127,8 @@ public class MCWiFiPnP {
 		client.getIntegratedServer().shareToLAN(GameType.getByName(cfg.GameMode), cfg.AllowCommands, cfg.port);
 		server.setOnlineMode(cfg.OnlineMode);
 		server.setAllowPvp(cfg.EnablePvP);
-		client.ingameGUI.getChatGUI().printChatMessage(new TranslationTextComponent("commands.publish.started", cfg.port));
-		client.ingameGUI.getChatGUI().printChatMessage(new TranslationTextComponent("mcwifipnp.upnp.allowcommands." + cfg.AllowCommands));
-		client.ingameGUI.getChatGUI().printChatMessage(new TranslationTextComponent("mcwifipnp.upnp.onlinemode." + cfg.OnlineMode));
-		client.ingameGUI.getChatGUI().printChatMessage(new TranslationTextComponent("mcwifipnp.upnp.enablepvp." + cfg.EnablePvP));
+		client.ingameGUI.getChatGUI()
+				.printChatMessage(new TranslationTextComponent("commands.publish.started", cfg.port));
 
 		new Thread(() -> {
 
@@ -144,37 +136,50 @@ public class MCWiFiPnP {
 				UPnPUtil.UPnPResult result = UPnPUtil.init(cfg.port, "Minecraft LAN Server");
 				switch (result) {
 					case SUCCESS:
-						client.ingameGUI.getChatGUI().printChatMessage(new TranslationTextComponent("mcwifipnp.upnp.success", cfg.port));
+						client.ingameGUI.getChatGUI()
+								.printChatMessage(new TranslationTextComponent("mcwifipnp.upnp.success", cfg.port));
 						LOGGER.info("Started forwarded port " + cfg.port + ".");
 						break;
 					case FAILED_GENERIC:
-						client.ingameGUI.getChatGUI().printChatMessage(new TranslationTextComponent("mcwifipnp.upnp.failed", cfg.port));
+						client.ingameGUI.getChatGUI()
+								.printChatMessage(new TranslationTextComponent("mcwifipnp.upnp.failed", cfg.port));
 						break;
 					case FAILED_MAPPED:
-						client.ingameGUI.getChatGUI().printChatMessage(new TranslationTextComponent("mcwifipnp.upnp.failed.mapped", cfg.port));
+						client.ingameGUI.getChatGUI().printChatMessage(
+								new TranslationTextComponent("mcwifipnp.upnp.failed.mapped", cfg.port));
 						break;
 					case FAILED_DISABLED:
-						client.ingameGUI.getChatGUI().printChatMessage(new TranslationTextComponent("mcwifipnp.upnp.failed.disabled", cfg.port));
+						client.ingameGUI.getChatGUI().printChatMessage(
+								new TranslationTextComponent("mcwifipnp.upnp.failed.disabled", cfg.port));
 						break;
 				}
 			}
 
 			if (cfg.CopyToClipboard) {
-				String ip = UPnP.getExternalIP();
-				if (ip == null || ip.equals("0.0.0.0")) {
-					client.ingameGUI.getChatGUI().printChatMessage(new TranslationTextComponent("mcwifipnp.upnp.success.cantgetip"));
+				String ip = null;
+				if (GetIP.GetLocalIPv6() != null && GetIP.GetGlobalIPv6() != null) {
+					ip = "[" + GetIP.GetGlobalIPv6() + "]";
+				} else if (UPnP.getExternalIP() != null && GetIP.GetGlobalIPv4() != null
+						&& UPnP.getExternalIP().equals(GetIP.GetGlobalIPv4())) {
+					ip = GetIP.GetGlobalIPv4();
+				}
+				if (ip == null) {
+					client.ingameGUI.getChatGUI()
+							.printChatMessage(new TranslationTextComponent("mcwifipnp.upnp.success.cantgetip"));
 				} else {
 					client.keyboardListener.setClipboardString(ip + ":" + cfg.port);
-					client.ingameGUI.getChatGUI().printChatMessage(new TranslationTextComponent("mcwifipnp.upnp.success.clipboard", ip + ":" + cfg.port));
+					client.ingameGUI.getChatGUI().printChatMessage(
+							new TranslationTextComponent("mcwifipnp.upnp.success.clipboard", ip + ":" + cfg.port));
 				}
 			}
-		},"MCWiFiPnP").start();
+		}, "MCWiFiPnP").start();
 	}
 
 	private static void saveConfig(Config cfg) {
 		if (!cfg.needsDefaults) {
 			try {
-				Files.write(cfg.location, toPrettyFormat(cfg).getBytes(), StandardOpenOption.TRUNCATE_EXISTING, StandardOpenOption.CREATE);
+				Files.write(cfg.location, toPrettyFormat(cfg).getBytes(), StandardOpenOption.TRUNCATE_EXISTING,
+						StandardOpenOption.CREATE);
 			} catch (IOException e) {
 				LOGGER.warn("Unable to write config file!", e);
 			}
