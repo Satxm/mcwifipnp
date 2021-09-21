@@ -26,14 +26,16 @@ public class MCWiFiPnP {
 		Minecraft client = Minecraft.getInstance();
 		Screen screen = event.getGui();
 		if (screen instanceof IngameMenuScreen && event.getWidgetList().size() != 0) {
-			for (int k = 0;  k < event.getWidgetList().size() ; k++ ){
+			for (int k = 0; k < event.getWidgetList().size(); k++) {
 				Button ShareToLanOld = (Button) event.getWidgetList().get(k);
-				if (ShareToLanOld.getMessage().getString().equals(new TranslationTextComponent("menu.shareToLan").getString())) {
+				if (ShareToLanOld.getMessage().getString()
+						.equals(new TranslationTextComponent("menu.shareToLan").getString())) {
 					int x = ShareToLanOld.x;
 					int y = ShareToLanOld.y;
 					int w = ShareToLanOld.getWidth();
 					int h = ShareToLanOld.getHeight();
-					Button ShareToLanNew = new Button(x, y, w, h, new TranslationTextComponent("menu.shareToLan"), (button) -> client.setScreen(new ShareToLanScreen(screen)));
+					Button ShareToLanNew = new Button(x, y, w, h, new TranslationTextComponent("menu.shareToLan"),
+							(button) -> client.setScreen(new ShareToLanScreen(screen)));
 					ShareToLanNew.active = ShareToLanOld.active;
 					event.removeWidget(ShareToLanOld);
 					event.addWidget(ShareToLanNew);
@@ -43,12 +45,12 @@ public class MCWiFiPnP {
 	}
 
 	@SubscribeEvent
-    public void onServerStarting(FMLServerStartingEvent event) {
+	public void onServerStarting(FMLServerStartingEvent event) {
 		MCWiFiPnPUnit.serverStarting(event.getServer());
 	}
 
 	@SubscribeEvent
-	public void onServerStopping(FMLServerStoppingEvent event){
+	public void onServerStopping(FMLServerStoppingEvent event) {
 		MCWiFiPnPUnit.serverStopping(event.getServer());
 	}
 }

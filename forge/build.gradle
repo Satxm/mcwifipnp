@@ -27,7 +27,7 @@ minecraft {
     
     runs {
         client {
-            workingDirectory project.file('run')
+            workingDirectory project.file('../run')
             property 'forge.logging.console.level', 'debug'
 
             mods {
@@ -63,7 +63,7 @@ sourceSets {
 jar {
     manifest {
         attributes([
-                "Specification-Title": "Minecraft WLAN Plug-n-Play",
+                "Specification-Title": "LAN World Plug-n-Play",
                 "Specification-Vendor": "Satxm",
                 "Specification-Version": "1",
                 "Implementation-Title": project.name,
