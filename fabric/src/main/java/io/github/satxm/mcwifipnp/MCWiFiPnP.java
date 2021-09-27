@@ -1,24 +1,5 @@
 package io.github.satxm.mcwifipnp;
 
-import com.dosse.upnp.UPnP;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.JsonParseException;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
-import net.fabricmc.api.ModInitializer;
-import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.util.NetworkUtils;
-import net.minecraft.server.MinecraftServer;
-import net.minecraft.text.LiteralText;
-import net.minecraft.text.TranslatableText;
-import net.minecraft.world.GameMode;
-
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-import org.jetbrains.annotations.NotNull;
-
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -28,6 +9,31 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.Objects;
 import java.util.WeakHashMap;
+
+import com.dosse.upnp.UPnP;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParseException;
+import com.google.gson.JsonParser;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.jetbrains.annotations.NotNull;
+
+import net.fabricmc.api.ModInitializer;
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.util.NetworkUtils;
+import net.minecraft.server.MinecraftServer;
+import net.minecraft.text.ClickEvent;
+import net.minecraft.text.HoverEvent;
+import net.minecraft.text.LiteralText;
+import net.minecraft.text.Text;
+import net.minecraft.text.Texts;
+import net.minecraft.text.TranslatableText;
+import net.minecraft.util.Formatting;
+import net.minecraft.world.GameMode;
 
 public class MCWiFiPnP implements ModInitializer {
 	public static final String MODID = "mcwifipnp";
@@ -85,19 +91,36 @@ public class MCWiFiPnP implements ModInitializer {
 			}
 
 			if (cfg.CopyToClipboard) {
-				String ip = null;
-				if (GetIP.GetLocalIPv6() != null && GetIP.GetGlobalIPv6() != null) {
-					ip = "[" + GetIP.GetGlobalIPv6() + "]";
-				} else if (UPnP.getExternalIP() != null && GetIP.GetGlobalIPv4() != null
-						&& UPnP.getExternalIP().equals(GetIP.GetGlobalIPv4())) {
-					ip = GetIP.GetGlobalIPv4();
-				}
-				if (ip == null) {
-					client.inGameHud.getChatHud().addMessage(new TranslatableText("mcwifipnp.upnp.success.cantgetip"));
+
+				if (IPv4() != null || IPv6() != null) {
+					if (IPv4() != null) {
+						String ipv4 = IPv4() + ":" + cfg.port;
+						Text component = Texts.bracketed((new LiteralText("IPv4")).styled((style) -> {
+							style.setColor(Formatting.GREEN)
+									.setClickEvent(
+											new ClickEvent(ClickEvent.Action.COPY_TO_CLIPBOARD, String.valueOf(ipv4)))
+									.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT,
+											new TranslatableText("chat.copy.click", new Object[0])))
+									.setInsertion(String.valueOf(ipv4));
+						}));
+						client.inGameHud.getChatHud()
+								.addMessage(new TranslatableText("mcwifipnp.upnp.success.clipboard", component));
+					}
+					if (IPv6() != null) {
+						String ipv6 = "[" + IPv6() + "]:" + cfg.port;
+						Text component = Texts.bracketed((new LiteralText("IPv6")).styled((style) -> {
+							style.setColor(Formatting.GREEN)
+									.setClickEvent(
+											new ClickEvent(ClickEvent.Action.COPY_TO_CLIPBOARD, String.valueOf(ipv6)))
+									.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT,
+											new TranslatableText("chat.copy.click", new Object[0])))
+									.setInsertion(String.valueOf(ipv6));
+						}));
+						client.inGameHud.getChatHud()
+								.addMessage(new TranslatableText("mcwifipnp.upnp.success.clipboard", component));
+					}
 				} else {
-					client.keyboard.setClipboard(ip + ":" + cfg.port);
-					client.inGameHud.getChatHud()
-							.addMessage(new TranslatableText("mcwifipnp.upnp.success.clipboard", ip + ":" + cfg.port));
+					client.inGameHud.getChatHud().addMessage(new TranslatableText("mcwifipnp.upnp.success.cantgetip"));
 				}
 			}
 		}, "MCWiFiPnP").start();
@@ -167,4 +190,22 @@ public class MCWiFiPnP implements ModInitializer {
 		return gson.toJson(jsonObject);
 	}
 
+	private static String IPv4() {
+		if (UPnP.getExternalIP() != null && GetIP.GetGlobalIPv4() != null
+				&& UPnP.getExternalIP().equals(GetIP.GetGlobalIPv4())) {
+			return GetIP.GetGlobalIPv4();
+		} else if (GetIP.GetGlobalIPv4() != null && GetIP.GetLocalIPv4() != null
+				&& GetIP.GetLocalIPv4().equals(GetIP.GetGlobalIPv4())) {
+			return GetIP.GetGlobalIPv4();
+		}
+		return null;
+	}
+
+	private static String IPv6() {
+		if (GetIP.GetGlobalIPv6() != null && GetIP.GetLocalIPv6() != null
+				&& GetIP.GetLocalIPv6().equals(GetIP.GetGlobalIPv6())) {
+			return GetIP.GetGlobalIPv6();
+		} else
+			return null;
+	}
 }

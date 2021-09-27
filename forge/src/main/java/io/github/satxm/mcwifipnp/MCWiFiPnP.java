@@ -29,8 +29,13 @@ import net.minecraft.client.gui.widget.button.Button;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.HTTPUtil;
+import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.StringTextComponent;
+import net.minecraft.util.text.TextComponentUtils;
+import net.minecraft.util.text.TextFormatting;
 import net.minecraft.util.text.TranslationTextComponent;
+import net.minecraft.util.text.event.ClickEvent;
+import net.minecraft.util.text.event.HoverEvent;
 import net.minecraft.world.GameType;
 import net.minecraft.world.dimension.DimensionType;
 import net.minecraftforge.client.event.GuiScreenEvent;
@@ -50,11 +55,6 @@ public class MCWiFiPnP {
 	public MCWiFiPnP() {
 		MinecraftForge.EVENT_BUS.register(this);
 		MinecraftForge.EVENT_BUS.addListener(this::ChangeButton);
-	}
-
-	@Nonnull
-	public static Config getConfig(MinecraftServer server) {
-		return Objects.requireNonNull(configMap.get(server), "no config for server???");
 	}
 
 	@SubscribeEvent
@@ -79,41 +79,9 @@ public class MCWiFiPnP {
 		}
 	}
 
-	@SubscribeEvent
-	public void onServerStarting(FMLServerStartingEvent event) {
-		MinecraftServer server = event.getServer();
-		File cfgfile = new File(server.getWorld(DimensionType.OVERWORLD).getSaveHandler().getWorldDirectory(),
-				"mcwifipnp.json");
-		Path location = cfgfile.toPath();
-
-		Config cfg;
-
-		try {
-			cfg = gson.fromJson(new String(Files.readAllBytes(location)), Config.class);
-			cfg.location = location;
-		} catch (IOException | JsonParseException e) {
-			try {
-				Files.deleteIfExists(location);
-			} catch (IOException ioException) {
-				//
-			}
-
-			cfg = new Config();
-			cfg.location = location;
-			cfg.needsDefaults = true;
-		}
-
-		configMap.put(server, cfg);
-	}
-
-	@SubscribeEvent
-	public void onServerStopping(FMLServerStoppingEvent event) {
-		MinecraftServer server = event.getServer();
-		Config cfg = configMap.get(server);
-		if (server.getPublic() && cfg.UseUPnP) {
-			UPnP.closePortTCP(cfg.port);
-			LOGGER.info("Stopped forwarded port " + cfg.port + ".");
-		}
+	@Nonnull
+	public static Config getConfig(MinecraftServer server) {
+		return Objects.requireNonNull(configMap.get(server), "no config for server???");
 	}
 
 	public static void openToLan(MinecraftServer server) {
@@ -156,23 +124,76 @@ public class MCWiFiPnP {
 			}
 
 			if (cfg.CopyToClipboard) {
-				String ip = null;
-				if (GetIP.GetLocalIPv6() != null && GetIP.GetGlobalIPv6() != null) {
-					ip = "[" + GetIP.GetGlobalIPv6() + "]";
-				} else if (UPnP.getExternalIP() != null && GetIP.GetGlobalIPv4() != null
-						&& UPnP.getExternalIP().equals(GetIP.GetGlobalIPv4())) {
-					ip = GetIP.GetGlobalIPv4();
-				}
-				if (ip == null) {
+				if (IPv4() != null || IPv6() != null) {
+					if (IPv4() != null) {
+						String ipv4 = IPv4() + ":" + cfg.port;
+						ITextComponent component = TextComponentUtils
+								.wrapInSquareBrackets((new StringTextComponent("IPv4")).applyTextStyle((style) -> {
+									style.setColor(TextFormatting.GREEN)
+											.setClickEvent(new ClickEvent(ClickEvent.Action.COPY_TO_CLIPBOARD, ipv4))
+											.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT,
+													new TranslationTextComponent("chat.copy.click")))
+											.setInsertion(ipv4);
+								}));
+						client.ingameGUI.getChatGUI().printChatMessage(
+								new TranslationTextComponent("mcwifipnp.upnp.success.clipboard", component));
+					}
+					if (IPv6() != null) {
+						String ipv6 = "[" + IPv6() + "]:" + cfg.port;
+						ITextComponent component = TextComponentUtils
+								.wrapInSquareBrackets((new StringTextComponent("IPv6")).applyTextStyle((style) -> {
+									style.setColor(TextFormatting.GREEN)
+											.setClickEvent(new ClickEvent(ClickEvent.Action.COPY_TO_CLIPBOARD, ipv6))
+											.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT,
+													new TranslationTextComponent("chat.copy.click")))
+											.setInsertion(ipv6);
+								}));
+						client.ingameGUI.getChatGUI().printChatMessage(
+								new TranslationTextComponent("mcwifipnp.upnp.success.clipboard", component));
+					}
+				} else {
 					client.ingameGUI.getChatGUI()
 							.printChatMessage(new TranslationTextComponent("mcwifipnp.upnp.success.cantgetip"));
-				} else {
-					client.keyboardListener.setClipboardString(ip + ":" + cfg.port);
-					client.ingameGUI.getChatGUI().printChatMessage(
-							new TranslationTextComponent("mcwifipnp.upnp.success.clipboard", ip + ":" + cfg.port));
 				}
 			}
 		}, "MCWiFiPnP").start();
+	}
+
+	@SubscribeEvent
+	public void onServerStarting(FMLServerStartingEvent event) {
+		MinecraftServer server = event.getServer();
+		File cfgfile = new File(server.getWorld(DimensionType.OVERWORLD).getSaveHandler().getWorldDirectory(),
+				"mcwifipnp.json");
+		Path location = cfgfile.toPath();
+
+		Config cfg;
+
+		try {
+			cfg = gson.fromJson(new String(Files.readAllBytes(location)), Config.class);
+			cfg.location = location;
+		} catch (IOException | JsonParseException e) {
+			try {
+				Files.deleteIfExists(location);
+			} catch (IOException ioException) {
+				//
+			}
+
+			cfg = new Config();
+			cfg.location = location;
+			cfg.needsDefaults = true;
+		}
+
+		configMap.put(server, cfg);
+	}
+
+	@SubscribeEvent
+	public void onServerStopping(FMLServerStoppingEvent event) {
+		MinecraftServer server = event.getServer();
+		Config cfg = configMap.get(server);
+		if (server.getPublic() && cfg.UseUPnP) {
+			UPnP.closePortTCP(cfg.port);
+			LOGGER.info("Stopped forwarded port " + cfg.port + ".");
+		}
 	}
 
 	private static void saveConfig(Config cfg) {
@@ -208,4 +229,22 @@ public class MCWiFiPnP {
 		return gson.toJson(jsonObject);
 	}
 
+	private static String IPv4() {
+		if (UPnP.getExternalIP() != null && GetIP.GetGlobalIPv4() != null
+				&& UPnP.getExternalIP().equals(GetIP.GetGlobalIPv4())) {
+			return GetIP.GetGlobalIPv4();
+		} else if (GetIP.GetGlobalIPv4() != null && GetIP.GetLocalIPv4() != null
+				&& GetIP.GetLocalIPv4().equals(GetIP.GetGlobalIPv4())) {
+			return GetIP.GetGlobalIPv4();
+		}
+		return null;
+	}
+
+	private static String IPv6() {
+		if (GetIP.GetGlobalIPv6() != null && GetIP.GetLocalIPv6() != null
+				&& GetIP.GetLocalIPv6().equals(GetIP.GetGlobalIPv6())) {
+			return GetIP.GetGlobalIPv6();
+		} else
+			return null;
+	}
 }
