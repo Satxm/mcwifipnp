@@ -24,7 +24,6 @@ public class ShareToLanScreen extends Screen {
 	private Button UseUPnPButton;
 	private Button CopyToClipboardButton;
 	private String portinfo = "info";
-	private String pvpinfo = "info";
 
 	public ShareToLanScreen(Screen screen) {
 		super(new TranslationTextComponent("lanServer.title"));
@@ -113,11 +112,6 @@ public class ShareToLanScreen extends Screen {
 
 		this.EnablePvPButton = (Button)this.addButton(new Button(this.width / 2 + 5, 130, 150, 20, new TranslationTextComponent("mcwifipnp.gui.EnablePvP"), (button) -> {
 			cfg.EnablePvP = !cfg.EnablePvP;
-			if (cfg.EnablePvP) {
-				this.pvpinfo = "ture";
-			} else {
-				this.pvpinfo = "false";
-			}
 			this.updateSelectionStrings();
 		}));
 
@@ -152,7 +146,7 @@ public class ShareToLanScreen extends Screen {
 		drawString(poseStack, this.font, new TranslationTextComponent("mcwifipnp.gui.motd.info"), this.width / 2 + 10, 88, -6250336);
 		drawCenteredString(poseStack, this.font, new TranslationTextComponent("lanServer.otherPlayers"), this.width / 2, 112, 16777215);
 		drawString(poseStack, this.font, new TranslationTextComponent("mcwifipnp.gui.OnlineMode.info"), this.width / 2 - 150, 152, -6250336);
-		drawString(poseStack, this.font, new TranslationTextComponent("mcwifipnp.gui.EnablePvP." + this.pvpinfo), this.width / 2 + 10, 152, -6250336);
+		drawString(poseStack, this.font, new TranslationTextComponent("mcwifipnp.gui.EnablePvP.info"), this.width / 2 + 10, 152, -6250336);
 		drawString(poseStack, this.font, new TranslationTextComponent("mcwifipnp.gui.UseUPnP.info"), this.width / 2 - 150, 186, -6250336);
 		drawString(poseStack, this.font, new TranslationTextComponent("mcwifipnp.gui.CopyToClipboard"), this.width / 2 + 10, 186, -6250336);
 		EditPort.render(poseStack, i, j, f);

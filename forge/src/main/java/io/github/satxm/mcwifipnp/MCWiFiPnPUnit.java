@@ -22,8 +22,13 @@ import org.apache.logging.log4j.Logger;
 import net.minecraft.client.Minecraft;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.HTTPUtil;
+import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.StringTextComponent;
+import net.minecraft.util.text.TextComponentUtils;
+import net.minecraft.util.text.TextFormatting;
 import net.minecraft.util.text.TranslationTextComponent;
+import net.minecraft.util.text.event.ClickEvent;
+import net.minecraft.util.text.event.HoverEvent;
 import net.minecraft.world.GameType;
 import net.minecraft.world.storage.FolderName;
 
@@ -38,7 +43,6 @@ public class MCWiFiPnPUnit {
 
 	public static void openToLan(MinecraftServer server) {
 		Minecraft client = Minecraft.getInstance();
-
 		Config cfg = configMap.get(server);
 		saveConfig(cfg);
 
@@ -73,20 +77,36 @@ public class MCWiFiPnPUnit {
 						break;
 				}
 			}
-
 			if (cfg.CopyToClipboard) {
-				String ip = null;
-				if (GetIP.GetLocalIPv6() != null && GetIP.GetGlobalIPv6() != null) {
-					ip = "[" + GetIP.GetGlobalIPv6() + "]";
-				} else if (UPnP.getExternalIP() != null && GetIP.GetGlobalIPv4() != null
-						&& UPnP.getExternalIP().equals(GetIP.GetGlobalIPv4())) {
-					ip = GetIP.GetGlobalIPv4();
-				}
-				if (ip == null) {
-					client.gui.getChat().addMessage(new TranslationTextComponent("mcwifipnp.upnp.success.cantgetip"));
+				if (IPv4() != null || IPv6() != null) {
+					if (IPv4() != null) {
+						String ipv4 = IPv4() + ":" + cfg.port;
+						ITextComponent component = TextComponentUtils
+								.wrapInSquareBrackets((new StringTextComponent("IPv4")).withStyle((style) -> {
+									return style.withColor(TextFormatting.GREEN)
+											.withClickEvent(new ClickEvent(ClickEvent.Action.COPY_TO_CLIPBOARD, ipv4))
+											.withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT,
+													new TranslationTextComponent("chat.copy.click")))
+											.withInsertion(ipv4);
+								}));
+						client.gui.getChat().addMessage(
+								new TranslationTextComponent("mcwifipnp.upnp.success.clipboard", component));
+					}
+					if (IPv6() != null) {
+						String ipv6 = "[" + IPv6() + "]:" + cfg.port;
+						ITextComponent component = TextComponentUtils
+								.wrapInSquareBrackets((new StringTextComponent("IPv6")).withStyle((style) -> {
+									return style.withColor(TextFormatting.GREEN)
+											.withClickEvent(new ClickEvent(ClickEvent.Action.COPY_TO_CLIPBOARD, ipv6))
+											.withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT,
+													new TranslationTextComponent("chat.copy.click")))
+											.withInsertion(ipv6);
+								}));
+						client.gui.getChat().addMessage(
+								new TranslationTextComponent("mcwifipnp.upnp.success.clipboard", component));
+					}
 				} else {
-					client.keyboardHandler.setClipboard(ip + ":" + cfg.port);
-					client.gui.getChat().addMessage(new TranslationTextComponent("mcwifipnp.upnp.success.clipboard"));
+					client.gui.getChat().addMessage(new TranslationTextComponent("mcwifipnp.upnp.success.cantgetip"));
 				}
 			}
 		}, "MCWiFiPnP").start();
@@ -98,7 +118,7 @@ public class MCWiFiPnPUnit {
 		Config cfg;
 
 		try {
-			cfg = gson.fromJson(new String(Files.readAllBytes(location)), Config.class);
+			cfg = gson.fromJson(new String(Files.readAllBytes(location)), MCWiFiPnPUnit.Config.class);
 			cfg.location = location;
 		} catch (IOException | JsonParseException e) {
 			try {
@@ -106,17 +126,15 @@ public class MCWiFiPnPUnit {
 			} catch (IOException ioException) {
 				//
 			}
-
-			cfg = new Config();
+			cfg = new MCWiFiPnPUnit.Config();
 			cfg.location = location;
 			cfg.needsDefaults = true;
 		}
-
 		configMap.put(server, cfg);
 	}
 
 	public static void serverStopping(MinecraftServer server) {
-		Config cfg = configMap.get(server);
+		MCWiFiPnPUnit.Config cfg = configMap.get(server);
 		if (server.isPublished() && cfg.UseUPnP) {
 			UPnP.closePortTCP(cfg.port);
 			LOGGER.info("Stopped forwarded port " + cfg.port + ".");
@@ -156,4 +174,22 @@ public class MCWiFiPnPUnit {
 		return gson.toJson(jsonObject);
 	}
 
+	private static String IPv4() {
+		if (UPnP.getExternalIP() != null && GetIP.GetGlobalIPv4() != null
+				&& UPnP.getExternalIP().equals(GetIP.GetGlobalIPv4())) {
+			return GetIP.GetGlobalIPv4();
+		} else if (GetIP.GetGlobalIPv4() != null && GetIP.GetLocalIPv4() != null
+				&& GetIP.GetLocalIPv4().equals(GetIP.GetGlobalIPv4())) {
+			return GetIP.GetGlobalIPv4();
+		}
+		return null;
+	}
+
+	private static String IPv6() {
+		if (GetIP.GetGlobalIPv6() != null && GetIP.GetLocalIPv6() != null
+				&& GetIP.GetLocalIPv6().equals(GetIP.GetGlobalIPv6())) {
+			return GetIP.GetGlobalIPv6();
+		} else
+			return null;
+	}
 }
