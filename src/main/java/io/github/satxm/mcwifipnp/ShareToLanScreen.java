@@ -19,7 +19,6 @@ public class ShareToLanScreen extends Screen {
 	private EditBox EditMotd;
 	private Button StartLanServer;
 	private String portinfo = "info";
-	private String pvpinfo = "info";
 
 	public ShareToLanScreen(Screen screen) {
 		super(new TranslatableComponent("lanServer.title"));
@@ -106,11 +105,6 @@ public class ShareToLanScreen extends Screen {
 		this.addRenderableWidget(CycleButton.onOffBuilder(cfg.EnablePvP).create(this.width / 2 + 5, 130, 150, 20,
 				new TranslatableComponent("mcwifipnp.gui.EnablePvP"), (button, EnablePvP) -> {
 					cfg.EnablePvP = EnablePvP;
-					if (cfg.EnablePvP) {
-						this.pvpinfo = "ture";
-					} else {
-						this.pvpinfo = "false";
-					}
 				}));
 
 		this.addRenderableWidget(CycleButton.onOffBuilder(cfg.UseUPnP).create(this.width / 2 - 155, 164, 150, 20,
@@ -140,7 +134,7 @@ public class ShareToLanScreen extends Screen {
 				112, 16777215);
 		drawString(poseStack, this.font, new TranslatableComponent("mcwifipnp.gui.OnlineMode.info"),
 				this.width / 2 - 150, 152, -6250336);
-		drawString(poseStack, this.font, new TranslatableComponent("mcwifipnp.gui.EnablePvP." + this.pvpinfo),
+		drawString(poseStack, this.font, new TranslatableComponent("mcwifipnp.gui.EnablePvP.info"),
 				this.width / 2 + 10, 152, -6250336);
 		drawString(poseStack, this.font, new TranslatableComponent("mcwifipnp.gui.UseUPnP.info"), this.width / 2 - 150,
 				186, -6250336);
