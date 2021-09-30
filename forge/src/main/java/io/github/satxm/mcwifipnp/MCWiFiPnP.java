@@ -208,7 +208,6 @@ public class MCWiFiPnP {
 	}
 
 	public static class Config {
-		public int version = 2;
 		public int port = HTTPUtil.getSuitableLanPort();
 		public String GameMode = "survival";
 		public String motd = "A Minecraft LAN Server";
@@ -230,21 +229,27 @@ public class MCWiFiPnP {
 	}
 
 	private static String IPv4() {
-		if (UPnP.getExternalIP() != null && GetIP.GetGlobalIPv4() != null
+		if (GetIP.IPv4AddressList().size() >= 1 || GetIP.GetGlobalIPv4() != null) {
+			for (int i = 0; i < GetIP.IPv4AddressList().size(); i++) {
+				if (GetIP.IPv4AddressList().get(i).getHostAddress().equals(GetIP.GetGlobalIPv4())) {
+					return GetIP.IPv4AddressList().get(i).getHostAddress();
+				};
+			}
+		} else if (UPnP.getExternalIP() != null && GetIP.GetGlobalIPv4() != null
 				&& UPnP.getExternalIP().equals(GetIP.GetGlobalIPv4())) {
-			return GetIP.GetGlobalIPv4();
-		} else if (GetIP.GetGlobalIPv4() != null && GetIP.GetLocalIPv4() != null
-				&& GetIP.GetLocalIPv4().equals(GetIP.GetGlobalIPv4())) {
 			return GetIP.GetGlobalIPv4();
 		}
 		return null;
 	}
 
 	private static String IPv6() {
-		if (GetIP.GetGlobalIPv6() != null && GetIP.GetLocalIPv6() != null
-				&& GetIP.GetLocalIPv6().equals(GetIP.GetGlobalIPv6())) {
-			return GetIP.GetGlobalIPv6();
-		} else
-			return null;
+		if (GetIP.IPv6AddressList().size() >= 1 || GetIP.GetGlobalIPv6() != null) {
+			for (int i = 0; i < GetIP.IPv6AddressList().size(); i++) {
+				if (GetIP.IPv6AddressList().get(i).getHostAddress().equals(GetIP.GetGlobalIPv6())) {
+					return GetIP.IPv6AddressList().get(i).getHostAddress();
+				};
+			}
+		}
+		return null;
 	}
 }

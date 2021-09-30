@@ -8,6 +8,7 @@ import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.net.URL;
 import java.net.URLConnection;
+import java.util.ArrayList;
 import java.util.Enumeration;
 
 public class GetIP {
@@ -45,8 +46,8 @@ public class GetIP {
         return ipv6;
     }
 
-    public static String GetLocalIPv4() {
-        String ip = null;
+    public static ArrayList<Inet4Address> IPv4AddressList() {
+        ArrayList<Inet4Address> ret = new ArrayList<Inet4Address>();
         try {
             Enumeration<NetworkInterface> ifaces = NetworkInterface.getNetworkInterfaces();
             while (ifaces.hasMoreElements()) {
@@ -62,10 +63,7 @@ public class GetIP {
                     while (addrs.hasMoreElements()) {
                         InetAddress addr = addrs.nextElement();
                         if (addr instanceof Inet4Address) {
-                            if (addr.getHostAddress().indexOf('%') == -1) {
-                                ip = addr.getHostAddress();
-                            }
-                        } else {
+                            ret.add((Inet4Address) addr);
                         }
                     }
                 } catch (Throwable t) {
@@ -73,11 +71,11 @@ public class GetIP {
             }
         } catch (Throwable t) {
         }
-        return ip;
+        return ret;
     }
 
-    public static String GetLocalIPv6() {
-        String ip = null;
+    public static ArrayList<Inet6Address> IPv6AddressList() {
+        ArrayList<Inet6Address> ret = new ArrayList<Inet6Address>();
         try {
             Enumeration<NetworkInterface> ifaces = NetworkInterface.getNetworkInterfaces();
             while (ifaces.hasMoreElements()) {
@@ -94,9 +92,8 @@ public class GetIP {
                         InetAddress addr = addrs.nextElement();
                         if (addr instanceof Inet6Address) {
                             if (addr.getHostAddress().indexOf('%') == -1) {
-                                ip = addr.getHostAddress();
+                                ret.add((Inet6Address) addr);
                             }
-                        } else {
                         }
                     }
                 } catch (Throwable t) {
@@ -104,6 +101,6 @@ public class GetIP {
             }
         } catch (Throwable t) {
         }
-        return ip;
+        return ret;
     }
 }
