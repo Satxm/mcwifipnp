@@ -6,20 +6,20 @@ issueTrackerURL="https://github.com/Satxm/mcwifipnp/issues"
 [[mods]]
 modId="mcwifipnp"
 version="${version}"
-displayName="Minecraft WLAN Plug-n-Play"
-displayURL="https://github.com/Satxm/mcwifipnp"
-logoFile="icon.png"
+displayName="LAN World Plug-n-Play"
+displayURL="https://www.curseforge.com/minecraft/mc-mods/mcwifipnp"
+logoFile="mcwifipnp.png"
 authors="Satxm"
 description="A Minecraft LAN World Tool With WLAN UPnP."
 
-[[dependencies.examplemod]]
+[[dependencies.mcwifipnp]]
     modId="forge"
     mandatory=true
     versionRange="${forge_version}"
     ordering="NONE"
     side="CLIENT"
 
-[[dependencies.examplemod]]
+[[dependencies.mcwifipnp]]
     modId="minecraft"
     mandatory=true
     versionRange="${mc_version}"

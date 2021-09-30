@@ -22,12 +22,10 @@ println('Java: ' + System.getProperty('java.version') + ' JVM: ' + System.getPro
 
 minecraft {
     mappings channel: 'official', version: project.minecraft_version
-
-    //accessTransformer = file('src/main/resources/META-INF/accesstransformer.cfg')
     
     runs {
         client {
-            workingDirectory project.file('run')
+            workingDirectory project.file('../run')
             property 'forge.logging.console.level', 'debug'
 
             mods {
@@ -63,7 +61,7 @@ sourceSets {
 jar {
     manifest {
         attributes([
-                "Specification-Title": "Minecraft WLAN Plug-n-Play",
+                "Specification-Title": "LAN World Plug-n-Play",
                 "Specification-Vendor": "Satxm",
                 "Specification-Version": "1",
                 "Implementation-Title": project.name,
@@ -76,12 +74,15 @@ jar {
 	}
 }
 
+java {
+    withSourcesJar()
+}
+
 def replaceResources = tasks.register("replaceResources", Copy) {
 	it.outputs.upToDateWhen { false }
-	//Copy it into the build dir
 	it.from(sourceSets.main.resources) {
 		include "META-INF/mods.toml"
-		expand 'version': project.mod_version, 'mc_version': project.minecraft_version_range, 'forge_version': project.forge_version_range, "loader_version": project.loader_version_range
+		expand 'version': project.mod_version, 'mc_version': project.forge_minecraft_version_range, 'forge_version': project.forge_version_range, "loader_version": project.forge_version_range
 	}
 	it.into "$buildDir/resources/main/"
 }
@@ -94,4 +95,9 @@ processResources {
 
 classes.configure {
 	dependsOn(replaceResources)
+}
+
+tasks.withType(JavaCompile).configureEach {
+	it.options.encoding = "UTF-8"
+	it.options.release = 16
 }
