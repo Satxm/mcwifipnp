@@ -7,11 +7,11 @@
 
 **For Fabric: Requires [Fabric API](https://www.curseforge.com/minecraft/mc-mods/fabric-api) and [Fabric Loader](https://fabricmc.net/use/)**,
 
-**For Forge: Requires [Forge Loader](https://files.minecraftforge.net/)**.
+**For Forge: Requires [Forge](https://files.minecraftforge.net/)**.
 
 **Fabric端：需要[Fabric API](https://www.curseforge.com/minecraft/mc-mods/fabric-api)和[Fabric Loader](https://fabricmc.net/use/)**，
 
-**Forge端：需要[Forge Loader](https://files.minecraftforge.net/)**.
+**Forge端：需要[Forge](https://files.minecraftforge.net/)**.
 
 ## Introduction - 简介
 
