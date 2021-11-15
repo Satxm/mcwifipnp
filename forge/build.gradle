@@ -13,7 +13,7 @@ apply plugin: 'net.minecraftforge.gradle'
 apply plugin: 'eclipse'
 
 archivesBaseName = project.archives_base_name
-version = project.mod_version + "-" + project.minecraft_version + "-forge"
+version = project.mod_version + "-forge"
 group = project.maven_group
 
 java.toolchain.languageVersion = JavaLanguageVersion.of(16)
