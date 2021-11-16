@@ -110,6 +110,7 @@ public class MCWiFiPnP implements ModInitializer {
 		Minecraft client = Minecraft.getInstance();
 		Config cfg = configMap.get(server);
 		saveConfig(cfg);
+		
 		server.setMotd(cfg.motd);
 		server.getStatus().setDescription(new TextComponent(cfg.motd));
 		server.publishServer(GameType.byName(cfg.GameMode), cfg.AllowCommands, cfg.port);
