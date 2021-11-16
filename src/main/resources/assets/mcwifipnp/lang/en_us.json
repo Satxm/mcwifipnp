@@ -15,7 +15,7 @@
 	"mcwifipnp.gui.CopyIP": "Copy IP",
 	"mcwifipnp.gui.CopyToClipboard": "Copy IP to clipboard",
 	"mcwifipnp.upnp.success": "Successfully forwarded port %s",
-	"mcwifipnp.upnp.success.clipboard": "Successfully got external port %s, Feel free to connect to it.",
+	"mcwifipnp.upnp.success.clipboard": "Successfully got %s, Feel free to connect to it.",
 	"mcwifipnp.upnp.success.cantgetip": "Couldn't get external IP! Your IPv4 may contain multiple NATs or you do not have IPv6.",
 	"mcwifipnp.upnp.failed.mapped": "Unable to forward port %s: Port was already mapped by another UPnP service, Please change the port number.",
 	"mcwifipnp.upnp.failed.disabled": "Unable to forward port %s: UPnP is not enabled on your router, You may need to use port mapping software.",

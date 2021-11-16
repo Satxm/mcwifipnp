@@ -32,6 +32,8 @@ public class ShareToLanScreen extends Screen {
 			cfg.AllowCommands = client.getSingleplayerServer().getWorldData().getAllowCommands();
 			cfg.GameMode = client.getSingleplayerServer().getWorldData().getGameType().getName();
 			cfg.OnlineMode = client.getSingleplayerServer().usesAuthentication();
+			cfg.motd = client.getSingleplayerServer().getSingleplayerName() + " - "
+					+ client.getSingleplayerServer().getWorldData().getLevelName();
 			cfg.needsDefaults = false;
 		}
 	}
@@ -91,6 +93,7 @@ public class ShareToLanScreen extends Screen {
 
 		this.EditMotd = new EditBox(this.font, this.width / 2 + 5, 66, 150, 20, new TextComponent(cfg.motd));
 		this.EditMotd.setValue(cfg.motd);
+		this.EditPort.setMaxLength(32);
 		this.addRenderableWidget(EditMotd);
 
 		EditMotd.setResponder((sMotd) -> {
@@ -134,8 +137,8 @@ public class ShareToLanScreen extends Screen {
 				112, 16777215);
 		drawString(poseStack, this.font, new TranslatableComponent("mcwifipnp.gui.OnlineMode.info"),
 				this.width / 2 - 150, 152, -6250336);
-		drawString(poseStack, this.font, new TranslatableComponent("mcwifipnp.gui.EnablePvP.info"),
-				this.width / 2 + 10, 152, -6250336);
+		drawString(poseStack, this.font, new TranslatableComponent("mcwifipnp.gui.EnablePvP.info"), this.width / 2 + 10,
+				152, -6250336);
 		drawString(poseStack, this.font, new TranslatableComponent("mcwifipnp.gui.UseUPnP.info"), this.width / 2 - 150,
 				186, -6250336);
 		drawString(poseStack, this.font, new TranslatableComponent("mcwifipnp.gui.CopyToClipboard"),
