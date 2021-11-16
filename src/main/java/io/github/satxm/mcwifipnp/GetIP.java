@@ -46,8 +46,9 @@ public class GetIP {
         return ipv6;
     }
 
-    public static ArrayList<Inet4Address> IPv4AddressList() {
-        ArrayList<Inet4Address> ret = new ArrayList<Inet4Address>();
+
+    public static ArrayList<String> IPv4AddressList() {
+        ArrayList<String> ret = new ArrayList<String>();
         try {
             Enumeration<NetworkInterface> ifaces = NetworkInterface.getNetworkInterfaces();
             while (ifaces.hasMoreElements()) {
@@ -63,7 +64,10 @@ public class GetIP {
                     while (addrs.hasMoreElements()) {
                         InetAddress addr = addrs.nextElement();
                         if (addr instanceof Inet4Address) {
-                            ret.add((Inet4Address) addr);
+                            String ipstart = addr.getHostAddress().substring(0, addr.getHostAddress().indexOf(":"));
+                            if (!ipstart.equals("10") && !ipstart.equals("172") && !ipstart.equals("192")) {
+                                ret.add(addr.getHostAddress());
+                            }
                         }
                     }
                 } catch (Throwable t) {
@@ -74,8 +78,8 @@ public class GetIP {
         return ret;
     }
 
-    public static ArrayList<Inet6Address> IPv6AddressList() {
-        ArrayList<Inet6Address> ret = new ArrayList<Inet6Address>();
+    public static ArrayList<String> IPv6AddressList() {
+        ArrayList<String> ret = new ArrayList<String>();
         try {
             Enumeration<NetworkInterface> ifaces = NetworkInterface.getNetworkInterfaces();
             while (ifaces.hasMoreElements()) {
@@ -91,8 +95,9 @@ public class GetIP {
                     while (addrs.hasMoreElements()) {
                         InetAddress addr = addrs.nextElement();
                         if (addr instanceof Inet6Address) {
-                            if (addr.getHostAddress().indexOf('%') == -1) {
-                                ret.add((Inet6Address) addr);
+                            String ipstart = addr.getHostAddress().substring(0, addr.getHostAddress().indexOf(":"));
+                            if (!ipstart.equals("fe80")) {
+                                ret.add(addr.getHostAddress());
                             }
                         }
                     }

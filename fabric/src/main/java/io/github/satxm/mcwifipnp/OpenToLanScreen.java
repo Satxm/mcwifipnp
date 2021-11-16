@@ -101,6 +101,7 @@ public class OpenToLanScreen extends Screen {
 		this.MotdField = new TextFieldWidget(this.font, this.width / 2 + 5, 66, 150, 20,
 				I18n.translate("mcwifipnp.gui.motd"));
 		this.MotdField.setText(cfg.motd);
+		this.PortField.setMaxLength(32);
 		this.MotdField.setChangedListener((sMotd) -> {
 			this.buttonStartLanServer.active = !sMotd.isEmpty();
 		});

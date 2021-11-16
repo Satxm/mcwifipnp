@@ -101,6 +101,7 @@ public class ShareToLanScreen extends Screen {
 		this.EditMotd = new TextFieldWidget(this.font, this.width / 2 + 5, 66, 150, 20,
 				I18n.format("mcwifipnp.gui.port"));
 		this.EditMotd.setText(cfg.motd);
+		this.EditPort.setMaxStringLength(32);
 		this.EditMotd.setResponder((sMotd) -> {
 			this.StartLanServer.active = !sMotd.isEmpty();
 		});

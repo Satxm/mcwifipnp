@@ -91,35 +91,38 @@ public class MCWiFiPnP implements ModInitializer {
 			}
 
 			if (cfg.CopyToClipboard) {
-
-				if (IPv4() != null || IPv6() != null) {
-					if (IPv4() != null) {
-						String ipv4 = IPv4() + ":" + cfg.port;
-						Text component = Texts.bracketed((new LiteralText("IPv4")).styled((style) -> {
-							style.setColor(Formatting.GREEN)
-									.setClickEvent(
-											new ClickEvent(ClickEvent.Action.COPY_TO_CLIPBOARD, String.valueOf(ipv4)))
-									.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT,
-											new TranslatableText("chat.copy.click", new Object[0])))
-									.setInsertion(String.valueOf(ipv4));
-						}));
-						client.inGameHud.getChatHud()
-								.addMessage(new TranslatableText("mcwifipnp.upnp.success.clipboard", component));
+				Boolean NoneIPv4 = false;
+				Boolean NoneIPv6 = false;
+				if (GetIP.IPv4AddressList().size() > 0 || GetIP.GetGlobalIPv4() != null
+						|| UPnP.getExternalIP() != null) {
+					for (int i = 0; i < GetIP.IPv4AddressList().size(); i++) {
+						String IP = GetIP.IPv4AddressList().get(i) + ":" + cfg.port;
+						IPComponent("IPv4", IP);
 					}
-					if (IPv6() != null) {
-						String ipv6 = "[" + IPv6() + "]:" + cfg.port;
-						Text component = Texts.bracketed((new LiteralText("IPv6")).styled((style) -> {
-							style.setColor(Formatting.GREEN)
-									.setClickEvent(
-											new ClickEvent(ClickEvent.Action.COPY_TO_CLIPBOARD, String.valueOf(ipv6)))
-									.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT,
-											new TranslatableText("chat.copy.click", new Object[0])))
-									.setInsertion(String.valueOf(ipv6));
-						}));
-						client.inGameHud.getChatHud()
-								.addMessage(new TranslatableText("mcwifipnp.upnp.success.clipboard", component));
+					if (GetIP.GetGlobalIPv4() != null & !GetIP.IPv4AddressList().contains(GetIP.GetGlobalIPv4())) {
+						String IP = GetIP.GetGlobalIPv4() + ":" + cfg.port;
+						IPComponent("IPv4", IP);
+					}
+					if (UPnP.getExternalIP() != null & !GetIP.IPv4AddressList().contains(UPnP.getExternalIP())) {
+						String IP = UPnP.getExternalIP() + ":" + cfg.port;
+						IPComponent("IPv4", IP);
 					}
 				} else {
+					NoneIPv4 = true;
+				}
+				if (GetIP.IPv6AddressList().size() > 0 || GetIP.GetGlobalIPv6() != null) {
+					for (int i = 0; i < GetIP.IPv6AddressList().size(); i++) {
+						String IP = "[" + GetIP.IPv6AddressList().get(i) + "]:" + cfg.port;
+						IPComponent("IPv6", IP);
+					}
+					if (GetIP.GetGlobalIPv6() != null & !GetIP.IPv6AddressList().contains(GetIP.GetGlobalIPv6())) {
+						String IP = "[" + GetIP.GetGlobalIPv6() + "]:" + cfg.port;
+						IPComponent("IPv6", IP);
+					}
+				} else {
+					NoneIPv6 = true;
+				}
+				if (NoneIPv4 == true && NoneIPv6 == true) {
 					client.inGameHud.getChatHud().addMessage(new TranslatableText("mcwifipnp.upnp.success.cantgetip"));
 				}
 			}
@@ -189,28 +192,18 @@ public class MCWiFiPnP implements ModInitializer {
 		return gson.toJson(jsonObject);
 	}
 
-	private static String IPv4() {
-		if (GetIP.IPv4AddressList().size() >= 1 || GetIP.GetGlobalIPv4() != null) {
-			for (int i = 0; i < GetIP.IPv4AddressList().size(); i++) {
-				if (GetIP.IPv4AddressList().get(i).getHostAddress().equals(GetIP.GetGlobalIPv4())) {
-					return GetIP.IPv4AddressList().get(i).getHostAddress();
-				};
-			}
-		} else if (UPnP.getExternalIP() != null && GetIP.GetGlobalIPv4() != null
-				&& UPnP.getExternalIP().equals(GetIP.GetGlobalIPv4())) {
-			return GetIP.GetGlobalIPv4();
-		}
-		return null;
-	}
-
-	private static String IPv6() {
-		if (GetIP.IPv6AddressList().size() >= 1 || GetIP.GetGlobalIPv6() != null) {
-			for (int i = 0; i < GetIP.IPv6AddressList().size(); i++) {
-				if (GetIP.IPv6AddressList().get(i).getHostAddress().equals(GetIP.GetGlobalIPv6())) {
-					return GetIP.IPv6AddressList().get(i).getHostAddress();
-				};
-			}
-		}
-		return null;
+	private static Text IPComponent(String Type, String IP) {
+		MinecraftClient client = MinecraftClient.getInstance();
+		Text component = Texts.bracketed((new LiteralText(Type)).styled((style) -> {
+			style.setColor(Formatting.GREEN)
+					.setClickEvent(
+							new ClickEvent(ClickEvent.Action.COPY_TO_CLIPBOARD, String.valueOf(IP)))
+					.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT,
+							new TranslatableText("chat.copy.click", new Object[0])))
+					.setInsertion(String.valueOf(IP));
+		}));
+		client.inGameHud.getChatHud()
+				.addMessage(new TranslatableText("mcwifipnp.upnp.success.clipboard", component));
+		return component;
 	}
 }
