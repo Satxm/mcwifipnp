@@ -32,8 +32,6 @@ public class ShareToLanScreen extends Screen {
 			cfg.AllowCommands = client.getSingleplayerServer().getWorldData().getAllowCommands();
 			cfg.GameMode = client.getSingleplayerServer().getWorldData().getGameType().getName();
 			cfg.OnlineMode = client.getSingleplayerServer().usesAuthentication();
-			cfg.motd = client.getSingleplayerServer().getSingleplayerName() + " - "
-					+ client.getSingleplayerServer().getWorldData().getLevelName();
 			cfg.needsDefaults = false;
 		}
 	}
