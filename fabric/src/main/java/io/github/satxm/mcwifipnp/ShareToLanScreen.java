@@ -37,6 +37,8 @@ public class ShareToLanScreen extends Screen {
 			cfg.AllowCommands = client.getSingleplayerServer().getWorldData().getAllowCommands();
 			cfg.GameMode = client.getSingleplayerServer().getWorldData().getGameType().getName();
 			cfg.OnlineMode = client.getSingleplayerServer().usesAuthentication();
+			cfg.motd = client.getSingleplayerServer().getSingleplayerName() + " - "
+					+ client.getSingleplayerServer().getWorldData().getLevelName();
 			cfg.needsDefaults = false;
 		}
 	}
@@ -99,6 +101,7 @@ public class ShareToLanScreen extends Screen {
 
 		this.EditMotd = new EditBox(this.font, this.width / 2 + 5 , 66 , 150 , 20 , new TextComponent(cfg.motd));
 		this.EditMotd.setValue(cfg.motd);
+		this.EditPort.setMaxLength(32);
 		this.addButton(EditMotd);
 
 		EditMotd.setResponder((sMotd)->{
