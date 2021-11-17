@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Map;
 import java.util.Objects;
@@ -86,7 +87,6 @@ public class MCWiFiPnP {
 
 	public static void openToLan(MinecraftServer server) {
 		Minecraft client = Minecraft.getInstance();
-
 		Config cfg = configMap.get(server);
 		saveConfig(cfg);
 
@@ -123,21 +123,22 @@ public class MCWiFiPnP {
 				}
 			}
 			if (cfg.CopyToClipboard) {
+				ArrayList<ITextComponent> IPComponentList = new ArrayList<ITextComponent>();
 				Boolean NoneIPv4 = false;
 				Boolean NoneIPv6 = false;
 				if (GetIP.IPv4AddressList().size() > 0 || GetIP.GetGlobalIPv4() != null
 						|| UPnP.getExternalIP() != null) {
 					for (int i = 0; i < GetIP.IPv4AddressList().size(); i++) {
 						String IP = GetIP.IPv4AddressList().get(i) + ":" + cfg.port;
-						IPComponent("IPv4", IP);
+						IPComponentList.add(IPComponent("IPv4", IP));
 					}
 					if (GetIP.GetGlobalIPv4() != null & !GetIP.IPv4AddressList().contains(GetIP.GetGlobalIPv4())) {
 						String IP = GetIP.GetGlobalIPv4() + ":" + cfg.port;
-						IPComponent("IPv4", IP);
+						IPComponentList.add(IPComponent("IPv4", IP));
 					}
 					if (UPnP.getExternalIP() != null & !GetIP.IPv4AddressList().contains(UPnP.getExternalIP())) {
 						String IP = UPnP.getExternalIP() + ":" + cfg.port;
-						IPComponent("IPv4", IP);
+						IPComponentList.add(IPComponent("IPv4", IP));
 					}
 				} else {
 					NoneIPv4 = true;
@@ -145,11 +146,11 @@ public class MCWiFiPnP {
 				if (GetIP.IPv6AddressList().size() > 0 || GetIP.GetGlobalIPv6() != null) {
 					for (int i = 0; i < GetIP.IPv6AddressList().size(); i++) {
 						String IP = "[" + GetIP.IPv6AddressList().get(i) + "]:" + cfg.port;
-						IPComponent("IPv6", IP);
+						IPComponentList.add(IPComponent("IPv6", IP));
 					}
 					if (GetIP.GetGlobalIPv6() != null & !GetIP.IPv6AddressList().contains(GetIP.GetGlobalIPv6())) {
 						String IP = "[" + GetIP.GetGlobalIPv6() + "]:" + cfg.port;
-						IPComponent("IPv6", IP);
+						IPComponentList.add(IPComponent("IPv6", IP));
 					}
 				} else {
 					NoneIPv6 = true;
@@ -157,6 +158,17 @@ public class MCWiFiPnP {
 				if (NoneIPv4 == true && NoneIPv6 == true) {
 					client.ingameGUI.getChatGUI()
 							.printChatMessage(new TranslationTextComponent("mcwifipnp.upnp.success.cantgetip"));
+				} else {
+					ITextComponent component = null;
+					for (int i = 0; i < IPComponentList.size(); i++) {
+						if (component == null) {
+							component = IPComponentList.get(i).deepCopy();
+						} else {
+							component.appendSibling(IPComponentList.get(i));
+						}
+					}
+					client.ingameGUI.getChatGUI()
+					.printChatMessage(new TranslationTextComponent("mcwifipnp.upnp.success.clipboard", new Object[] { component }));
 				}
 			}
 		}, "MCWiFiPnP").start();
@@ -165,12 +177,9 @@ public class MCWiFiPnP {
 	@SubscribeEvent
 	public void onServerStarting(FMLServerStartingEvent event) {
 		MinecraftServer server = event.getServer();
-		File cfgfile = new File(server.getWorld(DimensionType.OVERWORLD).getSaveHandler().getWorldDirectory(),
-				"mcwifipnp.json");
+		File cfgfile = new File(server.getWorld(DimensionType.OVERWORLD).getSaveHandler().getWorldDirectory(), "mcwifipnp.json");
 		Path location = cfgfile.toPath();
-
 		Config cfg;
-
 		try {
 			cfg = gson.fromJson(new String(Files.readAllBytes(location)), Config.class);
 			cfg.location = location;
@@ -178,14 +187,11 @@ public class MCWiFiPnP {
 			try {
 				Files.deleteIfExists(location);
 			} catch (IOException ioException) {
-				//
 			}
-
 			cfg = new Config();
 			cfg.location = location;
 			cfg.needsDefaults = true;
 		}
-
 		configMap.put(server, cfg);
 	}
 
@@ -213,7 +219,7 @@ public class MCWiFiPnP {
 	public static class Config {
 		public int port = HTTPUtil.getSuitableLanPort();
 		public String GameMode = "survival";
-		public String motd = "A Minecraft LAN Server";
+		public String motd = "A Minecraft LAN World";
 		public boolean UseUPnP = true;
 		public boolean AllowCommands = false;
 		public boolean OnlineMode = true;
@@ -232,17 +238,13 @@ public class MCWiFiPnP {
 	}
 
 	private static ITextComponent IPComponent(String Type, String IP) {
-		Minecraft client = Minecraft.getInstance();
-		ITextComponent component = TextComponentUtils
+		return TextComponentUtils
 				.wrapInSquareBrackets((new StringTextComponent(Type)).applyTextStyle((style) -> {
 					style.setColor(TextFormatting.GREEN)
 							.setClickEvent(new ClickEvent(ClickEvent.Action.COPY_TO_CLIPBOARD, IP))
 							.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT,
-									new TranslationTextComponent("chat.copy.click")))
+									new TranslationTextComponent("chat.copy.click").appendText("\n").appendText(IP)))
 							.setInsertion(IP);
 				}));
-		client.ingameGUI.getChatGUI()
-				.printChatMessage(new TranslationTextComponent("mcwifipnp.upnp.success.clipboard", component));
-		return component;
 	}
 }

@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Map;
 import java.util.Objects;
@@ -46,6 +47,34 @@ public class MCWiFiPnP implements ModInitializer {
 		ServerLifecycleEvents.SERVER_STARTING.register(this::onServerLoad);
 		ServerLifecycleEvents.SERVER_STOPPING.register(this::onServerStop);
 	}
+	
+	private void onServerLoad(MinecraftServer server) {
+		File cfgfile = server.getLevelStorage().resolveFile(server.getLevelName(), "mcwifipnp.json");
+		Path location = cfgfile.toPath();
+		Config cfg;
+		try {
+			cfg = gson.fromJson(new String(Files.readAllBytes(location)), Config.class);
+			cfg.location = location;
+		} catch (IOException | JsonParseException e) {
+			try {
+				Files.deleteIfExists(location);
+			} catch (IOException ioException) {
+				//
+			}
+			cfg = new Config();
+			cfg.location = location;
+			cfg.needsDefaults = true;
+		}
+		configMap.put(server, cfg);
+	}
+
+	private void onServerStop(MinecraftServer server) {
+		Config cfg = configMap.get(server);
+		if (server.isRemote() && cfg.UseUPnP) {
+			UPnP.closePortTCP(cfg.port);
+			LOGGER.info("Stopped forwarded port " + cfg.port + ".");
+		}
+	}
 
 	@NotNull
 	public static Config getConfig(MinecraftServer server) {
@@ -57,7 +86,7 @@ public class MCWiFiPnP implements ModInitializer {
 
 		Config cfg = configMap.get(server);
 		saveConfig(cfg);
-
+		
 		server.setMotd(cfg.motd);
 		server.getServerMetadata().setDescription(new LiteralText(cfg.motd));
 		server.openToLan(GameMode.byName(cfg.GameMode), cfg.AllowCommands, cfg.port);
@@ -91,21 +120,22 @@ public class MCWiFiPnP implements ModInitializer {
 			}
 
 			if (cfg.CopyToClipboard) {
+				ArrayList<Text> IPComponentList = new ArrayList<Text>();
 				Boolean NoneIPv4 = false;
 				Boolean NoneIPv6 = false;
 				if (GetIP.IPv4AddressList().size() > 0 || GetIP.GetGlobalIPv4() != null
 						|| UPnP.getExternalIP() != null) {
 					for (int i = 0; i < GetIP.IPv4AddressList().size(); i++) {
 						String IP = GetIP.IPv4AddressList().get(i) + ":" + cfg.port;
-						IPComponent("IPv4", IP);
+						IPComponentList.add(IPComponent("IPv4", IP));
 					}
 					if (GetIP.GetGlobalIPv4() != null & !GetIP.IPv4AddressList().contains(GetIP.GetGlobalIPv4())) {
 						String IP = GetIP.GetGlobalIPv4() + ":" + cfg.port;
-						IPComponent("IPv4", IP);
+						IPComponentList.add(IPComponent("IPv4", IP));
 					}
 					if (UPnP.getExternalIP() != null & !GetIP.IPv4AddressList().contains(UPnP.getExternalIP())) {
 						String IP = UPnP.getExternalIP() + ":" + cfg.port;
-						IPComponent("IPv4", IP);
+						IPComponentList.add(IPComponent("IPv4", IP));
 					}
 				} else {
 					NoneIPv4 = true;
@@ -113,51 +143,30 @@ public class MCWiFiPnP implements ModInitializer {
 				if (GetIP.IPv6AddressList().size() > 0 || GetIP.GetGlobalIPv6() != null) {
 					for (int i = 0; i < GetIP.IPv6AddressList().size(); i++) {
 						String IP = "[" + GetIP.IPv6AddressList().get(i) + "]:" + cfg.port;
-						IPComponent("IPv6", IP);
+						IPComponentList.add(IPComponent("IPv6", IP));
 					}
 					if (GetIP.GetGlobalIPv6() != null & !GetIP.IPv6AddressList().contains(GetIP.GetGlobalIPv6())) {
 						String IP = "[" + GetIP.GetGlobalIPv6() + "]:" + cfg.port;
-						IPComponent("IPv6", IP);
+						IPComponentList.add(IPComponent("IPv6", IP));
 					}
 				} else {
 					NoneIPv6 = true;
 				}
 				if (NoneIPv4 == true && NoneIPv6 == true) {
 					client.inGameHud.getChatHud().addMessage(new TranslatableText("mcwifipnp.upnp.success.cantgetip"));
+				} else {
+					Text component = null;
+					for (int i = 0; i < IPComponentList.size(); i++) {
+						if (component == null) {
+							component = IPComponentList.get(i).deepCopy();
+						} else {
+							component.append(IPComponentList.get(i));
+						}
+					}
+					client.inGameHud.getChatHud().addMessage(new TranslatableText("mcwifipnp.upnp.success.clipboard", new Object[] { component }));
 				}
 			}
 		}, "MCWiFiPnP").start();
-	}
-
-	private void onServerLoad(MinecraftServer server) {
-		File cfgfile = server.getLevelStorage().resolveFile(server.getLevelName(), "mcwifipnp.json");
-		Path location = cfgfile.toPath();
-		Config cfg;
-
-		try {
-			cfg = gson.fromJson(new String(Files.readAllBytes(location)), Config.class);
-			cfg.location = location;
-		} catch (IOException | JsonParseException e) {
-			try {
-				Files.deleteIfExists(location);
-			} catch (IOException ioException) {
-				//
-			}
-
-			cfg = new Config();
-			cfg.location = location;
-			cfg.needsDefaults = true;
-		}
-
-		configMap.put(server, cfg);
-	}
-
-	private void onServerStop(MinecraftServer server) {
-		Config cfg = configMap.get(server);
-		if (server.isRemote() && cfg.UseUPnP) {
-			UPnP.closePortTCP(cfg.port);
-			LOGGER.info("Stopped forwarded port " + cfg.port + ".");
-		}
 	}
 
 	private static void saveConfig(Config cfg) {
@@ -174,7 +183,7 @@ public class MCWiFiPnP implements ModInitializer {
 	public static class Config {
 		public int port = NetworkUtils.findLocalPort();
 		public String GameMode = "survival";
-		public String motd = "A Minecraft LAN Server";
+		public String motd = "A Minecraft LAN World";
 		public boolean UseUPnP = true;
 		public boolean AllowCommands = false;
 		public boolean OnlineMode = true;
@@ -193,17 +202,13 @@ public class MCWiFiPnP implements ModInitializer {
 	}
 
 	private static Text IPComponent(String Type, String IP) {
-		MinecraftClient client = MinecraftClient.getInstance();
-		Text component = Texts.bracketed((new LiteralText(Type)).styled((style) -> {
+		return Texts.bracketed((new LiteralText(Type)).styled((style) -> {
 			style.setColor(Formatting.GREEN)
 					.setClickEvent(
 							new ClickEvent(ClickEvent.Action.COPY_TO_CLIPBOARD, String.valueOf(IP)))
 					.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT,
-							new TranslatableText("chat.copy.click", new Object[0])))
+							new TranslatableText("chat.copy.click", new Object[0]).append("\n").append(IP)))
 					.setInsertion(String.valueOf(IP));
 		}));
-		client.inGameHud.getChatHud()
-				.addMessage(new TranslatableText("mcwifipnp.upnp.success.clipboard", component));
-		return component;
 	}
 }
