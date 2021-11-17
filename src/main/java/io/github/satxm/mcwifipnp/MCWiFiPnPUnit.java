@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Map;
 import java.util.Objects;
@@ -25,6 +26,7 @@ import net.minecraft.network.chat.ClickEvent;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.ComponentUtils;
 import net.minecraft.network.chat.HoverEvent;
+import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.network.chat.TextComponent;
 import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.server.MinecraftServer;
@@ -75,21 +77,22 @@ public class MCWiFiPnPUnit {
 				}
 			}
 			if (cfg.CopyToClipboard) {
+				ArrayList<Component> IPComponentList = new ArrayList<Component>();
 				Boolean NoneIPv4 = false;
 				Boolean NoneIPv6 = false;
 				if (GetIP.IPv4AddressList().size() > 0 || GetIP.GetGlobalIPv4() != null
 						|| UPnP.getExternalIP() != null) {
 					for (int i = 0; i < GetIP.IPv4AddressList().size(); i++) {
 						String IP = GetIP.IPv4AddressList().get(i) + ":" + cfg.port;
-						IPComponent("IPv4", IP);
+						IPComponentList.add(IPComponent("IPv4", IP));
 					}
 					if (GetIP.GetGlobalIPv4() != null & !GetIP.IPv4AddressList().contains(GetIP.GetGlobalIPv4())) {
 						String IP = GetIP.GetGlobalIPv4() + ":" + cfg.port;
-						IPComponent("IPv4", IP);
+						IPComponentList.add(IPComponent("IPv4", IP));
 					}
 					if (UPnP.getExternalIP() != null & !GetIP.IPv4AddressList().contains(UPnP.getExternalIP())) {
 						String IP = UPnP.getExternalIP() + ":" + cfg.port;
-						IPComponent("IPv4", IP);
+						IPComponentList.add(IPComponent("IPv4", IP));
 					}
 				} else {
 					NoneIPv4 = true;
@@ -97,17 +100,28 @@ public class MCWiFiPnPUnit {
 				if (GetIP.IPv6AddressList().size() > 0 || GetIP.GetGlobalIPv6() != null) {
 					for (int i = 0; i < GetIP.IPv6AddressList().size(); i++) {
 						String IP = "[" + GetIP.IPv6AddressList().get(i) + "]:" + cfg.port;
-						IPComponent("IPv6", IP);
+						IPComponentList.add(IPComponent("IPv6", IP));
 					}
 					if (GetIP.GetGlobalIPv6() != null & !GetIP.IPv6AddressList().contains(GetIP.GetGlobalIPv6())) {
 						String IP = "[" + GetIP.GetGlobalIPv6() + "]:" + cfg.port;
-						IPComponent("IPv6", IP);
+						IPComponentList.add(IPComponent("IPv6", IP));
 					}
 				} else {
 					NoneIPv6 = true;
 				}
 				if (NoneIPv4 == true && NoneIPv6 == true) {
 					client.gui.getChat().addMessage(new TranslatableComponent("mcwifipnp.upnp.success.cantgetip"));
+				} else {
+					MutableComponent component = null;
+					for (int i = 0; i < IPComponentList.size(); i++) {
+						if (component == null) {
+							component = IPComponentList.get(i).copy();
+						} else {
+							component.append(IPComponentList.get(i));
+						}
+					}
+					client.gui.getChat().addMessage(
+							new TranslatableComponent("mcwifipnp.upnp.success.clipboard", new Object[] { component }));
 				}
 			}
 		}, "MCWiFiPnP").start();
@@ -154,7 +168,7 @@ public class MCWiFiPnPUnit {
 	public static class Config {
 		public int port = HttpUtil.getAvailablePort();
 		public String GameMode = "survival";
-		public String motd = "A Minecraft LAN Server";
+		public String motd = "A Minecraft LAN World";
 		public boolean UseUPnP = true;
 		public boolean AllowCommands = false;
 		public boolean OnlineMode = true;
@@ -173,15 +187,12 @@ public class MCWiFiPnPUnit {
 	}
 
 	private static Component IPComponent(String Type, String IP) {
-		Minecraft client = Minecraft.getInstance();
-		Component component = ComponentUtils.wrapInSquareBrackets((new TextComponent(Type)).withStyle((style) -> {
+		return ComponentUtils.wrapInSquareBrackets((new TextComponent(Type)).withStyle((style) -> {
 			return style.withColor(ChatFormatting.GREEN)
 					.withClickEvent(new ClickEvent(ClickEvent.Action.COPY_TO_CLIPBOARD, IP))
-					.withHoverEvent(
-							new HoverEvent(HoverEvent.Action.SHOW_TEXT, new TranslatableComponent("chat.copy.click")))
+					.withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT,
+							new TranslatableComponent("chat.copy.click").append("\n").append(IP)))
 					.withInsertion(IP);
 		}));
-		client.gui.getChat().addMessage(new TranslatableComponent("mcwifipnp.upnp.success.clipboard", component));
-		return component;
 	}
 }
