@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Map;
 import java.util.Objects;
@@ -25,6 +26,7 @@ import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.button.Button;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.HTTPUtil;
+import net.minecraft.util.text.IFormattableTextComponent;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.util.text.TextComponentUtils;
@@ -76,6 +78,92 @@ public class MCWiFiPnP {
 		}
 	}
 
+	public static Config getConfig(MinecraftServer server) {
+		return Objects.requireNonNull(configMap.get(server), "no config for server???");
+	}
+
+	public static void openToLan(MinecraftServer server) {
+		Minecraft client = Minecraft.getInstance();
+		Config cfg = configMap.get(server);
+		saveConfig(cfg);
+
+		server.setMotd(cfg.motd);
+		server.getStatus().setDescription(new StringTextComponent(cfg.motd));
+		server.publishServer(GameType.byName(cfg.GameMode), cfg.AllowCommands, cfg.port);
+		server.setUsesAuthentication(cfg.OnlineMode);
+		server.setPvpAllowed(cfg.EnablePvP);
+		client.gui.getChat().addMessage(new TranslationTextComponent("commands.publish.started", cfg.port));
+		new Thread(() -> {
+			if (cfg.UseUPnP) {
+				UPnPUtil.UPnPResult result = UPnPUtil.init(cfg.port, "Minecraft LAN Server");
+				switch (result) {
+				case SUCCESS:
+					client.gui.getChat().addMessage(new TranslationTextComponent("mcwifipnp.upnp.success", cfg.port));
+					LOGGER.info("Started forwarded port " + cfg.port + ".");
+					break;
+				case FAILED_GENERIC:
+					client.gui.getChat().addMessage(new TranslationTextComponent("mcwifipnp.upnp.failed", cfg.port));
+					break;
+				case FAILED_MAPPED:
+					client.gui.getChat().addMessage(new TranslationTextComponent("mcwifipnp.upnp.failed.mapped", cfg.port));
+					break;
+				case FAILED_DISABLED:
+					client.gui.getChat().addMessage(new TranslationTextComponent("mcwifipnp.upnp.failed.disabled", cfg.port));
+					break;
+				}
+			}
+			if (cfg.CopyToClipboard) {
+				ArrayList<ITextComponent> IPComponentList = new ArrayList<ITextComponent>();
+				Boolean NoneIPv4 = false;
+				Boolean NoneIPv6 = false;
+				if (GetIP.IPv4AddressList().size() > 0 || GetIP.GetGlobalIPv4() != null
+						|| UPnP.getExternalIP() != null) {
+					for (int i = 0; i < GetIP.IPv4AddressList().size(); i++) {
+						String IP = GetIP.IPv4AddressList().get(i) + ":" + cfg.port;
+						IPComponentList.add(IPComponent("IPv4", IP));
+					}
+					if (GetIP.GetGlobalIPv4() != null & !GetIP.IPv4AddressList().contains(GetIP.GetGlobalIPv4())) {
+						String IP = GetIP.GetGlobalIPv4() + ":" + cfg.port;
+						IPComponentList.add(IPComponent("IPv4", IP));
+					}
+					if (UPnP.getExternalIP() != null & !GetIP.IPv4AddressList().contains(UPnP.getExternalIP())) {
+						String IP = UPnP.getExternalIP() + ":" + cfg.port;
+						IPComponentList.add(IPComponent("IPv4", IP));
+					}
+				} else {
+					NoneIPv4 = true;
+				}
+				if (GetIP.IPv6AddressList().size() > 0 || GetIP.GetGlobalIPv6() != null) {
+					for (int i = 0; i < GetIP.IPv6AddressList().size(); i++) {
+						String IP = "[" + GetIP.IPv6AddressList().get(i) + "]:" + cfg.port;
+						IPComponentList.add(IPComponent("IPv6", IP));
+					}
+					if (GetIP.GetGlobalIPv6() != null & !GetIP.IPv6AddressList().contains(GetIP.GetGlobalIPv6())) {
+						String IP = "[" + GetIP.GetGlobalIPv6() + "]:" + cfg.port;
+						IPComponentList.add(IPComponent("IPv6", IP));
+					}
+				} else {
+					NoneIPv6 = true;
+				}
+				if (NoneIPv4 == true && NoneIPv6 == true) {
+					client.gui.getChat().addMessage(new TranslationTextComponent("mcwifipnp.upnp.success.cantgetip"));
+				} else {
+					IFormattableTextComponent component = null;
+					for (int i = 0; i < IPComponentList.size(); i++) {
+						if (component == null) {
+							component = IPComponentList.get(i).copy();
+						} else {
+							component.append(IPComponentList.get(i));
+						}
+					}
+					client.gui.getChat().addMessage(new TranslationTextComponent("mcwifipnp.upnp.success.clipboard",
+							new Object[] { component }));
+				}
+			}
+		}, "MCWiFiPnP").start();
+	}
+
+	
 	@SubscribeEvent
 	public void onServerStarting(FMLServerStartingEvent event) {
 		Path location = event.getServer().getWorldPath(FolderName.ROOT).resolve("mcwifipnp.json");
@@ -89,8 +177,7 @@ public class MCWiFiPnP {
 			try {
 				Files.deleteIfExists(location);
 			} catch (IOException ioException) {
-				//
-			}
+						}
 			cfg = new Config();
 			cfg.location = location;
 			cfg.needsDefaults = true;
@@ -107,85 +194,6 @@ public class MCWiFiPnP {
 		}
 	}
 
-	public static Config getConfig(MinecraftServer server) {
-		return Objects.requireNonNull(configMap.get(server), "no config for server???");
-	}
-
-	public static void openToLan(MinecraftServer server) {
-		Minecraft client = Minecraft.getInstance();
-		Config cfg = configMap.get(server);
-		saveConfig(cfg);
-		
-		server.setMotd(cfg.motd);
-		server.getStatus().setDescription(new StringTextComponent(cfg.motd));
-		server.publishServer(GameType.byName(cfg.GameMode), cfg.AllowCommands, cfg.port);
-		server.setUsesAuthentication(cfg.OnlineMode);
-		server.setPvpAllowed(cfg.EnablePvP);
-		client.gui.getChat().addMessage(new TranslationTextComponent("commands.publish.started", cfg.port));
-		new Thread(() -> {
-			if (cfg.UseUPnP) {
-				UPnPUtil.UPnPResult result = UPnPUtil.init(cfg.port, "Minecraft LAN Server");
-				switch (result) {
-					case SUCCESS:
-						client.gui.getChat()
-								.addMessage(new TranslationTextComponent("mcwifipnp.upnp.success", cfg.port));
-						LOGGER.info("Started forwarded port " + cfg.port + ".");
-						break;
-					case FAILED_GENERIC:
-						client.gui.getChat()
-								.addMessage(new TranslationTextComponent("mcwifipnp.upnp.failed", cfg.port));
-						break;
-					case FAILED_MAPPED:
-						client.gui.getChat()
-								.addMessage(new TranslationTextComponent("mcwifipnp.upnp.failed.mapped", cfg.port));
-						break;
-					case FAILED_DISABLED:
-						client.gui.getChat()
-								.addMessage(new TranslationTextComponent("mcwifipnp.upnp.failed.disabled", cfg.port));
-						break;
-				}
-			}
-			
-			if (cfg.CopyToClipboard) {
-				Boolean NoneIPv4 = false;
-				Boolean NoneIPv6 = false;
-				if (GetIP.IPv4AddressList().size() > 0 || GetIP.GetGlobalIPv4() != null
-						|| UPnP.getExternalIP() != null) {
-					for (int i = 0; i < GetIP.IPv4AddressList().size(); i++) {
-						String IP = GetIP.IPv4AddressList().get(i) + ":" + cfg.port;
-						IPComponent("IPv4", IP);
-					}
-					if (GetIP.GetGlobalIPv4() != null & !GetIP.IPv4AddressList().contains(GetIP.GetGlobalIPv4())) {
-						String IP = GetIP.GetGlobalIPv4() + ":" + cfg.port;
-						IPComponent("IPv4", IP);
-					}
-					if (UPnP.getExternalIP() != null & !GetIP.IPv4AddressList().contains(UPnP.getExternalIP())) {
-						String IP = UPnP.getExternalIP() + ":" + cfg.port;
-						IPComponent("IPv4", IP);
-					}
-				} else {
-					NoneIPv4 = true;
-				}
-				if (GetIP.IPv6AddressList().size() > 0 || GetIP.GetGlobalIPv6() != null) {
-					for (int i = 0; i < GetIP.IPv6AddressList().size(); i++) {
-						String IP = "[" + GetIP.IPv6AddressList().get(i) + "]:" + cfg.port;
-						IPComponent("IPv6", IP);
-					}
-					if (GetIP.GetGlobalIPv6() != null & !GetIP.IPv6AddressList().contains(GetIP.GetGlobalIPv6())) {
-						String IP = "[" + GetIP.GetGlobalIPv6() + "]:" + cfg.port;
-						IPComponent("IPv6", IP);
-					}
-				} else {
-					NoneIPv6 = true;
-				}
-				if (NoneIPv4 == true && NoneIPv6 == true) {
-					client.gui.getChat()
-								.addMessage(new TranslationTextComponent("mcwifipnp.upnp.success.cantgetip"));
-				}
-			}
-		}, "MCWiFiPnP").start();
-	}
-
 	private static void saveConfig(Config cfg) {
 		if (!cfg.needsDefaults) {
 			try {
@@ -200,7 +208,7 @@ public class MCWiFiPnP {
 	public static class Config {
 		public int port = HTTPUtil.getAvailablePort();
 		public String GameMode = "survival";
-		public String motd = "A Minecraft LAN Server";
+		public String motd = "A Minecraft LAN World";
 		public boolean UseUPnP = true;
 		public boolean AllowCommands = false;
 		public boolean OnlineMode = true;
@@ -219,17 +227,12 @@ public class MCWiFiPnP {
 	}
 
 	private static ITextComponent IPComponent(String Type, String IP) {
-		Minecraft client = Minecraft.getInstance();
-		ITextComponent component = TextComponentUtils
-		.wrapInSquareBrackets((new StringTextComponent(Type)).withStyle((style) -> {
+		return TextComponentUtils.wrapInSquareBrackets((new StringTextComponent(Type)).withStyle((style) -> {
 			return style.withColor(TextFormatting.GREEN)
 					.withClickEvent(new ClickEvent(ClickEvent.Action.COPY_TO_CLIPBOARD, IP))
 					.withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT,
-							new TranslationTextComponent("chat.copy.click")))
+							new TranslationTextComponent("chat.copy.click").append("\n").append(IP)))
 					.withInsertion(IP);
 		}));
-		client.gui.getChat()
-								.addMessage(new TranslationTextComponent("mcwifipnp.upnp.success.clipboard", component));
-		return component;
 	}
 }
