@@ -16,7 +16,7 @@ archivesBaseName = project.archives_base_name
 version = project.mod_version + "-forge"
 group = project.maven_group
 
-java.toolchain.languageVersion = JavaLanguageVersion.of(16)
+java.toolchain.languageVersion = JavaLanguageVersion.of(17)
 
 println('Java: ' + System.getProperty('java.version') + ' JVM: ' + System.getProperty('java.vm.version') + '(' + System.getProperty('java.vendor') + ') Arch: ' + System.getProperty('os.arch'))
 
@@ -26,6 +26,7 @@ minecraft {
     runs {
         client {
             workingDirectory project.file('../run')
+            property 'forge.logging.markers', 'REGISTRIES'
             property 'forge.logging.console.level', 'debug'
 
             mods {
@@ -99,5 +100,5 @@ classes.configure {
 
 tasks.withType(JavaCompile).configureEach {
 	it.options.encoding = "UTF-8"
-	it.options.release = 16
+	it.options.release = 17
 }

@@ -180,8 +180,7 @@ public class MCWiFiPnPUnit {
 
 	private static String toPrettyFormat(Object src) {
 		String json = gson.toJson(src);
-		JsonParser jsonParser = new JsonParser();
-		JsonObject jsonObject = jsonParser.parse(json).getAsJsonObject();
+		JsonObject jsonObject = JsonParser.parseString(json).getAsJsonObject();
 		Gson gson = new GsonBuilder().setPrettyPrinting().create();
 		return gson.toJson(jsonObject);
 	}
