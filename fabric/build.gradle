@@ -5,7 +5,7 @@ plugins {
 sourceCompatibility = targetCompatibility = JavaVersion.VERSION_17
 
 archivesBaseName = project.archives_base_name
-version = project.mod_version + "-fabric"
+version = project.mod_version + "-" + project.minecraft_version + "-fabric"
 group = project.maven_group
 
 dependencies {
@@ -49,3 +49,5 @@ tasks.withType(JavaCompile).configureEach {
 	it.options.encoding = "UTF-8"
 	it.options.release = 16
 }
+
+buildDir = "../build"
