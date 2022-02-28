@@ -25,6 +25,6 @@
     "fabricloader": "${loader_version}",
     "fabric": "${fabric_version}",
     "minecraft": "${mc_version}",
-    "java": ">=16"
+    "java": ">=17"
   }
 }
