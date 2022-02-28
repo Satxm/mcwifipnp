@@ -13,7 +13,7 @@ apply plugin: 'net.minecraftforge.gradle'
 apply plugin: 'eclipse'
 
 archivesBaseName = project.archives_base_name
-version = project.mod_version + "-forge"
+version = project.mod_version + "-" + project.minecraft_version + "-forge"
 group = project.maven_group
 
 java.toolchain.languageVersion = JavaLanguageVersion.of(16)
@@ -101,3 +101,5 @@ tasks.withType(JavaCompile).configureEach {
 	it.options.encoding = "UTF-8"
 	it.options.release = 16
 }
+
+buildDir = "../build"
