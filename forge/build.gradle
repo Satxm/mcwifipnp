@@ -76,6 +76,10 @@ jar {
 }
 }
 
+java {
+    withSourcesJar()
+}
+
 def replaceResources = tasks.register("replaceResources", Copy) {
 	it.outputs.upToDateWhen { false }
 	//Copy it into the build dir
@@ -95,3 +99,5 @@ processResources {
 classes.configure {
 	dependsOn(replaceResources)
 }
+
+buildDir = "../build"

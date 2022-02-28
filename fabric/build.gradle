@@ -34,6 +34,10 @@ jar {
 	}
 }
 
+java {
+    withSourcesJar()
+}
+
 processResources {
 	inputs.property "version", project.version
 
@@ -49,3 +53,5 @@ tasks.withType(JavaCompile).configureEach {
 		it.options.release = targetVersion
 	}
 }
+
+buildDir = "../build"
