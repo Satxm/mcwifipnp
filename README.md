@@ -15,9 +15,9 @@
 
 ## Introduction - 简介
 
-Updated to Minecraft 1.17.x, Uses the vanilla Minecraft GUI style, Uses the official mojang mappings.
+Updated to Minecraft 1.18.x, Uses the vanilla Minecraft GUI style, Uses the official mojang mappings.
 
-已经更新到1.17.x，使用Minecraft原生界面样式，使用Mojang官方混淆表。
+已经更新到1.18.x，使用Minecraft原生界面样式，使用Mojang官方混淆表。
 
 Modified from [TheGlitch76/mcpnp](https://github.com/TheGlitch76/mcpnp) project and UPnP module from [adolfintel/WaifUPnP](https://github.com/adolfintel/WaifUPnP).
 
