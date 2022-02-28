@@ -76,6 +76,16 @@ jar {
     }
 }
 
+task sourcesJar(type: Jar, dependsOn: classes) {
+    classifier = 'sources'
+    from sourceSets.main.allJava
+    from sourceSets.main.resources
+}
+
+artifacts {
+    archives sourcesJar
+}
+
 def replaceResources = tasks.register("replaceResources", Copy) {
 	it.outputs.upToDateWhen { false }
 	//Copy it into the build dir
@@ -95,3 +105,5 @@ processResources {
 classes.configure {
 	dependsOn(replaceResources)
 }
+
+buildDir = "../build"

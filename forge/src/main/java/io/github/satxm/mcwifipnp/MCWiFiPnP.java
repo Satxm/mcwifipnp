@@ -101,25 +101,17 @@ public class MCWiFiPnP {
 		new Thread(() -> {
 
 			if (cfg.UseUPnP) {
-				UPnPUtil.UPnPResult result = UPnPUtil.init(cfg.port, "Minecraft LAN Server");
-				switch (result) {
-				case SUCCESS:
-					client.ingameGUI.getChatGUI()
-							.printChatMessage(new TranslationTextComponent("mcwifipnp.upnp.success", cfg.port));
-					LOGGER.info("Started forwarded port " + cfg.port + ".");
-					break;
-				case FAILED_GENERIC:
-					client.ingameGUI.getChatGUI()
-							.printChatMessage(new TranslationTextComponent("mcwifipnp.upnp.failed", cfg.port));
-					break;
-				case FAILED_MAPPED:
-					client.ingameGUI.getChatGUI()
-							.printChatMessage(new TranslationTextComponent("mcwifipnp.upnp.failed.mapped", cfg.port));
-					break;
-				case FAILED_DISABLED:
-					client.ingameGUI.getChatGUI()
-							.printChatMessage(new TranslationTextComponent("mcwifipnp.upnp.failed.disabled", cfg.port));
-					break;
+				if (UPnP.isUPnPAvailable()) {
+					if (UPnP.isMappedTCP(cfg.port)) {
+						client.ingameGUI.getChatGUI().printChatMessage(new TranslationTextComponent("mcwifipnp.upnp.failed.mapped", cfg.port));
+					} else if (UPnP.openPortTCP(cfg.port, cfg.motd)) {
+						client.ingameGUI.getChatGUI().printChatMessage(new TranslationTextComponent("mcwifipnp.upnp.success", cfg.port));
+						LOGGER.info("Started forwarded port " + cfg.port + ".");
+					} else {
+						client.ingameGUI.getChatGUI().printChatMessage(new TranslationTextComponent("mcwifipnp.upnp.failed", cfg.port));
+					}
+				} else {
+					client.ingameGUI.getChatGUI().printChatMessage(new TranslationTextComponent("mcwifipnp.upnp.failed.disabled", cfg.port));
 				}
 			}
 			if (cfg.CopyToClipboard) {

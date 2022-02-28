@@ -52,3 +52,5 @@ tasks.withType(JavaCompile).configureEach {
 java {
     withSourcesJar()
 }
+
+buildDir = "../build"
