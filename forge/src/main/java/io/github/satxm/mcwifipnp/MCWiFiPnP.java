@@ -5,8 +5,7 @@ import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.PauseScreen;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.server.IntegratedServer;
-import net.minecraft.network.chat.TextComponent;
-import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.network.chat.Component;
 import net.minecraft.world.level.GameType;
 import net.minecraftforge.client.event.ScreenEvent;
 import net.minecraftforge.common.MinecraftForge;
@@ -32,12 +31,12 @@ public class MCWiFiPnP {
 			for (int k = 0; k < event.getListenersList().size(); k++) {
 				Button ShareToLanOld = (Button) event.getListenersList().get(k);
 				if (ShareToLanOld.getMessage().getString()
-						.equals(new TranslatableComponent("menu.shareToLan").getString())) {
+						.equals(Component.translatable("menu.shareToLan").getString())) {
 					int x = ShareToLanOld.x;
 					int y = ShareToLanOld.y;
 					int w = ShareToLanOld.getWidth();
 					int h = ShareToLanOld.getHeight();
-					Button ShareToLanNew = new Button(x, y, w, h, new TranslatableComponent("menu.shareToLan"),
+					Button ShareToLanNew = new Button(x, y, w, h, Component.translatable("menu.shareToLan"),
 							(button) -> client.setScreen(new ShareToLanScreen(screen)));
 					ShareToLanNew.active = ShareToLanOld.active;
 					event.removeListener(ShareToLanOld);
@@ -63,12 +62,12 @@ public class MCWiFiPnP {
 		MCWiFiPnPUnit.Config cfg = MCWiFiPnPUnit.getConfig(server);
 
 		server.setMotd(cfg.motd);
-		server.getStatus().setDescription(new TextComponent(cfg.motd));
+		server.getStatus().setDescription(Component.literal(cfg.motd));
 		server.publishServer(GameType.byName(cfg.GameMode), cfg.AllowCommands, cfg.port);
 		server.getPlayerList().maxPlayers = cfg.maxPlayers;
 		server.setUsesAuthentication(cfg.OnlineMode);
 		server.setPvpAllowed(cfg.EnablePvP);
-		client.gui.getChat().addMessage(new TranslatableComponent("commands.publish.started", cfg.port));
+		client.gui.getChat().addMessage(Component.translatable("commands.publish.started", cfg.port));
 
 		new Thread(() -> {
 			MCWiFiPnPUnit.UseUPnP(cfg, client);

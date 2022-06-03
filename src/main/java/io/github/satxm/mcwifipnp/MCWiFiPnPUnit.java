@@ -36,8 +36,6 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.ComponentUtils;
 import net.minecraft.network.chat.HoverEvent;
 import net.minecraft.network.chat.MutableComponent;
-import net.minecraft.network.chat.TextComponent;
-import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.HttpUtil;
 import net.minecraft.world.level.storage.LevelResource;
@@ -56,16 +54,15 @@ public class MCWiFiPnPUnit {
         if (cfg.UseUPnP) {
             if (UPnP.isUPnPAvailable()) {
                 if (UPnP.isMappedTCP(cfg.port)) {
-                    client.gui.getChat()
-                            .addMessage(new TranslatableComponent("mcwifipnp.upnp.failed.mapped", cfg.port));
+                    client.gui.getChat().addMessage(Component.translatable("mcwifipnp.upnp.failed.mapped", cfg.port));
                 } else if (UPnP.openPortTCP(cfg.port, cfg.motd)) {
-                    client.gui.getChat().addMessage(new TranslatableComponent("mcwifipnp.upnp.success", cfg.port));
+                    client.gui.getChat().addMessage(Component.translatable("mcwifipnp.upnp.success", cfg.port));
                     LOGGER.info("Started forwarded port " + cfg.port + ".");
                 } else {
-                    client.gui.getChat().addMessage(new TranslatableComponent("mcwifipnp.upnp.failed", cfg.port));
+                    client.gui.getChat().addMessage(Component.translatable("mcwifipnp.upnp.failed", cfg.port));
                 }
             } else {
-                client.gui.getChat().addMessage(new TranslatableComponent("mcwifipnp.upnp.failed.disabled", cfg.port));
+                client.gui.getChat().addMessage(Component.translatable("mcwifipnp.upnp.failed.disabled", cfg.port));
             }
         }
     }
@@ -105,7 +102,7 @@ public class MCWiFiPnPUnit {
                 NoneIPv6 = true;
             }
             if (NoneIPv4 == true && NoneIPv6 == true) {
-                client.gui.getChat().addMessage(new TranslatableComponent("mcwifipnp.upnp.success.cantgetip"));
+                client.gui.getChat().addMessage(Component.translatable("mcwifipnp.upnp.success.cantgetip"));
             } else {
                 MutableComponent component = null;
                 for (int i = 0; i < IPComponentList.size(); i++) {
@@ -116,7 +113,7 @@ public class MCWiFiPnPUnit {
                     }
                 }
                 client.gui.getChat().addMessage(
-                        new TranslatableComponent("mcwifipnp.upnp.success.clipboard", new Object[] { component }));
+                        Component.translatable("mcwifipnp.upnp.success.clipboard", new Object[] { component }));
             }
         }
     }
@@ -181,11 +178,11 @@ public class MCWiFiPnPUnit {
     }
 
     private static Component IPComponent(String Type, String IP) {
-        return ComponentUtils.wrapInSquareBrackets((new TextComponent(Type)).withStyle((style) -> {
+        return ComponentUtils.wrapInSquareBrackets(Component.literal(Type).withStyle((style) -> {
             return style.withColor(ChatFormatting.GREEN)
                     .withClickEvent(new ClickEvent(ClickEvent.Action.COPY_TO_CLIPBOARD, IP))
                     .withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT,
-                            new TranslatableComponent("chat.copy.click").append("\n").append(IP)))
+                            Component.translatable("chat.copy.click").append("\n").append(IP)))
                     .withInsertion(IP);
         }));
     }
