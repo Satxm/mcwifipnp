@@ -16,6 +16,7 @@ public class ShareToLanScreen extends Screen {
 	private final Screen lastScreen;
 	private EditBox EditPort;
 	private EditBox EditMotd;
+	private EditBox EditPlayers;
 	private Button StartLanServer;
 	private Button GameModeButton;
 	private Button AllowCommandsButton;
@@ -45,8 +46,9 @@ public class ShareToLanScreen extends Screen {
 		this.StartLanServer = this.addButton(new Button(this.width / 2 - 155, this.height - 28, 150, 20, new TranslatableComponent("lanServer.start"), (button) -> {
 			cfg.port = Integer.parseInt(EditPort.getValue());
 			cfg.motd = EditMotd.getValue();
-			MinecraftServer server = Minecraft.getInstance().getSingleplayerServer();
-			MCWiFiPnP.openToLan(server);
+			cfg.maxPlayers = Integer.parseInt(EditPlayers.getValue());
+			MCWiFiPnP.saveConfig(cfg);
+			MCWiFiPnP.openToLan();
 			this.minecraft.updateTitle();
 			this.minecraft.setScreen((Screen) null);
 		}));
@@ -73,15 +75,15 @@ public class ShareToLanScreen extends Screen {
 			this.updateSelectionStrings();
 		}));
 
-		this.EditPort = new EditBox(this.font, this.width / 2 - 155 , 66 , 150 , 20 , new TextComponent(Integer.toString(cfg.port)));
+		this.EditPort = new EditBox(this.font, this.width / 2 - 154, 66 , 96, 20, new TextComponent(Integer.toString(cfg.port)));
 		this.EditPort.setValue(Integer.toString(cfg.port));
 		this.EditPort.setMaxLength(5);
 		this.addButton(EditPort);
 
-		EditPort.setResponder((sPort)->{
+		EditPort.setResponder((sPort) -> {
 			this.StartLanServer.active = !this.EditPort.getValue().isEmpty();
 			try {
-				int port =Integer.parseInt(EditPort.getValue());
+				int port = Integer.parseInt(EditPort.getValue());
 				if (port < 1024) {
 					this.portinfo = "small";
 					this.StartLanServer.active = false;
@@ -93,16 +95,31 @@ public class ShareToLanScreen extends Screen {
 				}
 			} catch (NumberFormatException ex) {
 				this.StartLanServer.active = false;
-				this.portinfo = "null";
 			}
 		});
 
-		this.EditMotd = new EditBox(this.font, this.width / 2 + 5 , 66 , 150 , 20 , new TextComponent(cfg.motd));
+		this.EditPlayers = new EditBox(this.font, this.width / 2 - 48, 66 , 96, 20, new TextComponent(Integer.toString(cfg.maxPlayers)));
+		this.EditPlayers.setValue(Integer.toString(cfg.maxPlayers));
+		this.addButton(EditPlayers);
+
+		EditPlayers.setResponder((sPlayers) -> {
+			this.StartLanServer.active = !this.EditPlayers.getValue().isEmpty();
+			try {
+				int port = Integer.parseInt(EditPlayers.getValue());
+				if (port <= 0) {
+					this.StartLanServer.active = false;
+				}
+			} catch (NumberFormatException ex) {
+				this.StartLanServer.active = false;
+			}
+		});
+
+		this.EditMotd = new EditBox(this.font, this.width / 2 + 58, 66 , 96, 20 , new TextComponent(cfg.motd));
 		this.EditMotd.setValue(cfg.motd);
-		this.EditPort.setMaxLength(32);
+		this.EditMotd.setMaxLength(32);
 		this.addButton(EditMotd);
 
-		EditMotd.setResponder((sMotd)->{
+		EditMotd.setResponder((sMotd) -> {
 			this.StartLanServer.active = !this.EditMotd.getValue().isEmpty();
 		});
 
@@ -141,10 +158,12 @@ public class ShareToLanScreen extends Screen {
 	public void render(PoseStack poseStack, int i, int j, float f) {
 		this.renderBackground(poseStack);
 		drawCenteredString(poseStack, this.font, this.title, this.width / 2, 15, 16777215);
-		drawString(poseStack, this.font, new TranslatableComponent("mcwifipnp.gui.port"), this.width / 2 - 150, 54, 16777215);
-		drawString(poseStack, this.font, new TranslatableComponent("mcwifipnp.gui.motd"), this.width / 2 + 10, 54, 16777215);
+		drawString(poseStack, this.font, new TranslatableComponent("mcwifipnp.gui.port"), this.width / 2 - 149, 54, 16777215);
+		drawString(poseStack, this.font, new TranslatableComponent("mcwifipnp.gui.players"), this.width / 2 - 43, 54, 16777215);
+		drawString(poseStack, this.font, new TranslatableComponent("mcwifipnp.gui.motd"), this.width / 2 + 63, 54, 16777215);
 		drawString(poseStack, this.font, new TranslatableComponent("mcwifipnp.gui.port." + this.portinfo), this.width / 2 - 150, 88, -6250336);
-		drawString(poseStack, this.font, new TranslatableComponent("mcwifipnp.gui.motd.info"), this.width / 2 + 10, 88, -6250336);
+		drawString(poseStack, this.font, new TranslatableComponent("mcwifipnp.gui.players.info"), this.width / 2 - 43, 88, -6250336);
+		drawString(poseStack, this.font, new TranslatableComponent("mcwifipnp.gui.motd.info"), this.width / 2 + 63, 88, -6250336);
 		drawCenteredString(poseStack, this.font, new TranslatableComponent("lanServer.otherPlayers"), this.width / 2, 112, 16777215);
 		drawString(poseStack, this.font, new TranslatableComponent("mcwifipnp.gui.OnlineMode.info"), this.width / 2 - 150, 152, -6250336);
 		drawString(poseStack, this.font, new TranslatableComponent("mcwifipnp.gui.EnablePvP.info"), this.width / 2 + 10, 152, -6250336);
@@ -152,6 +171,7 @@ public class ShareToLanScreen extends Screen {
 		drawString(poseStack, this.font, new TranslatableComponent("mcwifipnp.gui.CopyToClipboard"), this.width / 2 + 10, 186, -6250336);
 		EditPort.render(poseStack, i, j, f);
 		EditMotd.render(poseStack, i, j, f);
+		EditPlayers.render(poseStack, i, j, f);
 		super.render(poseStack, i, j, f);
 	}
 }

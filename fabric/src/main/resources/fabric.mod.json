@@ -20,7 +20,9 @@
       "io.github.satxm.mcwifipnp.MCWiFiPnP"
     ]
   },
-  "mixins": [],
+  "mixins": [
+    "mcwifipnp.mixins.json"
+  ],
   "depends": {
     "fabricloader": "${loader_version}",
     "fabric": "${fabric_version}",

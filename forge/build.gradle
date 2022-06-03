@@ -23,11 +23,12 @@ println('Java: ' + System.getProperty('java.version') + ' JVM: ' + System.getPro
 minecraft {
     mappings channel: 'official', version: project.minecraft_version
 
-    //accessTransformer = file('src/main/resources/META-INF/accesstransformer.cfg')
-    
+    accessTransformer = file('src/main/resources/META-INF/accesstransformer.cfg')
+
     runs {
         client {
             workingDirectory project.file('run')
+            property 'forge.logging.markers', 'REGISTRIES'
             property 'forge.logging.console.level', 'debug'
 
             mods {
@@ -82,10 +83,9 @@ java {
 
 def replaceResources = tasks.register("replaceResources", Copy) {
 	it.outputs.upToDateWhen { false }
-	//Copy it into the build dir
 	it.from(sourceSets.main.resources) {
 		include "META-INF/mods.toml"
-		expand 'version': project.mod_version, 'mc_version': project.minecraft_version_range, 'forge_version': project.forge_version_range, "loader_version": project.loader_version_range
+		expand 'version': project.mod_version, 'mc_version': project.forge_minecraft_version_range, 'forge_version': project.forge_version_range, "loader_version": project.forge_version_range
 	}
 	it.into "$buildDir/resources/main/"
 }
