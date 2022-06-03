@@ -2,6 +2,7 @@ package io.github.satxm.mcwifipnp;
 
 import java.util.List;
 
+import io.github.satxm.mcwifipnp.mixin.PlayerListAccessor;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.client.screen.v1.ScreenEvents;
 import net.fabricmc.fabric.api.client.screen.v1.Screens;
@@ -11,8 +12,12 @@ import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.PauseScreen;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.server.IntegratedServer;
+import net.minecraft.network.chat.TextComponent;
 import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.players.PlayerList;
+import net.minecraft.world.level.GameType;
 
 public class MCWiFiPnP implements ModInitializer {
 	public static final String MODID = "mcwifipnp";
@@ -51,5 +56,25 @@ public class MCWiFiPnP implements ModInitializer {
 
 	private void onServerStop(MinecraftServer server) {
 		MCWiFiPnPUnit.serverStopping(server);
+	}
+
+	public static void openToLan() {
+		Minecraft client = Minecraft.getInstance();
+		IntegratedServer server = client.getSingleplayerServer();
+		PlayerList playerList = server.getPlayerList();
+		MCWiFiPnPUnit.Config cfg = MCWiFiPnPUnit.getConfig(server);
+
+		server.setMotd(cfg.motd);
+		server.getStatus().setDescription(new TextComponent(cfg.motd));
+		server.publishServer(GameType.byName(cfg.GameMode), cfg.AllowCommands, cfg.port);
+		((PlayerListAccessor) playerList).setMaxPlayers(cfg.maxPlayers);
+		server.setUsesAuthentication(cfg.OnlineMode);
+		server.setPvpAllowed(cfg.EnablePvP);
+		client.gui.getChat().addMessage(new TranslatableComponent("commands.publish.started", cfg.port));
+
+		new Thread(() -> {
+			MCWiFiPnPUnit.UseUPnP(cfg, client);
+			MCWiFiPnPUnit.CopyToClipboard(cfg, client);
+		}, "MCWiFiPnP").start();
 	}
 }
