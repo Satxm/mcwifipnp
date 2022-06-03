@@ -4,7 +4,10 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.PauseScreen;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.server.IntegratedServer;
+import net.minecraft.network.chat.TextComponent;
 import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.world.level.GameType;
 import net.minecraftforge.client.event.ScreenEvent;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.server.ServerStartingEvent;
@@ -52,5 +55,24 @@ public class MCWiFiPnP {
 	@SubscribeEvent
 	public void onServerStopping(ServerStoppingEvent event) {
 		MCWiFiPnPUnit.serverStopping(event.getServer());
+	}
+
+	public static void openToLan() {
+		Minecraft client = Minecraft.getInstance();
+		IntegratedServer server = client.getSingleplayerServer();
+		MCWiFiPnPUnit.Config cfg = MCWiFiPnPUnit.getConfig(server);
+
+		server.setMotd(cfg.motd);
+		server.getStatus().setDescription(new TextComponent(cfg.motd));
+		server.publishServer(GameType.byName(cfg.GameMode), cfg.AllowCommands, cfg.port);
+		server.getPlayerList().maxPlayers = cfg.maxPlayers;
+		server.setUsesAuthentication(cfg.OnlineMode);
+		server.setPvpAllowed(cfg.EnablePvP);
+		client.gui.getChat().addMessage(new TranslatableComponent("commands.publish.started", cfg.port));
+
+		new Thread(() -> {
+			MCWiFiPnPUnit.UseUPnP(cfg, client);
+			MCWiFiPnPUnit.CopyToClipboard(cfg, client);
+		}, "MCWiFiPnP").start();
 	}
 }
