@@ -28,13 +28,13 @@ LAN World Screen - English GUI
 
 局域网世界截图 - 英语界面
 
-![GUI EN-US](https://github.com/Satxm/images/raw/main/mcwifipnp-1.4.2-en-us.jpg)
+![GUI EN-US](https://github.com/Satxm/images/raw/main/mcwifipnp-en-us.jpg)
 
 LAN World Screen - Chinese Simplified GUI
 
 局域网世界截图 - 简体中文界面
 
-![GUI ZH-CN](https://github.com/Satxm/images/raw/main/mcwifipnp-1.4.2-zh-cn.jpg)
+![GUI ZH-CN](https://github.com/Satxm/images/raw/main/mcwifipnp-zh-cn.jpg)
 
 ## What Can It Do - 它的作用
 
