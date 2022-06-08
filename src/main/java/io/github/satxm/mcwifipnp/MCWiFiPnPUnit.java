@@ -15,6 +15,7 @@ import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Enumeration;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.WeakHashMap;
@@ -45,7 +46,6 @@ import net.minecraft.world.level.storage.LevelResource;
 public class MCWiFiPnPUnit {
     private static final Map<MinecraftServer, Config> configMap = Collections.synchronizedMap(new WeakHashMap<>());
     private static final Gson gson = new GsonBuilder().create();
-
     private static final Logger LOGGER = LogManager.getLogger(MCWiFiPnP.class);
 
     public static Config getConfig(MinecraftServer server) {
@@ -73,39 +73,40 @@ public class MCWiFiPnPUnit {
     public static void CopyToClipboard(Config cfg, Minecraft client) {
         if (cfg.CopyToClipboard) {
             ArrayList<Component> IPComponentList = new ArrayList<Component>();
-            Boolean NoneIPv4 = false;
-            Boolean NoneIPv6 = false;
-            if (IPv4AddressList().size() > 0 || GetGlobalIPv4() != null
-                    || UPnP.getExternalIP() != null) {
-                for (int i = 0; i < IPv4AddressList().size(); i++) {
-                    String IP = IPv4AddressList().get(i) + ":" + cfg.port;
-                    IPComponentList.add(IPComponent("IPv4", IP));
+            ArrayList<String> IPList = new ArrayList<String>();
+            for (int i = 0; i < IPAddressList().size(); i++) {
+                Map<String, String> NewMap = IPAddressList().get(i);
+                if (NewMap.get("Type") == "IPv4") {
+                    IPComponentList.add(IPComponent(
+                            new TranslatableComponent(NewMap.get("Local")).getString() + " " + NewMap.get("Type"),
+                            NewMap.get("IP") + ":" + cfg.port));
+                } else {
+                    IPComponentList.add(IPComponent(
+                            new TranslatableComponent(NewMap.get("Local")).getString() + " " + NewMap.get("Type"),
+                            "[" + NewMap.get("IP") + "]:" + cfg.port));
                 }
-                if (GetGlobalIPv4() != null & !IPv4AddressList().contains(GetGlobalIPv4())) {
-                    String IP = GetGlobalIPv4() + ":" + cfg.port;
-                    IPComponentList.add(IPComponent("IPv4", IP));
-                }
-                if (UPnP.getExternalIP() != null & !IPv4AddressList().contains(UPnP.getExternalIP())) {
-                    String IP = UPnP.getExternalIP() + ":" + cfg.port;
-                    IPComponentList.add(IPComponent("IPv4", IP));
-                }
-            } else {
-                NoneIPv4 = true;
+                IPList.add(NewMap.get("IP"));
             }
-            if (IPv6AddressList().size() > 0 || GetGlobalIPv6() != null) {
-                for (int i = 0; i < IPv6AddressList().size(); i++) {
-                    String IP = "[" + IPv6AddressList().get(i) + "]:" + cfg.port;
-                    IPComponentList.add(IPComponent("IPv6", IP));
-                }
-                if (GetGlobalIPv6() != null & !IPv6AddressList().contains(GetGlobalIPv6())) {
-                    String IP = "[" + GetGlobalIPv6() + "]:" + cfg.port;
-                    IPComponentList.add(IPComponent("IPv6", IP));
-                }
-            } else {
-                NoneIPv6 = true;
+            if (!GetGlobalIPv4().isEmpty() && !IPList.contains(GetGlobalIPv4().get("IP"))) {
+                IPComponentList.add(IPComponent(
+                        new TranslatableComponent(GetGlobalIPv4().get("Local")).getString() + " "
+                                + GetGlobalIPv4().get("Type"),
+                        GetGlobalIPv4().get("IP") + ":" + cfg.port));
+                IPList.add(GetGlobalIPv4().get("IP"));
             }
-            if (NoneIPv4 == true && NoneIPv6 == true) {
-                client.gui.getChat().addMessage(new TranslatableComponent("mcwifipnp.upnp.success.cantgetip"));
+            if (!GetGlobalIPv6().isEmpty() && !IPList.contains(GetGlobalIPv6().get("IP"))) {
+                IPComponentList.add(IPComponent(
+                        new TranslatableComponent(GetGlobalIPv6().get("Local")).getString() + " "
+                                + GetGlobalIPv6().get("Type"),
+                        "[" + GetGlobalIPv6().get("IP") + "]:" + cfg.port));
+                IPList.add(GetGlobalIPv4().get("IP"));
+            }
+            if (cfg.UseUPnP && UPnP.getExternalIP() != null && !IPList.contains(GetGlobalIPv6().get("IP"))) {
+                IPComponentList.add(IPComponent("UPnP IPv4", UPnP.getExternalIP() + ":" + cfg.port));
+                IPList.add(UPnP.getExternalIP());
+            }
+            if (IPList.isEmpty()) {
+                client.gui.getChat().addMessage(new TranslatableComponent("mcwifipnp.upnp.cantgetip"));
             } else {
                 MutableComponent component = null;
                 for (int i = 0; i < IPComponentList.size(); i++) {
@@ -116,7 +117,7 @@ public class MCWiFiPnPUnit {
                     }
                 }
                 client.gui.getChat().addMessage(
-                        new TranslatableComponent("mcwifipnp.upnp.success.clipboard", new Object[] { component }));
+                        new TranslatableComponent("mcwifipnp.upnp.clipboard", new Object[] { component }));
             }
         }
     }
@@ -190,7 +191,7 @@ public class MCWiFiPnPUnit {
         }));
     }
 
-    public static String GetGlobalIPv4() {
+    public static Map<String, String> GetGlobalIPv4() {
         String ipv4 = null;
         try {
             URL url = new URL("https://api-ipv4.ip.sb/ip");
@@ -204,10 +205,17 @@ public class MCWiFiPnPUnit {
             bufr.close();
         } catch (Exception e) {
         }
-        return ipv4;
+        Map<String, String> Gl4Map = new HashMap<String, String>();
+        if (ipv4 != null) {
+            // Gl4Map.put("Iface", "Global IPv4");
+            Gl4Map.put("Type", "IPv4");
+            Gl4Map.put("Local", "mcwifipnp.gui.Global");
+            Gl4Map.put("IP", ipv4);
+        }
+        return Gl4Map;
     }
 
-    public static String GetGlobalIPv6() {
+    public static Map<String, String> GetGlobalIPv6() {
         String ipv6 = null;
         try {
             URL url = new URL("https://api-ipv6.ip.sb/ip");
@@ -221,11 +229,18 @@ public class MCWiFiPnPUnit {
             bufr.close();
         } catch (Exception e) {
         }
-        return ipv6;
+        Map<String, String> Gl6Map = new HashMap<String, String>();
+        if (ipv6 != null) {
+            // Gl6Map.put("Iface", "Global IPv6");
+            Gl6Map.put("Type", "IPv6");
+            Gl6Map.put("Local", "mcwifipnp.gui.Global");
+            Gl6Map.put("IP", ipv6);
+        }
+        return Gl6Map;
     }
 
-    public static ArrayList<String> IPv4AddressList() {
-        ArrayList<String> ret = new ArrayList<String>();
+    public static ArrayList<Map<String, String>> IPAddressList() {
+        ArrayList<Map<String, String>> out = new ArrayList<Map<String, String>>();
         try {
             Enumeration<NetworkInterface> ifaces = NetworkInterface.getNetworkInterfaces();
             while (ifaces.hasMoreElements()) {
@@ -234,56 +249,44 @@ public class MCWiFiPnPUnit {
                     if (!iface.isUp() || iface.isLoopback() || iface.isVirtual() || iface.isPointToPoint()) {
                         continue;
                     }
+                    if (iface.getDisplayName().contains("Virtual")
+                            || iface.getDisplayName().contains("VMware")
+                            || iface.getDisplayName().contains("VirtualBox")
+                            || iface.getDisplayName().contains("Bluetooth")
+                            || iface.getDisplayName().contains("Hyper-V")) {
+                        continue;
+                    }
                     Enumeration<InetAddress> addrs = iface.getInetAddresses();
                     if (addrs == null) {
                         continue;
                     }
                     while (addrs.hasMoreElements()) {
+                        Map<String, String> NetMap = new HashMap<String, String>();
+                        // NetMap.put("Iface", iface.getDisplayName());
                         InetAddress addr = addrs.nextElement();
                         if (addr instanceof Inet4Address) {
-                            String ipstart = addr.getHostAddress().substring(0, addr.getHostAddress().indexOf(":"));
-                            if (!ipstart.equals("10") && !ipstart.equals("172") && !ipstart.equals("192")) {
-                                ret.add(addr.getHostAddress());
-                            }
+                            NetMap.put("Type", "IPv4");
                         }
-                    }
-                } catch (Throwable t) {
-                }
-            }
-        } catch (Throwable t) {
-        }
-        return ret;
-    }
-
-    public static ArrayList<String> IPv6AddressList() {
-        ArrayList<String> ret = new ArrayList<String>();
-        try {
-            Enumeration<NetworkInterface> ifaces = NetworkInterface.getNetworkInterfaces();
-            while (ifaces.hasMoreElements()) {
-                try {
-                    NetworkInterface iface = ifaces.nextElement();
-                    if (!iface.isUp() || iface.isLoopback() || iface.isVirtual() || iface.isPointToPoint()) {
-                        continue;
-                    }
-                    Enumeration<InetAddress> addrs = iface.getInetAddresses();
-                    if (addrs == null) {
-                        continue;
-                    }
-                    while (addrs.hasMoreElements()) {
-                        InetAddress addr = addrs.nextElement();
                         if (addr instanceof Inet6Address) {
-                            String ipstart = addr.getHostAddress().substring(0, addr.getHostAddress().indexOf(":"));
-                            if (!ipstart.equals("fe80")) {
-                                ret.add(addr.getHostAddress());
-                            }
+                            NetMap.put("Type", "IPv6");
                         }
+                        if (addr.isLinkLocalAddress()) {
+                            continue;
+                        }
+                        if (addr.isSiteLocalAddress()) {
+                            NetMap.put("Local", "mcwifipnp.gui.Local");
+                        } else {
+                            NetMap.put("Local", "mcwifipnp.gui.Global");
+                        }
+                        NetMap.put("IP", addr.getHostAddress());
+                        out.add(NetMap);
                     }
                 } catch (Throwable t) {
                 }
             }
         } catch (Throwable t) {
         }
-        return ret;
+        return out;
     }
 
 }
