@@ -11,7 +11,7 @@ group = project.maven_group
 dependencies {
 	minecraft "com.mojang:minecraft:${project.minecraft_version}"
 	mappings loom.officialMojangMappings()
-	modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
+	modImplementation "net.fabricmc:fabric-loader:${project.fabric_loader_version}"
 
 	modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
 
@@ -41,7 +41,7 @@ processResources {
 	inputs.property "version", project.version
 
 	filesMatching("fabric.mod.json") {
-		expand "version": project.mod_version,'mc_version': project.fabric_minecraft_version_range, 'fabric_version': project.fabric_version_range, "loader_version": project.fabric_loader_version_range
+		expand "version": project.mod_version,"mc_version": project.fabric_minecraft_version_range, "fabric_version": project.fabric_version_range, "fabric_loader_version": project.fabric_loader_version_range
 	}
 }
 

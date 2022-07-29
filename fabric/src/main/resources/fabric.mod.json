@@ -24,7 +24,7 @@
     "mcwifipnp.mixins.json"
   ],
   "depends": {
-    "fabricloader": "${loader_version}",
+    "fabricloader": "${fabric_loader_version}",
     "fabric": "${fabric_version}",
     "minecraft": "${mc_version}",
     "java": ">=17"

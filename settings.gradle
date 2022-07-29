@@ -8,11 +8,15 @@ pluginManagement {
             name = 'Forge'
             url = 'https://maven.minecraftforge.net'
         }
-        gradlePluginPortal()
-    }
+		maven {
+			name = 'Quilt'
+			url = 'https://maven.quiltmc.org/repository/release'
+		}
+		gradlePluginPortal()
+	}
 }
-
 include("fabric")
 include("forge")
+include("quilt")
 
 rootProject.name = "mcwifipnp"

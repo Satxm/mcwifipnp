@@ -20,11 +20,10 @@ public class MCWiFiPnP {
 
 	public MCWiFiPnP() {
 		MinecraftForge.EVENT_BUS.register(this);
-		MinecraftForge.EVENT_BUS.addListener(this::ChangeButton);
+		MinecraftForge.EVENT_BUS.addListener(MCWiFiPnP::ChangeButton);
 	}
 
-	@SubscribeEvent
-	public void ChangeButton(ScreenEvent.InitScreenEvent.Post event) {
+	public static void ChangeButton(final ScreenEvent.Init.Post event) {
 		Minecraft client = Minecraft.getInstance();
 		Screen screen = event.getScreen();
 		if (screen instanceof PauseScreen && event.getListenersList().size() != 0) {
