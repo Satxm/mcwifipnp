@@ -1,22 +1,34 @@
 # LAN World Plug-n-Play
 
-![CurseForge Version](https://cf.way2muchnoise.eu/versions/450250.svg)
+![CurseForge Title](https://cf.way2muchnoise.eu/title/450250.svg) ![CurseForge Downloads](https://cf.way2muchnoise.eu/450250.svg) ![CurseForge Version](https://cf.way2muchnoise.eu/versions/450250.svg)
 
 **This Branch is for Minecraft 1.19.x only!**
 
-**For Fabric: Requires [Fabric API](https://www.curseforge.com/minecraft/mc-mods/fabric-api) and [Fabric Loader](https://fabricmc.net/use/)**,
+**For Fabric: Requires [Fabric Loader](https://fabricmc.net/use/) and [Fabric API](https://www.curseforge.com/minecraft/mc-mods/fabric-api)**,
 
-**For Forge: Requires [Forge](https://files.minecraftforge.net/)**.
+**For Quilt: Requires [Quilt Loader](https://quiltmc.org/install/) and [QFAPI/QSL](https://www.curseforge.com/minecraft/mc-mods/qsl)**,
 
-**Fabric端：需要[Fabric API](https://www.curseforge.com/minecraft/mc-mods/fabric-api)和[Fabric Loader](https://fabricmc.net/use/)**，
+**For Forge: Requires [Forge](https://files.minecraftforge.net/net/minecraftforge/forge/)**.
 
-**Forge端：需要[Forge](https://files.minecraftforge.net/)**.
+**Fabric：需要[Fabric Loader](https://fabricmc.net/use/)和[Fabric API](https://www.curseforge.com/minecraft/mc-mods/fabric-api)**；
+
+**Quilt：需要[Quilt Loader](https://quiltmc.org/install/)和[QFAPI/QSL](https://www.curseforge.com/minecraft/mc-mods/qsl)**；
+
+**Forge：需要[Forge](https://files.minecraftforge.net/net/minecraftforge/forge/)**。
+
+
+## Download - 下载
+
+MC百科： [LAN World Plug-n-Play](https://www.mcmod.cn/class/4498.html)
+CurseForge : [LAN World Plug-n-Play](https://www.curseforge.com/minecraft/mc-mods/mcwifipnp)
+Modrinth : [LAN World Plug-n-Play](https://modrinth.com/mod/mcwifipnp)
+GitHub 源码: [LAN World Plug-n-Play](https://github.com/Satxm/mcwifipnp)
 
 ## Introduction - 简介
 
-Updated to Minecraft 1.19.x, Uses the vanilla Minecraft GUI style, Uses the official mojang mappings.
+Updated to Minecraft 1.19.1, Uses the vanilla Minecraft GUI style, Uses the official mojang mappings.
 
-已经更新到1.19.x，使用Minecraft原生界面样式，使用Mojang官方混淆表。
+已经更新到1.19.1，使用Minecraft原生界面样式，使用Mojang官方混淆表。
 
 Modified from [TheGlitch76/mcpnp](https://github.com/TheGlitch76/mcpnp) project and UPnP module from [adolfintel/WaifUPnP](https://github.com/adolfintel/WaifUPnP).
 
