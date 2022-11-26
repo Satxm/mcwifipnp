@@ -38,7 +38,6 @@ import net.minecraft.network.chat.ComponentUtils;
 import net.minecraft.network.chat.HoverEvent;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.util.HttpUtil;
 import net.minecraft.world.level.storage.LevelResource;
 
 public class MCWiFiPnPUnit {
@@ -121,7 +120,7 @@ public class MCWiFiPnPUnit {
         }
     }
 
-    public static void serverSatrting(MinecraftServer server) {
+    public static void ReadingConfig(MinecraftServer server) {
         Path location = server.getWorldPath(LevelResource.ROOT).resolve("mcwifipnp.json");
         MCWiFiPnPUnit.Config cfg;
         try {
@@ -140,7 +139,7 @@ public class MCWiFiPnPUnit {
         configMap.put(server, cfg);
     }
 
-    public static void serverStopping(MinecraftServer server) {
+    public static void ClosePortUPnP(MinecraftServer server) {
         MCWiFiPnPUnit.Config cfg = configMap.get(server);
         if (server.isPublished() && cfg.UseUPnP) {
             UPnP.closePortTCP(cfg.port);
@@ -160,7 +159,7 @@ public class MCWiFiPnPUnit {
     }
 
     public static class Config {
-        public int port = HttpUtil.getAvailablePort();
+        public int port = 25565;
         public int maxPlayers = 10;
         public String GameMode = "survival";
         public String motd = "A Minecraft LAN World";

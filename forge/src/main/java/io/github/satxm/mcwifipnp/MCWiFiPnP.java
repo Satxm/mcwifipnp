@@ -1,9 +1,8 @@
 package io.github.satxm.mcwifipnp;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.components.Button;
-import net.minecraft.client.gui.screens.PauseScreen;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.gui.screens.ShareToLanScreen;
 import net.minecraft.client.server.IntegratedServer;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.level.GameType;
@@ -26,40 +25,26 @@ public class MCWiFiPnP {
 	public static void ChangeButton(final ScreenEvent.Init.Post event) {
 		Minecraft client = Minecraft.getInstance();
 		Screen screen = event.getScreen();
-		if (screen instanceof PauseScreen && event.getListenersList().size() != 0) {
-			for (int k = 0; k < event.getListenersList().size(); k++) {
-				Button ShareToLanOld = (Button) event.getListenersList().get(k);
-				if (ShareToLanOld.getMessage().getString()
-						.equals(Component.translatable("menu.shareToLan").getString())) {
-					int x = ShareToLanOld.x;
-					int y = ShareToLanOld.y;
-					int w = ShareToLanOld.getWidth();
-					int h = ShareToLanOld.getHeight();
-					Button ShareToLanNew = new Button(x, y, w, h, Component.translatable("menu.shareToLan"),
-							(button) -> client.setScreen(new ShareToLanScreen(screen)));
-					ShareToLanNew.active = ShareToLanOld.active;
-					event.removeListener(ShareToLanOld);
-					event.addListener(ShareToLanNew);
-				}
-			}
+		if (screen instanceof ShareToLanScreen) {
+			client.setScreen(new ShareToLanScreenNew(screen));
 		}
 	}
 
 	@SubscribeEvent
 	public void onServerStarting(ServerStartingEvent event) {
-		MCWiFiPnPUnit.serverSatrting(event.getServer());
+		MCWiFiPnPUnit.ReadingConfig(event.getServer());
 	}
 
 	@SubscribeEvent
 	public void onServerStopping(ServerStoppingEvent event) {
-		MCWiFiPnPUnit.serverStopping(event.getServer());
+		MCWiFiPnPUnit.ClosePortUPnP(event.getServer());
 	}
 
 	public static void openToLan() {
 		Minecraft client = Minecraft.getInstance();
 		IntegratedServer server = client.getSingleplayerServer();
 		MCWiFiPnPUnit.Config cfg = MCWiFiPnPUnit.getConfig(server);
-
+		
 		server.setMotd(cfg.motd);
 		server.getStatus().setDescription(Component.literal(cfg.motd));
 		server.publishServer(GameType.byName(cfg.GameMode), cfg.AllowCommands, cfg.port);
