@@ -40,7 +40,7 @@ import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.network.chat.TextComponent;
 import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.util.HttpUtil;
+import net.minecraft.server.players.OldUsersConverter;
 import net.minecraft.world.level.storage.LevelResource;
 
 public class MCWiFiPnPUnit {
@@ -122,7 +122,7 @@ public class MCWiFiPnPUnit {
         }
     }
 
-    public static void serverSatrting(MinecraftServer server) {
+    public static void ReadingConfig(MinecraftServer server) {
         Path location = server.getWorldPath(LevelResource.ROOT).resolve("mcwifipnp.json");
         MCWiFiPnPUnit.Config cfg;
         try {
@@ -141,7 +141,7 @@ public class MCWiFiPnPUnit {
         configMap.put(server, cfg);
     }
 
-    public static void serverStopping(MinecraftServer server) {
+    public static void ClosePortUPnP(MinecraftServer server) {
         MCWiFiPnPUnit.Config cfg = configMap.get(server);
         if (server.isPublished() && cfg.UseUPnP) {
             UPnP.closePortTCP(cfg.port);
@@ -161,14 +161,16 @@ public class MCWiFiPnPUnit {
     }
 
     public static class Config {
-        public int port = HttpUtil.getAvailablePort();
+        public int port = 25565;
         public int maxPlayers = 10;
         public String GameMode = "survival";
         public String motd = "A Minecraft LAN World";
+        public boolean AllPlayersCheats = false;
+        public boolean Whitelist = false;
         public boolean UseUPnP = true;
         public boolean AllowCommands = false;
         public boolean OnlineMode = true;
-        public boolean EnablePvP = true;
+        public boolean PvP = true;
         public boolean CopyToClipboard = true;
         public transient Path location;
         public transient boolean needsDefaults = false;
@@ -287,6 +289,52 @@ public class MCWiFiPnPUnit {
         } catch (Throwable t) {
         }
         return out;
+    }
+
+    protected static boolean convertOldUsers(MinecraftServer server) {
+        int i;
+        boolean bl = false;
+        for (i = 0; !bl && i <= 2; ++i) {
+            if (i > 0) {
+                LOGGER.warn("Encountered a problem while converting the user banlist, retrying in a few seconds");
+                MCWiFiPnPUnit.waitForRetry();
+            }
+            bl = OldUsersConverter.convertUserBanlist(server);
+        }
+        boolean bl2 = false;
+        for (i = 0; !bl2 && i <= 2; ++i) {
+            if (i > 0) {
+                LOGGER.warn("Encountered a problem while converting the ip banlist, retrying in a few seconds");
+                MCWiFiPnPUnit.waitForRetry();
+            }
+            bl2 = OldUsersConverter.convertIpBanlist(server);
+        }
+        boolean bl3 = false;
+        for (i = 0; !bl3 && i <= 2; ++i) {
+            if (i > 0) {
+                LOGGER.warn("Encountered a problem while converting the op list, retrying in a few seconds");
+                MCWiFiPnPUnit.waitForRetry();
+            }
+            bl3 = OldUsersConverter.convertOpsList(server);
+        }
+        boolean bl4 = false;
+        for (i = 0; !bl4 && i <= 2; ++i) {
+            if (i > 0) {
+                LOGGER.warn("Encountered a problem while converting the whitelist, retrying in a few seconds");
+                MCWiFiPnPUnit.waitForRetry();
+            }
+            bl4 = OldUsersConverter.convertWhiteList(server);
+        }
+        return bl || bl2 || bl3 || bl4;
+    }
+
+    private static void waitForRetry() {
+        try {
+            Thread.sleep(5000L);
+        }
+        catch (InterruptedException interruptedException) {
+            return;
+        }
     }
 
 }

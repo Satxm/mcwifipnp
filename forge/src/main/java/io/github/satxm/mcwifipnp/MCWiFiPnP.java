@@ -1,9 +1,8 @@
 package io.github.satxm.mcwifipnp;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.components.Button;
-import net.minecraft.client.gui.screens.PauseScreen;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.gui.screens.ShareToLanScreen;
 import net.minecraft.client.server.IntegratedServer;
 import net.minecraft.network.chat.TextComponent;
 import net.minecraft.network.chat.TranslatableComponent;
@@ -28,33 +27,19 @@ public class MCWiFiPnP {
 	public void ChangeButton(ScreenEvent.InitScreenEvent.Post event) {
 		Minecraft client = Minecraft.getInstance();
 		Screen screen = event.getScreen();
-		if (screen instanceof PauseScreen && event.getListenersList().size() != 0) {
-			for (int k = 0; k < event.getListenersList().size(); k++) {
-				Button ShareToLanOld = (Button) event.getListenersList().get(k);
-				if (ShareToLanOld.getMessage().getString()
-						.equals(new TranslatableComponent("menu.shareToLan").getString())) {
-					int x = ShareToLanOld.x;
-					int y = ShareToLanOld.y;
-					int w = ShareToLanOld.getWidth();
-					int h = ShareToLanOld.getHeight();
-					Button ShareToLanNew = new Button(x, y, w, h, new TranslatableComponent("menu.shareToLan"),
-							(button) -> client.setScreen(new ShareToLanScreen(screen)));
-					ShareToLanNew.active = ShareToLanOld.active;
-					event.removeListener(ShareToLanOld);
-					event.addListener(ShareToLanNew);
-				}
-			}
+		if (screen instanceof ShareToLanScreen) {
+			client.setScreen(new ShareToLanScreenNew(screen));
 		}
 	}
 
 	@SubscribeEvent
 	public void onServerStarting(ServerStartingEvent event) {
-		MCWiFiPnPUnit.serverSatrting(event.getServer());
+		MCWiFiPnPUnit.ReadingConfig(event.getServer());
 	}
 
 	@SubscribeEvent
 	public void onServerStopping(ServerStoppingEvent event) {
-		MCWiFiPnPUnit.serverStopping(event.getServer());
+		MCWiFiPnPUnit.ClosePortUPnP(event.getServer());
 	}
 
 	public static void openToLan() {
@@ -67,7 +52,7 @@ public class MCWiFiPnP {
 		server.publishServer(GameType.byName(cfg.GameMode), cfg.AllowCommands, cfg.port);
 		server.getPlayerList().maxPlayers = cfg.maxPlayers;
 		server.setUsesAuthentication(cfg.OnlineMode);
-		server.setPvpAllowed(cfg.EnablePvP);
+		server.setPvpAllowed(cfg.PvP);
 		client.gui.getChat().addMessage(new TranslatableComponent("commands.publish.started", cfg.port));
 
 		new Thread(() -> {
