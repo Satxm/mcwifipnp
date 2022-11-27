@@ -21,7 +21,7 @@ public class ShareToLanScreenNew extends Screen {
 	private Button StartLanServer;
 	public ShareToLanScreenNew(Screen screen) {
 		super(Component.translatable("lanServer.title"));
-		
+
 		Minecraft client = Minecraft.getInstance();
 		MinecraftServer server = Minecraft.getInstance().getSingleplayerServer();
 		MCWiFiPnPUnit.ReadingConfig(server);
@@ -130,7 +130,7 @@ public class ShareToLanScreenNew extends Screen {
 					cfg.OnlineMode = OnlineMode;
 				}));
 
-		this.addRenderableWidget(CycleButton.onOffBuilder(cfg.PvP).create(this.width / 2 + 5, 148, 152, 20,
+		this.addRenderableWidget(CycleButton.onOffBuilder(cfg.PvP).create(this.width / 2 + 5, 148, 150, 20,
 				Component.translatable("mcwifipnp.gui.PvP"), (button, PvP) -> {
 					cfg.PvP = PvP;
 				}));

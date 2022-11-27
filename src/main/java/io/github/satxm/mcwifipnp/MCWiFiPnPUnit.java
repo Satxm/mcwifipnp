@@ -44,7 +44,6 @@ import net.minecraft.world.level.storage.LevelResource;
 public class MCWiFiPnPUnit {
     private static final Map<MinecraftServer, Config> configMap = Collections.synchronizedMap(new WeakHashMap<>());
     private static final Gson gson = new GsonBuilder().create();
-
     private static final Logger LOGGER = LogManager.getLogger(MCWiFiPnP.class);
 
     public static Config getConfig(MinecraftServer server) {
@@ -326,7 +325,7 @@ public class MCWiFiPnPUnit {
         }
         return bl || bl2 || bl3 || bl4;
     }
-    
+
     private static void waitForRetry() {
         try {
             Thread.sleep(5000L);
@@ -335,6 +334,5 @@ public class MCWiFiPnPUnit {
             return;
         }
     }
-    
 
 }
