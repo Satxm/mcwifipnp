@@ -1,0 +1,21 @@
+{
+	"mcwifipnp.gui.port": "端口",
+	"mcwifipnp.gui.players":"允許玩家數",
+	"mcwifipnp.gui.motd":"伺服器信息",
+	"mcwifipnp.gui.AllPlayersCheats":"其他玩家可作弊",
+	"mcwifipnp.gui.Whitelist":"白名单",
+	"mcwifipnp.gui.OnlineMode": "正版驗證",
+	"mcwifipnp.gui.PvP":"PVP",
+	"mcwifipnp.gui.UseUPnP": "映射端口",
+	"mcwifipnp.gui.Local": "內網",
+	"mcwifipnp.gui.Global": "公網",
+	"mcwifipnp.gui.CopyIP": "獲取IP",
+	"mcwifipnp.gui.CopyToClipboard": "獲取內網IP地址及公網IP地址",
+	"mcwifipnp.upnp.success": "成功轉發端口%s",
+	"mcwifipnp.upnp.clipboard": "成功獲取到%s，由於NAT等因素，這些IP可能仍舊無法直接聯機。",
+	"mcwifipnp.upnp.cantgetip": "無法獲取IP！請檢查你的網路設置。你的IPv4可能包含多級NAT或者你無IPv6。",
+	"mcwifipnp.upnp.failed.mapped": "無法轉發端口%s：端口%s已被另一個UPnP服務映射，請更換端口。",
+	"mcwifipnp.upnp.failed.disabled": "無法轉發端口%s：路由器上未啟用UPnP，你可能需要端口映射軟件。",
+	"mcwifipnp.upnp.failed.unknownerror": "無法轉發端口%s：添加端口映射時出現未知錯誤，請使用端口映射軟件。",
+	"mcwifipnp.upnp.failed": "無法轉發端口%s！請使用端口映射軟件。"
+}

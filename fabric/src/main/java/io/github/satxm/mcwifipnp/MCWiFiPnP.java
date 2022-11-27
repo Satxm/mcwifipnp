@@ -1,8 +1,16 @@
 package io.github.satxm.mcwifipnp;
 
+import net.minecraft.server.commands.BanIpCommands;
+import net.minecraft.server.commands.BanListCommands;
+import net.minecraft.server.commands.BanPlayerCommands;
+import net.minecraft.server.commands.DeOpCommands;
+import net.minecraft.server.commands.OpCommand;
+import net.minecraft.server.commands.WhitelistCommand;
+import net.minecraft.server.level.ServerPlayer;
 import io.github.satxm.mcwifipnp.mixin.PlayerListAccessor;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.client.screen.v1.ScreenEvents;
+import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.Screen;
@@ -21,6 +29,16 @@ public class MCWiFiPnP implements ModInitializer {
 		ServerLifecycleEvents.SERVER_STARTING.register(this::onServerLoad);
 		ServerLifecycleEvents.SERVER_STOPPING.register(this::onServerStop);
 		ScreenEvents.AFTER_INIT.register(MCWiFiPnP::afterScreenInit);
+
+		CommandRegistrationCallback.EVENT.register((dispatcher, registryAccess, environment) ->
+		{
+			DeOpCommands.register(dispatcher);
+			OpCommand.register(dispatcher);
+			WhitelistCommand.register(dispatcher);
+			BanIpCommands.register(dispatcher);
+			BanListCommands.register(dispatcher);
+			BanPlayerCommands.register(dispatcher);
+		});
 	}
 
 	public static void afterScreenInit(Minecraft client, Screen screen, int i, int j) {
@@ -48,7 +66,13 @@ public class MCWiFiPnP implements ModInitializer {
 		server.publishServer(GameType.byName(cfg.GameMode), cfg.AllowCommands, cfg.port);
 		((PlayerListAccessor) playerList).setMaxPlayers(cfg.maxPlayers);
 		server.setUsesAuthentication(cfg.OnlineMode);
-		server.setPvpAllowed(cfg.EnablePvP);
+		server.setPvpAllowed(cfg.PvP);
+		server.setEnforceWhitelist(cfg.Whitelist);
+		playerList.setUsingWhiteList(cfg.Whitelist);
+		playerList.setAllowCheatsForAllPlayers(cfg.AllPlayersCheats);
+		for (ServerPlayer player : playerList.getPlayers()) {
+			playerList.sendPlayerPermissionLevel(player);
+		}
 		client.gui.getChat().addMessage(Component.translatable("commands.publish.started", cfg.port));
 
 		new Thread(() -> {

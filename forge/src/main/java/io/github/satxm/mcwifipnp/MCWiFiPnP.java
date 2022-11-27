@@ -1,5 +1,13 @@
 package io.github.satxm.mcwifipnp;
 
+import net.minecraft.server.commands.BanIpCommands;
+import net.minecraft.server.commands.BanListCommands;
+import net.minecraft.server.commands.BanPlayerCommands;
+import net.minecraft.server.commands.DeOpCommands;
+import net.minecraft.server.commands.OpCommand;
+import net.minecraft.server.commands.WhitelistCommand;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.server.players.PlayerList;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.ShareToLanScreen;
@@ -33,7 +41,13 @@ public class MCWiFiPnP {
 	@SubscribeEvent
 	public void onServerStarting(ServerStartingEvent event) {
 		MCWiFiPnPUnit.ReadingConfig(event.getServer());
-	}
+		DeOpCommands.register(event.getServer().getCommands().getDispatcher());
+		OpCommand.register(event.getServer().getCommands().getDispatcher());
+		WhitelistCommand.register(event.getServer().getCommands().getDispatcher());
+		BanIpCommands.register(event.getServer().getCommands().getDispatcher());
+		BanListCommands.register(event.getServer().getCommands().getDispatcher());
+		BanPlayerCommands.register(event.getServer().getCommands().getDispatcher());
+    }
 
 	@SubscribeEvent
 	public void onServerStopping(ServerStoppingEvent event) {
@@ -43,6 +57,7 @@ public class MCWiFiPnP {
 	public static void openToLan() {
 		Minecraft client = Minecraft.getInstance();
 		IntegratedServer server = client.getSingleplayerServer();
+		PlayerList playerList = server.getPlayerList();
 		MCWiFiPnPUnit.Config cfg = MCWiFiPnPUnit.getConfig(server);
 		
 		server.setMotd(cfg.motd);
@@ -50,7 +65,13 @@ public class MCWiFiPnP {
 		server.publishServer(GameType.byName(cfg.GameMode), cfg.AllowCommands, cfg.port);
 		server.getPlayerList().maxPlayers = cfg.maxPlayers;
 		server.setUsesAuthentication(cfg.OnlineMode);
-		server.setPvpAllowed(cfg.EnablePvP);
+		server.setPvpAllowed(cfg.PvP);
+		server.setEnforceWhitelist(cfg.Whitelist);
+		playerList.setUsingWhiteList(cfg.Whitelist);
+		playerList.setAllowCheatsForAllPlayers(cfg.AllPlayersCheats);
+		for (ServerPlayer player : playerList.getPlayers()) {
+			playerList.sendPlayerPermissionLevel(player);
+		}
 		client.gui.getChat().addMessage(Component.translatable("commands.publish.started", cfg.port));
 
 		new Thread(() -> {
