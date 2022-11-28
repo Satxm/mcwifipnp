@@ -4,11 +4,11 @@
 
 **This Branch is for Minecraft 1.19.x only!**
 
-**For Fabric: Requires [Fabric Loader](https://fabricmc.net/use/) and [Fabric API](https://www.curseforge.com/minecraft/mc-mods/fabric-api)**,
+**Fabric: Requires [Fabric Loader](https://fabricmc.net/use/) and [Fabric API](https://www.curseforge.com/minecraft/mc-mods/fabric-api)**,
 
-**For Quilt: Requires [Quilt Loader](https://quiltmc.org/install/) and [QFAPI/QSL](https://www.curseforge.com/minecraft/mc-mods/qsl)**,
+**Quilt: Requires [Quilt Loader](https://quiltmc.org/install/) and [QFAPI/QSL](https://www.curseforge.com/minecraft/mc-mods/qsl)**,
 
-**For Forge: Requires [Forge](https://files.minecraftforge.net/net/minecraftforge/forge/)**.
+**Forge: Requires [Forge](https://files.minecraftforge.net/net/minecraftforge/forge/)**.
 
 **Fabric：需要[Fabric Loader](https://fabricmc.net/use/)和[Fabric API](https://www.curseforge.com/minecraft/mc-mods/fabric-api)**；
 
@@ -19,10 +19,13 @@
 
 ## Download - 下载
 
-MC百科： [LAN World Plug-n-Play](https://www.mcmod.cn/class/4498.html)
-CurseForge : [LAN World Plug-n-Play](https://www.curseforge.com/minecraft/mc-mods/mcwifipnp)
-Modrinth : [LAN World Plug-n-Play](https://modrinth.com/mod/mcwifipnp)
-GitHub 源码: [LAN World Plug-n-Play](https://github.com/Satxm/mcwifipnp)
+MC百科： [https://www.mcmod.cn/class/4498.html](https://www.mcmod.cn/class/4498.html)
+
+CurseForge : [https://www.curseforge.com/minecraft/mc-mods/mcwifipnp](https://www.curseforge.com/minecraft/mc-mods/mcwifipnp)
+
+Modrinth : [https://modrinth.com/mod/mcwifipnp](https://modrinth.com/mod/mcwifipnp)
+
+GitHub 源码: [https://github.com/Satxm/mcwifipnp](https://github.com/Satxm/mcwifipnp)
 
 ## Introduction - 简介
 
@@ -40,13 +43,13 @@ LAN World Screen - English GUI
 
 局域网世界截图 - 英语界面
 
-![GUI EN-US](https://github.com/Satxm/images/raw/main/mcwifipnp-en-us.jpg)
+![GUI EN-US](https://github.com/Satxm/images/raw/main/en.jpg)
 
 LAN World Screen - Chinese Simplified GUI
 
 局域网世界截图 - 简体中文界面
 
-![GUI ZH-CN](https://github.com/Satxm/images/raw/main/mcwifipnp-zh-cn.jpg)
+![GUI ZH-CN](https://github.com/Satxm/images/raw/main/zh.jpg)
 
 ## What Can It Do - 它的作用
 
@@ -61,6 +64,14 @@ Automatically select game mode according to your game, allows you to enable or d
 Allows you to change server motd (Which is the message that is displayed in the server list of the client, below the name).
 
 允许你自定义MOTD（是玩家客户端的多人游戏服务器列表中显示的服务器信息，显示于名称下方）。
+
+Allows you control other players op permissions, means you can use ```/op``` ```/deop``` commands to do that.
+
+允许你控制其他玩家的op权限，你可以使用```/op``` ```/deop```命令进行控制。
+
+You can use whitelist to block other players join your world.
+
+你可以使用白名单来组建其他玩家进加入你的游戏世界。
 
 Allows players to connect your world from anywhere, this includes toggling online mode.
 
