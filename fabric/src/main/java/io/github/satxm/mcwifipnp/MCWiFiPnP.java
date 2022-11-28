@@ -1,17 +1,12 @@
 package io.github.satxm.mcwifipnp;
 
-import java.util.List;
-
 import io.github.satxm.mcwifipnp.mixin.PlayerListAccessor;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.client.screen.v1.ScreenEvents;
-import net.fabricmc.fabric.api.client.screen.v1.Screens;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.components.AbstractWidget;
-import net.minecraft.client.gui.components.Button;
-import net.minecraft.client.gui.screens.PauseScreen;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.gui.screens.ShareToLanScreen;
 import net.minecraft.client.server.IntegratedServer;
 import net.minecraft.network.chat.TextComponent;
 import net.minecraft.network.chat.TranslatableComponent;
@@ -30,32 +25,17 @@ public class MCWiFiPnP implements ModInitializer {
 	}
 
 	public static void afterScreenInit(Minecraft client, Screen screen, int i, int j) {
-		if (screen instanceof PauseScreen) {
-			final List<AbstractWidget> buttons = Screens.getButtons(screen);
-			for (int k = 0; k < buttons.size(); k++) {
-				AbstractWidget ShareToLanOld = buttons.get(k);
-				if (buttons.size() != 0 && ShareToLanOld.getMessage().getString()
-						.equals(new TranslatableComponent("menu.shareToLan").getString())) {
-					int x = ShareToLanOld.x;
-					int y = ShareToLanOld.y;
-					int w = ShareToLanOld.getWidth();
-					int h = ShareToLanOld.getHeight();
-					AbstractWidget ShareToLanNew = new Button(x, y, w, h, new TranslatableComponent("menu.shareToLan"),
-							(button) -> client.setScreen(new ShareToLanScreen(screen)));
-					ShareToLanNew.active = ShareToLanOld.active;
-					buttons.remove(ShareToLanOld);
-					buttons.add(ShareToLanNew);
-				}
-			}
+		if (screen instanceof ShareToLanScreen) {
+			client.setScreen(new ShareToLanScreenNew(screen));
 		}
 	}
 
 	private void onServerLoad(MinecraftServer server) {
-		MCWiFiPnPUnit.serverSatrting(server);
+		MCWiFiPnPUnit.ReadingConfig(server);
 	}
 
 	private void onServerStop(MinecraftServer server) {
-		MCWiFiPnPUnit.serverStopping(server);
+		MCWiFiPnPUnit.ClosePortUPnP(server);
 	}
 
 	public static void openToLan() {
@@ -69,7 +49,7 @@ public class MCWiFiPnP implements ModInitializer {
 		server.publishServer(GameType.byName(cfg.GameMode), cfg.AllowCommands, cfg.port);
 		((PlayerListAccessor) playerList).setMaxPlayers(cfg.maxPlayers);
 		server.setUsesAuthentication(cfg.OnlineMode);
-		server.setPvpAllowed(cfg.EnablePvP);
+		server.setPvpAllowed(cfg.PvP);
 		client.gui.getChat().addMessage(new TranslatableComponent("commands.publish.started", cfg.port));
 
 		new Thread(() -> {
