@@ -11,8 +11,8 @@ import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.TextComponent;
 import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.world.level.GameType;
 import net.minecraft.util.HttpUtil;
+import net.minecraft.world.level.GameType;
 
 public class ShareToLanScreenNew extends Screen {
 	private final MCWiFiPnPUnit.Config cfg;

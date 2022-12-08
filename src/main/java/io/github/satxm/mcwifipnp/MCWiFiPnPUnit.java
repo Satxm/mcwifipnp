@@ -141,7 +141,7 @@ public class MCWiFiPnPUnit {
         configMap.put(server, cfg);
     }
 
-    public static void ClosePortUPnP(MinecraftServer server) {
+    public static void CloseUPnPPort(MinecraftServer server) {
         MCWiFiPnPUnit.Config cfg = configMap.get(server);
         if (server.isPublished() && cfg.UseUPnP) {
             UPnP.closePortTCP(cfg.port);
