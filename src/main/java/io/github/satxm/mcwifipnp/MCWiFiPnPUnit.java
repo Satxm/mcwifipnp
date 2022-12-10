@@ -74,10 +74,9 @@ public class MCWiFiPnPUnit {
             for (int i = 0; i < IPAddressList().size(); i++) {
                 Map<String, String> NewMap = IPAddressList().get(i);
                 if (NewMap.get("Type") == "IPv4") {
-                    IPComponentList.add(
-                            IPComponent(
-                                    Component.translatable(NewMap.get("Local")).getString() + " " + NewMap.get("Type"),
-                                    NewMap.get("IP") + ":" + cfg.port));
+                    IPComponentList.add(IPComponent(
+                            Component.translatable(NewMap.get("Local")).getString() + " " + NewMap.get("Type"),
+                            NewMap.get("IP") + ":" + cfg.port));
                 } else {
                     IPComponentList.add(IPComponent(
                             Component.translatable(NewMap.get("Local")).getString() + " " + NewMap.get("Type"),
@@ -93,10 +92,8 @@ public class MCWiFiPnPUnit {
                 IPList.add(GetGlobalIPv4().get("IP"));
             }
             if (!GetGlobalIPv6().isEmpty() && !IPList.contains(GetGlobalIPv6().get("IP"))) {
-                IPComponentList.add(IPComponent(
-                        Component.translatable(GetGlobalIPv6().get("Local")).getString() + " "
-                                + GetGlobalIPv6().get("Type"),
-                        "[" + GetGlobalIPv6().get("IP") + "]:" + cfg.port));
+                IPComponentList.add(IPComponent(Component.translatable(GetGlobalIPv6().get("Local")).getString() + " "
+                        + GetGlobalIPv6().get("Type"), "[" + GetGlobalIPv6().get("IP") + "]:" + cfg.port));
                 IPList.add(GetGlobalIPv4().get("IP"));
             }
             if (cfg.UseUPnP && UPnP.getExternalIP() != null && !IPList.contains(GetGlobalIPv6().get("IP"))) {
@@ -139,7 +136,7 @@ public class MCWiFiPnPUnit {
         configMap.put(server, cfg);
     }
 
-    public static void ClosePortUPnP(MinecraftServer server) {
+    public static void CloseUPnPPort(MinecraftServer server) {
         MCWiFiPnPUnit.Config cfg = configMap.get(server);
         if (server.isPublished() && cfg.UseUPnP) {
             UPnP.closePortTCP(cfg.port);
@@ -182,13 +179,13 @@ public class MCWiFiPnPUnit {
     }
 
     private static Component IPComponent(String Type, String IP) {
-        return ComponentUtils.wrapInSquareBrackets(Component.literal(Type).withStyle((style) -> {
-            return style.withColor(ChatFormatting.GREEN)
-                    .withClickEvent(new ClickEvent(ClickEvent.Action.COPY_TO_CLIPBOARD, IP))
-                    .withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT,
-                            Component.translatable("chat.copy.click").append("\n").append(IP)))
-                    .withInsertion(IP);
-        }));
+        return ComponentUtils.wrapInSquareBrackets(Component.literal(Type)
+                .withStyle(style -> style.withColor(ChatFormatting.GREEN)
+                        .withClickEvent(new ClickEvent(ClickEvent.Action.COPY_TO_CLIPBOARD, IP))
+                        .withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT,
+                                Component.translatable("chat.copy.click").append("\n").append(IP)))
+                        .withInsertion(IP)));
+
     }
 
     public static Map<String, String> GetGlobalIPv4() {
@@ -329,8 +326,7 @@ public class MCWiFiPnPUnit {
     private static void waitForRetry() {
         try {
             Thread.sleep(5000L);
-        }
-        catch (InterruptedException interruptedException) {
+        } catch (InterruptedException interruptedException) {
             return;
         }
     }

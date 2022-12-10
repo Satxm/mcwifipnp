@@ -65,13 +65,14 @@ Allows you to change server motd (Which is the message that is displayed in the 
 
 允许你自定义MOTD（是玩家客户端的多人游戏服务器列表中显示的服务器信息，显示于名称下方）。
 
-Allows you control other players op permissions, means you can use ```/op``` ```/deop``` commands to do that.
+Allows you control other players' op permissions when they join your world, and you can use ```/op``` ```/deop``` commands to do that.
 
-允许你控制其他玩家的op权限，你可以使用```/op``` ```/deop```命令进行控制。
+你可以控制其他玩家加入时是否有op权限、是否可以作弊，你也可以使用```/op``` ```/deop```命令进行控制。
 
-You can use whitelist to block other players join your world.
 
-你可以使用白名单来组建其他玩家进加入你的游戏世界。
+You can control haw many players can join your world. You can use whitelist to block other players join your world.
+
+你可以决定有多少玩家可以加入你的世界，你可以使用白名单来组建其他玩家进加入你的游戏世界。
 
 Allows players to connect your world from anywhere, this includes toggling online mode.
 
@@ -81,6 +82,6 @@ Your settings will be recorded in a file, and it will be automatically loaded ne
 
 可以自动保存配置文件，并且下次加载世界时会自动载入配置。
 
-You can choose whether to copy the IP address to the clipboard.
+You can choose whether to copy the IP address (such as local IPv4, globe IPv4 IPv6) to the clipboard.
 
-你可以选择是否复制IP到剪切板。
+可以获取你本机的IP地址（本地IPv4，公网IPv4、IPv6[1.4.8+]），方便联机使用，你可以选择是否复制IP到剪切板。

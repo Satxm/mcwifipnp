@@ -1,16 +1,23 @@
 package io.github.satxm.mcwifipnp;
 
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.gui.screens.ShareToLanScreen;
+import net.minecraft.client.server.IntegratedServer;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.commands.BanIpCommands;
 import net.minecraft.server.commands.BanListCommands;
 import net.minecraft.server.commands.BanPlayerCommands;
 import net.minecraft.server.commands.DeOpCommands;
 import net.minecraft.server.commands.OpCommand;
+import net.minecraft.server.commands.PublishCommand;
 import net.minecraft.server.commands.WhitelistCommand;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.players.PlayerList;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.Screen;
-import net.minecraft.client.gui.screens.ShareToLanScreen;
 import net.minecraft.client.server.IntegratedServer;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.level.GameType;
@@ -27,10 +34,10 @@ public class MCWiFiPnP {
 
 	public MCWiFiPnP() {
 		MinecraftForge.EVENT_BUS.register(this);
-		MinecraftForge.EVENT_BUS.addListener(MCWiFiPnP::ChangeButton);
+		MinecraftForge.EVENT_BUS.addListener(MCWiFiPnP::afterScreenInit);
 	}
 
-	public static void ChangeButton(final ScreenEvent.Init.Post event) {
+	public static void afterScreenInit(final ScreenEvent.Init.Post event) {
 		Minecraft client = Minecraft.getInstance();
 		Screen screen = event.getScreen();
 		if (screen instanceof ShareToLanScreen) {
@@ -47,11 +54,11 @@ public class MCWiFiPnP {
 		BanIpCommands.register(event.getServer().getCommands().getDispatcher());
 		BanListCommands.register(event.getServer().getCommands().getDispatcher());
 		BanPlayerCommands.register(event.getServer().getCommands().getDispatcher());
-    }
+	}
 
 	@SubscribeEvent
 	public void onServerStopping(ServerStoppingEvent event) {
-		MCWiFiPnPUnit.ClosePortUPnP(event.getServer());
+		MCWiFiPnPUnit.CloseUPnPPort(event.getServer());
 	}
 
 	public static void openToLan() {
@@ -59,10 +66,11 @@ public class MCWiFiPnP {
 		IntegratedServer server = client.getSingleplayerServer();
 		PlayerList playerList = server.getPlayerList();
 		MCWiFiPnPUnit.Config cfg = MCWiFiPnPUnit.getConfig(server);
-		
+
 		server.setMotd(cfg.motd);
 		server.getStatus().setDescription(Component.literal(cfg.motd));
-		server.publishServer(GameType.byName(cfg.GameMode), cfg.AllowCommands, cfg.port);
+		MutableComponent component = server.publishServer(GameType.byName(cfg.GameMode), cfg.AllowCommands, cfg.port) ? PublishCommand.getSuccessMessage(cfg.port) : Component.translatable("commands.publish.failed");
+		client.gui.getChat().addMessage(component);
 		server.getPlayerList().maxPlayers = cfg.maxPlayers;
 		server.setUsesAuthentication(cfg.OnlineMode);
 		server.setPvpAllowed(cfg.PvP);
@@ -72,7 +80,6 @@ public class MCWiFiPnP {
 		for (ServerPlayer player : playerList.getPlayers()) {
 			playerList.sendPlayerPermissionLevel(player);
 		}
-		client.gui.getChat().addMessage(Component.translatable("commands.publish.started", cfg.port));
 
 		new Thread(() -> {
 			MCWiFiPnPUnit.UseUPnP(cfg, client);
