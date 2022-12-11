@@ -40,22 +40,18 @@ public class ShareToLanScreenNew extends Screen {
 
 	protected void init() {
 		Button StartLanServer = Button.builder(Component.translatable("lanServer.start"), button -> {
-			if (!EditPort.getValue().isEmpty()) {
+			if (!EditPort.getValue().isEmpty())
 				cfg.port = Integer.parseInt(EditPort.getValue());
-			}
-			if (!EditPlayers.getValue().isEmpty()) {
+			if (!EditPlayers.getValue().isEmpty())
 				cfg.maxPlayers = Integer.parseInt(EditPlayers.getValue());
-			}
-			if (!EditMotd.getValue().isEmpty()) {
+			if (!EditMotd.getValue().isEmpty())
 				cfg.motd = EditMotd.getValue();
-			}
 			MCWiFiPnPUnit.saveConfig(cfg);
 			MCWiFiPnPUnit.OpenToLan();
 			this.minecraft.updateTitle();
 			this.minecraft.setScreen((Screen) null);
-			if (MCWiFiPnPUnit.convertOldUsers(this.minecraft.getSingleplayerServer())) {
+			if (MCWiFiPnPUnit.convertOldUsers(this.minecraft.getSingleplayerServer()))
 				this.minecraft.getSingleplayerServer().getProfileCache().save();
-			}
 		}).bounds(this.width / 2 - 155, this.height - 32, 150, 20).build();
 		this.addRenderableWidget(StartLanServer);
 
