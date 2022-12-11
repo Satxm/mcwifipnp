@@ -64,10 +64,10 @@ public class MCWiFiPnPUnit {
 
 		server.setMotd(cfg.motd);
 		server.getStatus().setDescription(new TextComponent(cfg.motd));
-		TranslatableComponent component = server.publishServer(GameType.byName(cfg.GameMode), cfg.AllowCommands, cfg.port) 
+        TranslatableComponent component = server.publishServer(GameType.byName(cfg.GameMode), cfg.AllowCommands, cfg.port)
                 ? new TranslatableComponent("commands.publish.started", cfg.port)
                 : new TranslatableComponent("commands.publish.failed");
-		client.gui.getChat().addMessage(component);
+        client.gui.getChat().addMessage(component);
 
 		((PlayerListAccessor) playerList).setMaxPlayers(cfg.maxPlayers);
 		server.setUsesAuthentication(cfg.OnlineMode);
