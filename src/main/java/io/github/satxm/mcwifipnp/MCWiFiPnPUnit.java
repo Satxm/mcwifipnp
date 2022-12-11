@@ -30,15 +30,20 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 import com.google.gson.JsonParser;
 
+import io.github.satxm.mcwifipnp.mixin.PlayerListAccessor;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.server.IntegratedServer;
 import net.minecraft.network.chat.ClickEvent;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.ComponentUtils;
 import net.minecraft.network.chat.HoverEvent;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.commands.PublishCommand;
 import net.minecraft.server.players.OldUsersConverter;
+import net.minecraft.server.players.PlayerList;
+import net.minecraft.world.level.GameType;
 import net.minecraft.world.level.storage.LevelResource;
 
 public class MCWiFiPnPUnit {
@@ -49,6 +54,34 @@ public class MCWiFiPnPUnit {
     public static Config getConfig(MinecraftServer server) {
         return Objects.requireNonNull(configMap.get(server), "no config for server???");
     }
+
+    
+	public static void OpenToLan() {
+		Minecraft client = Minecraft.getInstance();
+		IntegratedServer server = client.getSingleplayerServer();
+		PlayerList playerList = server.getPlayerList();
+		MCWiFiPnPUnit.Config cfg = MCWiFiPnPUnit.getConfig(server);
+
+		server.setMotd(cfg.motd);
+		server.getStatus().setDescription(Component.literal(cfg.motd));
+		MutableComponent component = server.publishServer(GameType.byName(cfg.GameMode), cfg.AllowCommands, cfg.port)
+				? PublishCommand.getSuccessMessage(cfg.port)
+				: Component.translatable("commands.publish.failed");
+		client.gui.getChat().addMessage(component);
+		((PlayerListAccessor) playerList).setMaxPlayers(cfg.maxPlayers);
+		server.setUsesAuthentication(cfg.OnlineMode);
+		server.setPvpAllowed(cfg.PvP);
+		server.setEnforceWhitelist(cfg.Whitelist);
+		playerList.setUsingWhiteList(cfg.Whitelist);
+		if (cfg.AllowCommands)
+			((SetCommandsAllowed) server.getWorldData()).setCommandsAllowed(cfg.AllowCommands);
+		playerList.setAllowCheatsForAllPlayers(cfg.AllPlayersCheats);
+
+		new Thread(() -> {
+			MCWiFiPnPUnit.UseUPnP(cfg, client);
+			MCWiFiPnPUnit.CopyToClipboard(cfg, client);
+		}, "MCWiFiPnP").start();
+	}
 
     public static void UseUPnP(Config cfg, Minecraft client) {
         if (cfg.UseUPnP) {

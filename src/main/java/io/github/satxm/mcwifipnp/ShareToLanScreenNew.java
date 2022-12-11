@@ -50,7 +50,7 @@ public class ShareToLanScreenNew extends Screen {
 				cfg.motd = EditMotd.getValue();
 			}
 			MCWiFiPnPUnit.saveConfig(cfg);
-			MCWiFiPnP.openToLan();
+			MCWiFiPnPUnit.OpenToLan();
 			this.minecraft.updateTitle();
 			this.minecraft.setScreen((Screen) null);
 			if (MCWiFiPnPUnit.convertOldUsers(this.minecraft.getSingleplayerServer())) {
@@ -113,7 +113,7 @@ public class ShareToLanScreenNew extends Screen {
 				} catch (NumberFormatException ex) {
 					this.EditPort.setTextColor(0xFF5555);
 					this.EditPort.setTooltip(
-							Tooltip.create(Component.translatable("mcwifipnp.gui.port.invalid.new")));
+							Tooltip.create(Component.translatable("mcwifipnp.gui.port.invalid")));
 					StartLanServer.active = false;
 				}
 			}
