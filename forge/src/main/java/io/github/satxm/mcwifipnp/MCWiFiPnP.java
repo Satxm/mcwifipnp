@@ -3,10 +3,12 @@ package io.github.satxm.mcwifipnp;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.ShareToLanScreen;
-import net.minecraft.client.server.IntegratedServer;
-import net.minecraft.network.chat.TextComponent;
-import net.minecraft.network.chat.TranslatableComponent;
-import net.minecraft.world.level.GameType;
+import net.minecraft.server.commands.BanIpCommands;
+import net.minecraft.server.commands.BanListCommands;
+import net.minecraft.server.commands.BanPlayerCommands;
+import net.minecraft.server.commands.DeOpCommands;
+import net.minecraft.server.commands.OpCommand;
+import net.minecraft.server.commands.WhitelistCommand;
 import net.minecraftforge.client.event.GuiScreenEvent;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -35,29 +37,17 @@ public class MCWiFiPnP {
 	@SubscribeEvent
 	public void onServerStarting(FMLServerStartingEvent event) {
 		MCWiFiPnPUnit.ReadingConfig(event.getServer());
+		DeOpCommands.register(event.getServer().getCommands().getDispatcher());
+		OpCommand.register(event.getServer().getCommands().getDispatcher());
+		WhitelistCommand.register(event.getServer().getCommands().getDispatcher());
+		BanIpCommands.register(event.getServer().getCommands().getDispatcher());
+		BanListCommands.register(event.getServer().getCommands().getDispatcher());
+		BanPlayerCommands.register(event.getServer().getCommands().getDispatcher());
 	}
 
 	@SubscribeEvent
 	public void onServerStopping(FMLServerStoppingEvent event) {
-		MCWiFiPnPUnit.ClosePortUPnP(event.getServer());
+		MCWiFiPnPUnit.CloseUPnPPort(event.getServer());
 	}
 
-	public static void openToLan() {
-		Minecraft client = Minecraft.getInstance();
-		IntegratedServer server = client.getSingleplayerServer();
-		MCWiFiPnPUnit.Config cfg = MCWiFiPnPUnit.getConfig(server);
-
-		server.setMotd(cfg.motd);
-		server.getStatus().setDescription(new TextComponent(cfg.motd));
-		server.publishServer(GameType.byName(cfg.GameMode), cfg.AllowCommands, cfg.port);
-		server.getPlayerList().maxPlayers = cfg.maxPlayers;
-		server.setUsesAuthentication(cfg.OnlineMode);
-		server.setPvpAllowed(cfg.PvP);
-		client.gui.getChat().addMessage(new TranslatableComponent("commands.publish.started", cfg.port));
-
-		new Thread(() -> {
-			MCWiFiPnPUnit.UseUPnP(cfg, client);
-			MCWiFiPnPUnit.CopyToClipboard(cfg, client);
-		}, "MCWiFiPnP").start();
-	}
 }

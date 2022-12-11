@@ -4,7 +4,8 @@
     "package": "io.github.satxm.mcwifipnp.mixin",
     "compatibilityLevel": "JAVA_16",
     "client": [
-        "PlayerListAccessor"
+        "PlayerListAccessor",
+        "PrimaryLevelDataMixin"
     ],
     "injectors": {
         "defaultRequire": 1

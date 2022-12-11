@@ -45,7 +45,7 @@ public class ShareToLanScreenNew extends Screen {
 					cfg.motd = EditMotd.getValue();
 					cfg.maxPlayers = Integer.parseInt(EditPlayers.getValue());
 					MCWiFiPnPUnit.saveConfig(cfg);
-					MCWiFiPnP.openToLan();
+					MCWiFiPnPUnit.OpenToLan();
 					this.minecraft.updateTitle();
 					this.minecraft.setScreen((Screen) null);
 					if (MCWiFiPnPUnit.convertOldUsers(this.minecraft.getSingleplayerServer())) {
