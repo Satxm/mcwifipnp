@@ -42,8 +42,8 @@ import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.network.chat.TextComponent;
 import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.server.players.OldUsersConverter;
 import net.minecraft.server.players.PlayerList;
+import net.minecraft.server.players.ServerOpListEntry;
 import net.minecraft.world.level.GameType;
 import net.minecraft.world.level.storage.LevelResource;
 
@@ -75,7 +75,8 @@ public class MCWiFiPnPUnit {
 		server.setEnforceWhitelist(cfg.Whitelist);
 		playerList.setUsingWhiteList(cfg.Whitelist);
         if (cfg.AllowCommands)
-            ((SetCommandsAllowed) server.getWorldData()).setCommandsAllowed(cfg.AllowCommands);
+            playerList.getOps().add(new ServerOpListEntry(client.player.getGameProfile(), 4,
+                    playerList.canBypassPlayerLimit(client.player.getGameProfile())));
         playerList.setAllowCheatsForAllPlayers(cfg.AllPlayersCheats);
 
 		new Thread(() -> {
@@ -321,52 +322,6 @@ public class MCWiFiPnPUnit {
         } catch (Throwable t) {
         }
         return out;
-    }
-
-    protected static boolean convertOldUsers(MinecraftServer server) {
-        int i;
-        boolean bl = false;
-        for (i = 0; !bl && i <= 2; ++i) {
-            if (i > 0) {
-                LOGGER.warn("Encountered a problem while converting the user banlist, retrying in a few seconds");
-                MCWiFiPnPUnit.waitForRetry();
-            }
-            bl = OldUsersConverter.convertUserBanlist(server);
-        }
-        boolean bl2 = false;
-        for (i = 0; !bl2 && i <= 2; ++i) {
-            if (i > 0) {
-                LOGGER.warn("Encountered a problem while converting the ip banlist, retrying in a few seconds");
-                MCWiFiPnPUnit.waitForRetry();
-            }
-            bl2 = OldUsersConverter.convertIpBanlist(server);
-        }
-        boolean bl3 = false;
-        for (i = 0; !bl3 && i <= 2; ++i) {
-            if (i > 0) {
-                LOGGER.warn("Encountered a problem while converting the op list, retrying in a few seconds");
-                MCWiFiPnPUnit.waitForRetry();
-            }
-            bl3 = OldUsersConverter.convertOpsList(server);
-        }
-        boolean bl4 = false;
-        for (i = 0; !bl4 && i <= 2; ++i) {
-            if (i > 0) {
-                LOGGER.warn("Encountered a problem while converting the whitelist, retrying in a few seconds");
-                MCWiFiPnPUnit.waitForRetry();
-            }
-            bl4 = OldUsersConverter.convertWhiteList(server);
-        }
-        return bl || bl2 || bl3 || bl4;
-    }
-
-    private static void waitForRetry() {
-        try {
-            Thread.sleep(5000L);
-        }
-        catch (InterruptedException interruptedException) {
-            return;
-        }
     }
 
 }
