@@ -63,7 +63,6 @@ public class MCWiFiPnPUnit {
 		MCWiFiPnPUnit.Config cfg = MCWiFiPnPUnit.getConfig(server);
 
 		server.setMotd(cfg.motd);
-		server.getStatus().setDescription(Component.literal(cfg.motd));
 		MutableComponent component = server.publishServer(GameType.byName(cfg.GameMode), cfg.AllowCommands, cfg.port)
 				? PublishCommand.getSuccessMessage(cfg.port)
 				: Component.translatable("commands.publish.failed");

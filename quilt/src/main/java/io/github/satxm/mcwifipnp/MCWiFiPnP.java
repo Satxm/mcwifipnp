@@ -35,7 +35,7 @@ public class MCWiFiPnP implements ModInitializer {
 		});
 	}
 
-	public static void afterScreenInit(Screen screen, Minecraft client, int i, int j) {
+	public static void afterScreenInit(Screen screen, Minecraft client, boolean i) {
 		if (screen instanceof ShareToLanScreen) {
 			client.setScreen(new ShareToLanScreenNew(screen));
 		}
