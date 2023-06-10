@@ -5,7 +5,7 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath group: 'net.minecraftforge.gradle', name: 'ForgeGradle', version: '5.1.+', changing: true
+        classpath group: 'net.minecraftforge.gradle', name: 'ForgeGradle', version: '6.0.+', changing: true
         classpath 'org.spongepowered:mixingradle:0.7.+'
     }
 }
@@ -24,8 +24,8 @@ println "Java: ${System.getProperty 'java.version'}, JVM: ${System.getProperty '
 
 minecraft {
     mappings channel: 'official', version: project.minecraft_version
+    copyIdeResources = true
 
-    //accessTransformer = file('src/main/resources/META-INF/accesstransformer.cfg')
 
     runs {
         client {
@@ -42,6 +42,8 @@ minecraft {
         }
     }
 }
+
+sourceSets.main.resources { srcDir 'src/generated/resources' }
 
 dependencies {
     minecraft "net.minecraftforge:forge:${project.minecraft_version}-${project.forge_version}"
@@ -86,23 +88,15 @@ java {
     withSourcesJar()
 }
 
-def replaceResources = tasks.register("replaceResources", Copy) {
-	it.outputs.upToDateWhen { false }
-	it.from(sourceSets.main.resources) {
-		include "META-INF/mods.toml"
-		expand "version": project.mod_version, "mc_version": project.forge_minecraft_version_range, "forge_version": project.forge_version_range, "loader_version": project.forge_version_range
-	}
-	it.into "$buildDir/resources/main/"
-}
-
+def resourceTargets = ['META-INF/mods.toml']
+def replaceProperties = [version : project.mod_version, mc_version : project.forge_minecraft_version_range, forge_version : project.forge_version_range, loader_version : project.forge_loader_version_range]
 processResources {
-	duplicatesStrategy(DuplicatesStrategy.FAIL)
-	exclude('META-INF/mods.toml')
-	configure { finalizedBy(replaceResources) }
-}
+    inputs.properties replaceProperties
+    replaceProperties.put 'project', project
 
-classes.configure {
-	dependsOn(replaceResources)
+    filesMatching(resourceTargets) {
+        expand replaceProperties
+    }
 }
 
 tasks.withType(JavaCompile).configureEach {
@@ -114,5 +108,3 @@ mixin {
     config 'mcwifipnp.mixins.json'
     disableAnnotationProcessorCheck()
 }
-
-buildDir = "../build"

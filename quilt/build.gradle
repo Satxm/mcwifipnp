@@ -50,5 +50,3 @@ jar {
 	from("../LICENSE") {
 	}
 }
-
-buildDir = "../build"

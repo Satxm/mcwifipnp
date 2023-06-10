@@ -1,9 +1,8 @@
 package io.github.satxm.mcwifipnp;
 
-import com.mojang.blaze3d.vertex.PoseStack;
-
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.CycleButton;
 import net.minecraft.client.gui.components.EditBox;
@@ -185,20 +184,21 @@ public class ShareToLanScreenNew extends Screen {
 				})).setTooltip(Tooltip.create(Component.translatable("mcwifipnp.gui.CopyIP.info")));
 	}
 
-	public void render(PoseStack poseStack, int i, int j, float f) {
-		this.renderBackground(poseStack);
-		drawCenteredString(poseStack, this.font, this.title, this.width / 2, 16, 16777215);
-		drawString(poseStack, this.font, Component.translatable("mcwifipnp.gui.port"), this.width / 2 - 149, 58,
+	public void render(GuiGraphics guiGraphics, int i, int j, float f) {
+		this.renderBackground(guiGraphics);
+		guiGraphics.drawCenteredString(this.font, this.title, this.width / 2, 16, 16777215);
+		guiGraphics.drawString(this.font, Component.translatable("mcwifipnp.gui.port"), this.width / 2 - 149, 58,
 				16777215);
-		drawString(poseStack, this.font, Component.translatable("mcwifipnp.gui.players"), this.width / 2 - 43, 58,
+		guiGraphics.drawString(this.font, Component.translatable("mcwifipnp.gui.players"), this.width / 2 - 43, 58,
 				16777215);
-		drawString(poseStack, this.font, Component.translatable("mcwifipnp.gui.motd"), this.width / 2 + 63, 58,
+		guiGraphics.drawString(this.font, Component.translatable("mcwifipnp.gui.motd"), this.width / 2 + 63, 58,
 				16777215);
-		drawCenteredString(poseStack, this.font, Component.translatable("lanServer.otherPlayers"), this.width / 2,
-				104, 16777215);
-		EditPort.render(poseStack, i, j, f);
-		EditPlayers.render(poseStack, i, j, f);
-		EditMotd.render(poseStack, i, j, f);
-		super.render(poseStack, i, j, f);
+		guiGraphics.drawCenteredString(this.font, Component.translatable("lanServer.otherPlayers"), this.width / 2, 104,
+				16777215);
+		EditPort.render(guiGraphics, i, j, f);
+		EditPlayers.render(guiGraphics, i, j, f);
+		EditMotd.render(guiGraphics, i, j, f);
+		super.render(guiGraphics, i, j, f);
 	}
+
 }
