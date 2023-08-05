@@ -73,7 +73,7 @@ public class MCWiFiPnPUnit {
 		server.setPvpAllowed(cfg.PvP);
 		server.setEnforceWhitelist(cfg.Whitelist);
 		playerList.setUsingWhiteList(cfg.Whitelist);
-        playerList.getOps().add(new ServerOpListEntry(server.getSingleplayerProfile(), 4, true));
+        playerList.getOps().add(new ServerOpListEntry(server.getSingleplayerProfile(), 4, playerList.canBypassPlayerLimit(server.getSingleplayerProfile())));
 		playerList.setAllowCheatsForAllPlayers(cfg.AllPlayersCheats);
 
 		new Thread(() -> {
