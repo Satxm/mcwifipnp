@@ -1,8 +1,10 @@
 plugins {
-	id 'org.quiltmc.loom' version '1.0+'
+	id 'org.quiltmc.loom' version '1.2.+'
 }
 
-archivesBaseName = project.archives_base_name
+base {
+    archivesBaseName = project.archives_base_name
+}
 version = project.mod_version + "-" + project.minecraft_version + "-quilt"
 group = project.maven_group
 
@@ -13,7 +15,7 @@ dependencies {
 	}
 	modImplementation "org.quiltmc:qsl:${qsl_version}+${minecraft_version}"
 	modImplementation "org.quiltmc:quilt-loader:${project.quilt_loader_version}"
-	modImplementation "org.quiltmc.quilted-fabric-api:quilted-fabric-api:${quilted_fabric_api_version}-${minecraft_version}"
+	//modImplementation "org.quiltmc.quilted-fabric-api:quilted-fabric-api:${quilted_fabric_api_version}-${minecraft_version}"
 }
 
 sourceSets {

@@ -11,6 +11,7 @@ import net.minecraft.server.commands.OpCommand;
 import net.minecraft.server.commands.WhitelistCommand;
 import net.minecraftforge.client.event.ScreenEvent;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.event.RegisterCommandsEvent;
 import net.minecraftforge.event.server.ServerStartingEvent;
 import net.minecraftforge.event.server.ServerStoppingEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -22,10 +23,11 @@ public class MCWiFiPnP {
 
 	public MCWiFiPnP() {
 		MinecraftForge.EVENT_BUS.register(this);
-		MinecraftForge.EVENT_BUS.addListener(MCWiFiPnP::afterScreenInit);
+		MinecraftForge.EVENT_BUS.addListener(this::afterScreenInit);
+		MinecraftForge.EVENT_BUS.addListener(this::onRegisterCommands);
 	}
 
-	public static void afterScreenInit(final ScreenEvent.Init.Post event) {
+	public void afterScreenInit(final ScreenEvent.Init.Post event) {
 		Minecraft client = Minecraft.getInstance();
 		Screen screen = event.getScreen();
 		if (screen instanceof ShareToLanScreen) {
@@ -36,13 +38,18 @@ public class MCWiFiPnP {
 	@SubscribeEvent
 	public void onServerStarting(ServerStartingEvent event) {
 		MCWiFiPnPUnit.ReadingConfig(event.getServer());
-		DeOpCommands.register(event.getServer().getCommands().getDispatcher());
-		OpCommand.register(event.getServer().getCommands().getDispatcher());
-		WhitelistCommand.register(event.getServer().getCommands().getDispatcher());
-		BanIpCommands.register(event.getServer().getCommands().getDispatcher());
-		BanListCommands.register(event.getServer().getCommands().getDispatcher());
-		BanPlayerCommands.register(event.getServer().getCommands().getDispatcher());
 	}
+
+
+    @SubscribeEvent
+    public void onRegisterCommands(RegisterCommandsEvent event) {
+		DeOpCommands.register(event.getDispatcher());
+		OpCommand.register(event.getDispatcher());
+		WhitelistCommand.register(event.getDispatcher());
+		BanIpCommands.register(event.getDispatcher());
+		BanListCommands.register(event.getDispatcher());
+		BanPlayerCommands.register(event.getDispatcher());
+    }
 
 	@SubscribeEvent
 	public void onServerStopping(ServerStoppingEvent event) {

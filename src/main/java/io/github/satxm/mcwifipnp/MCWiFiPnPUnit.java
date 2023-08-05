@@ -43,6 +43,7 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.commands.PublishCommand;
 import net.minecraft.server.players.OldUsersConverter;
 import net.minecraft.server.players.PlayerList;
+import net.minecraft.server.players.ServerOpListEntry;
 import net.minecraft.world.level.GameType;
 import net.minecraft.world.level.storage.LevelResource;
 
@@ -72,8 +73,7 @@ public class MCWiFiPnPUnit {
 		server.setPvpAllowed(cfg.PvP);
 		server.setEnforceWhitelist(cfg.Whitelist);
 		playerList.setUsingWhiteList(cfg.Whitelist);
-		if (cfg.AllowCommands)
-			((SetCommandsAllowed) server.getWorldData()).setCommandsAllowed(cfg.AllowCommands);
+        playerList.getOps().add(new ServerOpListEntry(server.getSingleplayerProfile(), 4, true));
 		playerList.setAllowCheatsForAllPlayers(cfg.AllPlayersCheats);
 
 		new Thread(() -> {

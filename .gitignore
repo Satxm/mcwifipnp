@@ -20,6 +20,7 @@ run/
 bin/
 .classpath
 .project
+.factorypath
 
 # Eclipse JDT LS
 workspace/
