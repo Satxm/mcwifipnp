@@ -185,7 +185,6 @@ public class ShareToLanScreenNew extends Screen {
 	}
 
 	public void render(GuiGraphics guiGraphics, int i, int j, float f) {
-		this.renderBackground(guiGraphics);
 		guiGraphics.drawCenteredString(this.font, this.title, this.width / 2, 16, 16777215);
 		guiGraphics.drawString(this.font, Component.translatable("mcwifipnp.gui.port"), this.width / 2 - 149, 58,
 				16777215);

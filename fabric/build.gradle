@@ -4,11 +4,12 @@ plugins {
 
 sourceCompatibility = targetCompatibility = JavaVersion.VERSION_17
 
-base {
-    archivesBaseName = project.archives_base_name
-}
 version = project.mod_version + "-" + project.minecraft_version + "-fabric"
-group = project.maven_group
+group = project.mod_group_id
+
+base {
+    archivesBaseName = project.mod_id
+}
 
 dependencies {
 	minecraft "com.mojang:minecraft:${project.minecraft_version}"
@@ -17,6 +18,19 @@ dependencies {
 
 	modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
 
+}
+
+processResources {
+	inputs.property "version", project.version
+
+	filesMatching("fabric.mod.json") {
+		expand "version": project.mod_version,"minecraft_version_range": project.fabric_minecraft_version_range, "fabric_version_range": project.fabric_version_range, "fabric_loader_version_range": project.fabric_loader_version_range
+	}
+}
+
+tasks.withType(JavaCompile).configureEach {
+	it.options.encoding = "UTF-8"
+	it.options.release = 17
 }
 
 sourceSets {
@@ -37,17 +51,4 @@ jar {
 
 java {
     withSourcesJar()
-}
-
-processResources {
-	inputs.property "version", project.version
-
-	filesMatching("fabric.mod.json") {
-		expand "version": project.mod_version,"mc_version": project.fabric_minecraft_version_range, "fabric_version": project.fabric_version_range, "fabric_loader_version": project.fabric_loader_version_range
-	}
-}
-
-tasks.withType(JavaCompile).configureEach {
-	it.options.encoding = "UTF-8"
-	it.options.release = 17
 }

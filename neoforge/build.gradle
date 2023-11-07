@@ -1,0 +1,94 @@
+plugins {
+    id 'java-library'
+    id 'eclipse'
+    id 'idea'
+    id 'net.neoforged.gradle.userdev' version '7.0.26'
+    id 'org.spongepowered.mixin' version '0.7.+'
+}
+
+version = project.mod_version + "-" + project.minecraft_version + "-forge"
+group = project.maven_group
+
+base {
+    archivesBaseName = mod_id
+}
+
+repositories {
+    mavenLocal()
+}
+
+java.toolchain.languageVersion = JavaLanguageVersion.of(17)
+
+minecraft {
+    mappings channel: 'official', version: project.minecraft_version
+    copyIdeResources = true
+}
+
+runs {
+    configureEach {
+        systemProperty 'forge.logging.markers', 'REGISTRIES'
+        systemProperty 'forge.logging.console.level', 'debug'
+        modSource project.sourceSets.main
+    }
+    client {
+        systemProperty 'forge.enabledGameTestNamespaces', project.mod_id
+    }
+    gameTestServer {
+        systemProperty 'forge.enabledGameTestNamespaces', project.mod_id
+    }
+    data {
+        programArguments.addAll '--mod', project.mod_id, '--all', '--output', file('src/generated/resources/').getAbsolutePath(), '--existing', file('src/main/resources/').getAbsolutePath()
+    }
+}
+
+sourceSets.main.resources { srcDir 'src/generated/resources' }
+
+dependencies {
+    implementation "net.neoforged:neoforge:${project.neo_version}"
+    implementation 'org.spongepowered:mixin:0.8.2'
+    annotationProcessor 'org.spongepowered:mixin:0.8.5:processor'
+}
+
+tasks.withType(ProcessResources).configureEach {
+    var replaceProperties = [
+        mod_version: project.mod_version,
+        neo_version_range : project.neo_version_range,
+        neo_loader_version_range : project.neo_loader_version_range,
+        minecraft_version_range : project.neo_minecraft_version_range,
+        pack_format_number: project.pack_format_number,
+    ]
+    inputs.properties replaceProperties
+    filesMatching(['META-INF/mods.toml', 'pack.mcmeta']) {
+        expand replaceProperties + [project: project]
+    }
+}
+
+sourceSets {
+	main {
+		java {
+			srcDir "../src/main/java"
+		}
+		resources {
+			srcDir "../src/main/resources"
+		}
+	}
+}
+
+jar {
+	from("../LICENSE") {
+	}
+}
+
+java {
+    withSourcesJar()
+}
+
+tasks.withType(JavaCompile).configureEach {
+	it.options.encoding = 'UTF-8'
+	it.options.release = 17
+}
+
+mixin {
+    config 'mcwifipnp.mixins.json'
+    disableAnnotationProcessorCheck()
+}

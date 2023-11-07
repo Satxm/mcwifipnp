@@ -11,7 +11,7 @@
 				"Me!": "Satxm"
 			},
 			"contact": {
-				"homepage": "https://www.curseforge.com/minecraft/mc-mods/mcwifipnp",
+				"homepage": "https://github.com/satxm/mcwifipnp",
 				"issues": "https://github.com/satxm/mcwifipnp/issues",
 				"sources": "https://github.com/satxm/mcwifipnp"
 			},
@@ -24,15 +24,15 @@
 		"depends": [
 			{
 				"id": "quilt_loader",
-				"versions": "${quilt_loader_version}"
+				"versions": "${quilt_loader_version_range}"
 			},
 			{
 				"id": "quilted_fabric_api",
-				"versions": "${quilted_fabric_api_version}"
+				"versions": "${quilted_fabric_api_version_range}"
 			},
 			{
 				"id": "minecraft",
-				"versions": "${mc_version}"
+				"versions": "${minecraft_version_range}"
 			}
 		]
 	},

@@ -5,18 +5,25 @@ pluginManagement {
             url = 'https://maven.fabricmc.net/'
         }
         maven {
-            name = 'Forge'
+            name = 'MinecraftForge'
+            url = 'https://maven.minecraftforge.net/'
+        }
+        maven {
+            name = 'NeoForge'
             url = 'https://maven.neoforged.net/releases'
         }
 		maven {
 			name = 'Quilt'
 			url = 'https://maven.quiltmc.org/repository/release'
 		}
-		gradlePluginPortal()
+        mavenLocal()
+        gradlePluginPortal()
 	}
 }
+
 include("fabric")
 include("forge")
-include("quilt")
+//include("quilt")
+include("neoforge")
 
 rootProject.name = "mcwifipnp"

@@ -8,7 +8,7 @@
     "Satxm"
   ],
   "contact": {
-    "homepage": "https://www.curseforge.com/minecraft/mc-mods/mcwifipnp",
+    "homepage": "https://github.com/satxm/mcwifipnp",
     "issues": "https://github.com/satxm/mcwifipnp/issues",
     "sources": "https://github.com/satxm/mcwifipnp"
   },
@@ -24,9 +24,10 @@
     "mcwifipnp.mixins.json"
   ],
   "depends": {
-    "fabricloader": "${fabric_loader_version}",
-    "fabric": "${fabric_version}",
-    "minecraft": "${mc_version}",
+    "fabric": "${fabric_version_range}",
+    "minecraft": "${minecraft_version_range}",
+    "fabricloader": "${fabric_loader_version_range}",
     "java": ">=17"
   }
 }
+
