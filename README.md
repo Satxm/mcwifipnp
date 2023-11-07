@@ -2,7 +2,7 @@
 
 ![CurseForge Title](https://cf.way2muchnoise.eu/title/450250.svg) ![CurseForge Downloads](https://cf.way2muchnoise.eu/450250.svg) ![CurseForge Version](https://cf.way2muchnoise.eu/versions/450250.svg)
 
-**This Branch is for Minecraft 1.19.x only!**
+**This Branch is for Minecraft 1.20 1.20.1 only!**
 
 **Fabric: Requires [Fabric Loader](https://fabricmc.net/use/) and [Fabric API](https://www.curseforge.com/minecraft/mc-mods/fabric-api)**,
 
