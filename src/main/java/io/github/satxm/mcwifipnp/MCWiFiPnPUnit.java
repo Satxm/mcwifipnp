@@ -30,7 +30,6 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 import com.google.gson.JsonParser;
 
-import io.github.satxm.mcwifipnp.mixin.PlayerListAccessor;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.server.IntegratedServer;
@@ -68,7 +67,7 @@ public class MCWiFiPnPUnit {
 				? PublishCommand.getSuccessMessage(cfg.port)
 				: Component.translatable("commands.publish.failed");
 		client.gui.getChat().addMessage(component);
-		((PlayerListAccessor) playerList).setMaxPlayers(cfg.maxPlayers);
+        MCWiFiPnP.setMaxPlayers(server,cfg.maxPlayers);
 		server.setUsesAuthentication(cfg.OnlineMode);
 		server.setPvpAllowed(cfg.PvP);
 		server.setEnforceWhitelist(cfg.Whitelist);

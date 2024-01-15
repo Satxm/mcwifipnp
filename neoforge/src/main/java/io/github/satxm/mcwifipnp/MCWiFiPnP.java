@@ -10,21 +10,23 @@ import net.minecraft.server.commands.DeOpCommands;
 import net.minecraft.server.commands.OpCommand;
 import net.minecraft.server.commands.WhitelistCommand;
 import net.minecraftforge.client.event.ScreenEvent;
-import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.RegisterCommandsEvent;
 import net.minecraftforge.event.server.ServerStartingEvent;
 import net.minecraftforge.event.server.ServerStoppingEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.common.Mod;
+import net.neoforged.bus.api.IEventBus;
+import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.fml.common.Mod;
+import net.neoforged.neoforge.event.server.ServerStartingEvent;
+import net.neoforged.neoforge.event.server.ServerStoppingEvent;
 
 @Mod(MCWiFiPnP.MODID)
 public class MCWiFiPnP {
 	public static final String MODID = "mcwifipnp";
 
-	public MCWiFiPnP() {
-		MinecraftForge.EVENT_BUS.register(this);
-		MinecraftForge.EVENT_BUS.addListener(this::afterScreenInit);
-		MinecraftForge.EVENT_BUS.addListener(this::onRegisterCommands);
+	public MCWiFiPnP(IEventBus modBus) {
+		modBus.register(this);
+		modBus.addListener(this::afterScreenInit);
+		modBus.addListener(this::onRegisterCommands);
 	}
 
 	public void afterScreenInit(final ScreenEvent.Init.Post event) {
@@ -35,8 +37,8 @@ public class MCWiFiPnP {
 		}
 	}
 
-	@SubscribeEvent
-	public void onServerStarting(ServerStartingEvent event) {
+    @SubscribeEvent
+    public void onServerStarting(ServerStartingEvent event) {
 		MCWiFiPnPUnit.ReadingConfig(event.getServer());
 	}
 

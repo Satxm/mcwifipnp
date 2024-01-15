@@ -3,12 +3,14 @@ package io.github.satxm.mcwifipnp;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.ShareToLanScreen;
+import net.minecraft.client.server.IntegratedServer;
 import net.minecraft.server.commands.BanIpCommands;
 import net.minecraft.server.commands.BanListCommands;
 import net.minecraft.server.commands.BanPlayerCommands;
 import net.minecraft.server.commands.DeOpCommands;
 import net.minecraft.server.commands.OpCommand;
 import net.minecraft.server.commands.WhitelistCommand;
+import net.minecraft.server.players.PlayerList;
 import net.minecraftforge.client.event.ScreenEvent;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.RegisterCommandsEvent;
@@ -31,6 +33,7 @@ public class MCWiFiPnP {
 		Minecraft client = Minecraft.getInstance();
 		Screen screen = event.getScreen();
 		if (screen instanceof ShareToLanScreen) {
+
 			client.setScreen(new ShareToLanScreenNew(screen));
 		}
 	}
@@ -56,4 +59,8 @@ public class MCWiFiPnP {
 		MCWiFiPnPUnit.CloseUPnPPort(event.getServer());
 	}
 
+	public static void setMaxPlayers(IntegratedServer server, int num) {
+		PlayerList playerList = server.getPlayerList();
+		playerList.maxPlayers = num;
+	}
 }

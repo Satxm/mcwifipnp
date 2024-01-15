@@ -2,15 +2,14 @@ plugins {
     id 'java-library'
     id 'eclipse'
     id 'idea'
-    id 'net.neoforged.gradle.userdev' version '7.0.26'
-    id 'org.spongepowered.mixin' version '0.7.+'
+    id 'net.neoforged.gradle.userdev' version '7.0.57'
 }
 
-version = project.mod_version + "-" + project.minecraft_version + "-forge"
-group = project.maven_group
+version = project.mod_version + "-" + project.minecraft_version + "-neoforge"
+group = project.mod_group_id
 
 base {
-    archivesBaseName = mod_id
+    archivesName = project.mod_id
 }
 
 repositories {
@@ -20,8 +19,9 @@ repositories {
 java.toolchain.languageVersion = JavaLanguageVersion.of(17)
 
 minecraft {
-    mappings channel: 'official', version: project.minecraft_version
-    copyIdeResources = true
+    accessTransformers {
+        file('src/main/resources/META-INF/accesstransformer.cfg')
+    }
 }
 
 runs {
@@ -41,12 +41,20 @@ runs {
     }
 }
 
-sourceSets.main.resources { srcDir 'src/generated/resources' }
+sourceSets {
+	main {
+		java {
+			srcDir "../src/main/java"
+		}
+		resources {
+			srcDir "../src/main/resources"
+            srcDir "src/generated/resources"
+		}
+	}
+}
 
 dependencies {
     implementation "net.neoforged:neoforge:${project.neo_version}"
-    implementation 'org.spongepowered:mixin:0.8.2'
-    annotationProcessor 'org.spongepowered:mixin:0.8.5:processor'
 }
 
 tasks.withType(ProcessResources).configureEach {
@@ -58,21 +66,12 @@ tasks.withType(ProcessResources).configureEach {
         pack_format_number: project.pack_format_number,
     ]
     inputs.properties replaceProperties
+
     filesMatching(['META-INF/mods.toml', 'pack.mcmeta']) {
         expand replaceProperties + [project: project]
     }
 }
 
-sourceSets {
-	main {
-		java {
-			srcDir "../src/main/java"
-		}
-		resources {
-			srcDir "../src/main/resources"
-		}
-	}
-}
 
 jar {
 	from("../LICENSE") {
@@ -84,11 +83,6 @@ java {
 }
 
 tasks.withType(JavaCompile).configureEach {
-	it.options.encoding = 'UTF-8'
+    options.encoding = 'UTF-8'
 	it.options.release = 17
-}
-
-mixin {
-    config 'mcwifipnp.mixins.json'
-    disableAnnotationProcessorCheck()
 }

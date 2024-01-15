@@ -1,12 +1,11 @@
 plugins {
     id 'eclipse'
     id 'idea'
-    id 'net.minecraftforge.gradle' version '[6.0.14,6.2)'
-    id 'org.spongepowered.mixin' version '0.7.+'
+    id 'net.minecraftforge.gradle' version '[6.0.16,6.2)'
 }
 
 version = project.mod_version + "-" + project.minecraft_version + "-forge"
-group = project.maven_group
+group = project.mod_group_id
 
 base {
     archivesName = project.mod_id
@@ -19,6 +18,8 @@ println "Java: ${System.getProperty 'java.version'}, JVM: ${System.getProperty '
 minecraft {
     
     mappings channel: 'official', version: project.minecraft_version
+
+    accessTransformer = file('src/main/resources/META-INF/accesstransformer.cfg')
     
     copyIdeResources = true
     
@@ -36,11 +37,11 @@ minecraft {
         }
         client {
             
-            property 'forge.enabledGameTestNamespaces', mod_id
+            property 'forge.enabledGameTestNamespaces', project.mod_id
         }
         
         gameTestServer {
-            property 'forge.enabledGameTestNamespaces', mod_id
+            property 'forge.enabledGameTestNamespaces', project.mod_id
         }
         data {
             
@@ -50,15 +51,11 @@ minecraft {
         }
     }
 }
-sourceSets.main.resources { srcDir 'src/generated/resources' }
 repositories {
     
 }
 dependencies {
-    
     minecraft "net.minecraftforge:forge:${project.minecraft_version}-${project.forge_version}"
-    implementation 'org.spongepowered:mixin:0.8.2'
-    annotationProcessor 'org.spongepowered:mixin:0.8.5:processor'
 }
 
 sourceSets {
@@ -114,9 +111,4 @@ java {
 tasks.withType(JavaCompile).configureEach {
     options.encoding = 'UTF-8' 
 	it.options.release = 17
-}
-
-mixin {
-    config 'mcwifipnp.mixins.json'
-    disableAnnotationProcessorCheck()
 }
