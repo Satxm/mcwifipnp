@@ -1,18 +1,9 @@
-buildscript {
-    repositories {
-        maven { url = 'https://maven.minecraftforge.net/' }
-        jcenter()
-        mavenCentral()
-    }
-    dependencies {
-        classpath group: 'net.minecraftforge.gradle', name: 'ForgeGradle', version: '5.1.+', changing: true
-        classpath 'org.spongepowered:mixingradle:0.7.+'
-    }
+plugins {
+    id 'eclipse'
+    id 'idea'
+    id 'maven-publish'
+    id 'net.minecraftforge.gradle' version '[6.0,6.2)'
 }
-
-apply plugin: 'net.minecraftforge.gradle'
-apply plugin: 'eclipse'
-apply plugin: 'org.spongepowered.mixin'
 
 archivesBaseName = project.archives_base_name
 version = project.mod_version + "-" + project.minecraft_version + "-forge"
@@ -25,14 +16,13 @@ println('Java: ' + System.getProperty('java.version') + ' JVM: ' + System.getPro
 minecraft {
     mappings channel: 'official', version: project.minecraft_version
 
-    //accessTransformer = file('src/main/resources/META-INF/accesstransformer.cfg')
+    accessTransformer = file('src/main/resources/META-INF/accesstransformer.cfg')
 
     runs {
         client {
-            workingDirectory project.file('../run')
+            workingDirectory project.file('run')
             property 'forge.logging.markers', 'REGISTRIES'
             property 'forge.logging.console.level', 'debug'
-            arg '-torg.spongepowered.asm.launch.MixinTweaker'
 
             mods {
                 mcwifipnp {
@@ -45,8 +35,6 @@ minecraft {
 
 dependencies {
     minecraft "net.minecraftforge:forge:${project.minecraft_version}-${project.forge_version}"
-    implementation 'org.spongepowered:mixin:0.8.2'
-    annotationProcessor 'org.spongepowered:mixin:0.8.5:processor'
 }
 
 afterEvaluate {
@@ -56,14 +44,14 @@ afterEvaluate {
 }
 
 sourceSets {
-	main {
-		java {
-			srcDir "../src/main/java"
-		}
-		resources {
-			srcDir "../src/main/resources"
-		}
-	}
+    main {
+        java {
+            srcDir "../src/main/java"
+        }
+        resources {
+            srcDir "../src/main/resources"
+        }
+    }
 }
 
 jar {
@@ -79,7 +67,7 @@ jar {
         ])
     }
     from("../LICENSE") {
-	}
+    }
 }
 
 java {
@@ -87,32 +75,25 @@ java {
 }
 
 def replaceResources = tasks.register("replaceResources", Copy) {
-	it.outputs.upToDateWhen { false }
-	it.from(sourceSets.main.resources) {
-		include "META-INF/mods.toml"
-		expand 'version': project.mod_version, 'mc_version': project.forge_minecraft_version_range, 'forge_version': project.forge_version_range, "loader_version": project.forge_version_range
-	}
-	it.into "$buildDir/resources/main/"
+    it.outputs.upToDateWhen { false }
+    it.from(sourceSets.main.resources) {
+        include "META-INF/mods.toml"
+        expand 'version': project.mod_version, 'mc_version': project.forge_minecraft_version_range, 'forge_version': project.forge_version_range, "loader_version": project.forge_version_range
+    }
+    it.into "$buildDir/resources/main/"
 }
 
 processResources {
-	duplicatesStrategy(DuplicatesStrategy.FAIL)
-	exclude('META-INF/mods.toml')
-	configure { finalizedBy(replaceResources) }
+    duplicatesStrategy(DuplicatesStrategy.FAIL)
+    exclude('META-INF/mods.toml')
+    configure { finalizedBy(replaceResources) }
 }
 
 classes.configure {
-	dependsOn(replaceResources)
+    dependsOn(replaceResources)
 }
 
 tasks.withType(JavaCompile).configureEach {
-	it.options.encoding = "UTF-8"
-	it.options.release = 17
+    it.options.encoding = "UTF-8"
+    it.options.release = 17
 }
-
-mixin {
-    config 'mcwifipnp.mixins.json'
-    disableAnnotationProcessorCheck()
-}
-
-buildDir = "../build"

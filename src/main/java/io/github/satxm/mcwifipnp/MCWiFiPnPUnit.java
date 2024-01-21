@@ -30,7 +30,6 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 import com.google.gson.JsonParser;
 
-import io.github.satxm.mcwifipnp.mixin.PlayerListAccessor;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.server.IntegratedServer;
@@ -56,34 +55,32 @@ public class MCWiFiPnPUnit {
         return Objects.requireNonNull(configMap.get(server), "no config for server???");
     }
 
-	public static void OpenToLan() {
-		Minecraft client = Minecraft.getInstance();
-		IntegratedServer server = client.getSingleplayerServer();
-		PlayerList playerList = server.getPlayerList();
-		MCWiFiPnPUnit.Config cfg = MCWiFiPnPUnit.getConfig(server);
+    public static void OpenToLan() {
+        Minecraft client = Minecraft.getInstance();
+        IntegratedServer server = client.getSingleplayerServer();
+        PlayerList playerList = server.getPlayerList();
+        MCWiFiPnPUnit.Config cfg = MCWiFiPnPUnit.getConfig(server);
 
-		server.setMotd(cfg.motd);
-		server.getStatus().setDescription(new TextComponent(cfg.motd));
+        server.setMotd(cfg.motd);
+        server.getStatus().setDescription(new TextComponent(cfg.motd));
         TranslatableComponent component = server.publishServer(GameType.byName(cfg.GameMode), cfg.AllowCommands, cfg.port)
                 ? new TranslatableComponent("commands.publish.started", cfg.port)
                 : new TranslatableComponent("commands.publish.failed");
         client.gui.getChat().addMessage(component);
 
-		((PlayerListAccessor) playerList).setMaxPlayers(cfg.maxPlayers);
-		server.setUsesAuthentication(cfg.OnlineMode);
-		server.setPvpAllowed(cfg.PvP);
-		server.setEnforceWhitelist(cfg.Whitelist);
-		playerList.setUsingWhiteList(cfg.Whitelist);
-        if (cfg.AllowCommands)
-            playerList.getOps().add(new ServerOpListEntry(client.player.getGameProfile(), 4,
-                    playerList.canBypassPlayerLimit(client.player.getGameProfile())));
+        MCWiFiPnP.setMaxPlayers(server, cfg.maxPlayers);
+        server.setUsesAuthentication(cfg.OnlineMode);
+        server.setPvpAllowed(cfg.PvP);
+        server.setEnforceWhitelist(cfg.Whitelist);
+        playerList.setUsingWhiteList(cfg.Whitelist);
+        playerList.getOps().add(new ServerOpListEntry(client.player.getGameProfile(), 4, playerList.canBypassPlayerLimit(client.player.getGameProfile())));
         playerList.setAllowCheatsForAllPlayers(cfg.AllPlayersCheats);
 
-		new Thread(() -> {
-			MCWiFiPnPUnit.UseUPnP(cfg, client);
-			MCWiFiPnPUnit.CopyToClipboard(cfg, client);
-		}, "MCWiFiPnP").start();
-	}
+        new Thread(() -> {
+            MCWiFiPnPUnit.UseUPnP(cfg, client);
+            MCWiFiPnPUnit.CopyToClipboard(cfg, client);
+        }, "MCWiFiPnP").start();
+    }
 
     public static void UseUPnP(Config cfg, Minecraft client) {
         if (cfg.UseUPnP) {
