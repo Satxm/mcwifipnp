@@ -1,40 +1,36 @@
 {
-	"schema_version": 1,
-	"quilt_loader": {
-		"group": "io.github.satxm.mcwifipnp",
-		"id": "mcwifipnp",
-		"version": "${version}",
-		"metadata": {
-			"name": "LAN World Plug-n-Play",
-			"description": "A Minecraft LAN World Tool With WLAN UPnP.",
-			"contributors": {
-				"Me!": "Satxm"
-			},
-			"contact": {
-				"homepage": "https://github.com/satxm/mcwifipnp",
-				"issues": "https://github.com/satxm/mcwifipnp/issues",
-				"sources": "https://github.com/satxm/mcwifipnp"
-			},
-			"icon": "mcwifipnp.png"
-		},
-		"intermediate_mappings": "net.fabricmc:intermediary",
-		"entrypoints": {
-			"init": "io.github.satxm.mcwifipnp.MCWiFiPnP"
-		},
-		"depends": [
-			{
-				"id": "quilt_loader",
-				"versions": "${quilt_loader_version_range}"
-			},
-			{
-				"id": "quilted_fabric_api",
-				"versions": "${quilted_fabric_api_version_range}"
-			},
-			{
-				"id": "minecraft",
-				"versions": "${minecraft_version_range}"
-			}
-		]
-	},
-	"mixin": "mcwifipnp.mixins.json"
+    "schema_version": 1,
+    "quilt_loader": {
+        "group": "io.github.satxm.mcwifipnp",
+        "id": "mcwifipnp",
+        "version": "${version}",
+        "metadata": {
+            "name": "LAN World Plug-n-Play",
+            "description": "A Minecraft LAN World Tool With WLAN UPnP.",
+            "contributors": {
+                "Me!": "Satxm"
+            },
+            "contact": {
+                "homepage": "https://github.com/satxm/mcwifipnp",
+                "issues": "https://github.com/satxm/mcwifipnp/issues",
+                "sources": "https://github.com/satxm/mcwifipnp"
+            },
+            "icon": "mcwifipnp.png"
+        },
+        "intermediate_mappings": "net.fabricmc:intermediary",
+        "entrypoints": {
+            "init": "io.github.satxm.mcwifipnp.MCWiFiPnP"
+        },
+        "depends": [
+            {
+                "id": "quilt_loader",
+                "versions": "${quilt_loader_version_range}"
+            },
+            {
+                "id": "minecraft",
+                "versions": "${minecraft_version_range}"
+            }
+        ]
+    },
+    "mixin": "mcwifipnp.mixins.json"
 }

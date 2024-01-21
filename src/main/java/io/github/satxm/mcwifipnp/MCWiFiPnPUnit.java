@@ -56,30 +56,30 @@ public class MCWiFiPnPUnit {
     }
 
     
-	public static void OpenToLan() {
-		Minecraft client = Minecraft.getInstance();
-		IntegratedServer server = client.getSingleplayerServer();
-		PlayerList playerList = server.getPlayerList();
-		MCWiFiPnPUnit.Config cfg = MCWiFiPnPUnit.getConfig(server);
+    public static void OpenToLan() {
+        Minecraft client = Minecraft.getInstance();
+        IntegratedServer server = client.getSingleplayerServer();
+        PlayerList playerList = server.getPlayerList();
+        MCWiFiPnPUnit.Config cfg = MCWiFiPnPUnit.getConfig(server);
 
-		server.setMotd(cfg.motd);
-		MutableComponent component = server.publishServer(GameType.byName(cfg.GameMode), cfg.AllowCommands, cfg.port)
-				? PublishCommand.getSuccessMessage(cfg.port)
-				: Component.translatable("commands.publish.failed");
-		client.gui.getChat().addMessage(component);
+        server.setMotd(cfg.motd);
+        MutableComponent component = server.publishServer(GameType.byName(cfg.GameMode), cfg.AllowCommands, cfg.port)
+                ? PublishCommand.getSuccessMessage(cfg.port)
+                : Component.translatable("commands.publish.failed");
+        client.gui.getChat().addMessage(component);
         MCWiFiPnP.setMaxPlayers(server,cfg.maxPlayers);
-		server.setUsesAuthentication(cfg.OnlineMode);
-		server.setPvpAllowed(cfg.PvP);
-		server.setEnforceWhitelist(cfg.Whitelist);
-		playerList.setUsingWhiteList(cfg.Whitelist);
+        server.setUsesAuthentication(cfg.OnlineMode);
+        server.setPvpAllowed(cfg.PvP);
+        server.setEnforceWhitelist(cfg.Whitelist);
+        playerList.setUsingWhiteList(cfg.Whitelist);
         playerList.getOps().add(new ServerOpListEntry(server.getSingleplayerProfile(), 4, playerList.canBypassPlayerLimit(server.getSingleplayerProfile())));
-		playerList.setAllowCheatsForAllPlayers(cfg.AllPlayersCheats);
+        playerList.setAllowCheatsForAllPlayers(cfg.AllPlayersCheats);
 
-		new Thread(() -> {
-			MCWiFiPnPUnit.UseUPnP(cfg, client);
-			MCWiFiPnPUnit.CopyToClipboard(cfg, client);
-		}, "MCWiFiPnP").start();
-	}
+        new Thread(() -> {
+            MCWiFiPnPUnit.UseUPnP(cfg, client);
+            MCWiFiPnPUnit.CopyToClipboard(cfg, client);
+        }, "MCWiFiPnP").start();
+    }
 
     public static void UseUPnP(Config cfg, Minecraft client) {
         if (cfg.UseUPnP) {

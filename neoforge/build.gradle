@@ -9,7 +9,7 @@ version = project.mod_version + "-" + project.minecraft_version + "-neoforge"
 group = project.mod_group_id
 
 base {
-    archivesName = project.mod_id
+    archivesName = mod_id
 }
 
 repositories {
@@ -18,22 +18,16 @@ repositories {
 
 java.toolchain.languageVersion = JavaLanguageVersion.of(17)
 
-minecraft {
-    accessTransformers {
-        file('src/main/resources/META-INF/accesstransformer.cfg')
-    }
-}
+minecraft.accessTransformers.file rootProject.file('src/main/resources/META-INF/accesstransformer.cfg')
 
 runs {
     configureEach {
+        workingDirectory project.file('run')
         systemProperty 'forge.logging.markers', 'REGISTRIES'
         systemProperty 'forge.logging.console.level', 'debug'
         modSource project.sourceSets.main
     }
     client {
-        systemProperty 'forge.enabledGameTestNamespaces', project.mod_id
-    }
-    gameTestServer {
         systemProperty 'forge.enabledGameTestNamespaces', project.mod_id
     }
     data {
@@ -42,15 +36,15 @@ runs {
 }
 
 sourceSets {
-	main {
-		java {
-			srcDir "../src/main/java"
-		}
-		resources {
-			srcDir "../src/main/resources"
+    main {
+        java {
+            srcDir "../src/main/java"
+        }
+        resources {
+            srcDir "../src/main/resources"
             srcDir "src/generated/resources"
-		}
-	}
+        }
+    }
 }
 
 dependencies {
@@ -59,30 +53,27 @@ dependencies {
 
 tasks.withType(ProcessResources).configureEach {
     var replaceProperties = [
-        mod_version: project.mod_version,
+        minecraft_version_range : project.neo_minecraft_version_range,
         neo_version_range : project.neo_version_range,
         neo_loader_version_range : project.neo_loader_version_range,
-        minecraft_version_range : project.neo_minecraft_version_range,
+        mod_version: project.mod_version,
         pack_format_number: project.pack_format_number,
     ]
     inputs.properties replaceProperties
-
     filesMatching(['META-INF/mods.toml', 'pack.mcmeta']) {
         expand replaceProperties + [project: project]
     }
 }
 
+tasks.withType(JavaCompile).configureEach {
+    options.encoding = 'UTF-8'
+}
 
 jar {
-	from("../LICENSE") {
-	}
+    from("../LICENSE") {
+    }
 }
 
 java {
     withSourcesJar()
-}
-
-tasks.withType(JavaCompile).configureEach {
-    options.encoding = 'UTF-8'
-	it.options.release = 17
 }

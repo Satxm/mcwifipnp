@@ -39,10 +39,6 @@ minecraft {
             
             property 'forge.enabledGameTestNamespaces', project.mod_id
         }
-        
-        gameTestServer {
-            property 'forge.enabledGameTestNamespaces', project.mod_id
-        }
         data {
             
             workingDirectory project.file('run-data')
@@ -59,14 +55,14 @@ dependencies {
 }
 
 sourceSets {
-	main {
-		java {
-			srcDir "../src/main/java"
-		}
-		resources {
-			srcDir "../src/main/resources"
-		}
-	}
+    main {
+        java {
+            srcDir "../src/main/java"
+        }
+        resources {
+            srcDir "../src/main/resources"
+        }
+    }
 }
 
 tasks.named('processResources', ProcessResources).configure {
@@ -100,8 +96,8 @@ tasks.named('jar', Jar).configure {
 }
 
 jar {
-	from("../LICENSE") {
-	}
+    from("../LICENSE") {
+    }
 }
 
 java {
@@ -110,5 +106,4 @@ java {
 
 tasks.withType(JavaCompile).configureEach {
     options.encoding = 'UTF-8' 
-	it.options.release = 17
 }

@@ -4,6 +4,7 @@ build/
 out/
 classes/
 run/
+runs/
 
 # Eclipse
 *.launch
