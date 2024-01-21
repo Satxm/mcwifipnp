@@ -1,22 +1,24 @@
 plugins {
     id 'eclipse'
     id 'idea'
-    id 'net.neoforged.gradle' version '[6.0.13, 6.2)'
-    id 'org.spongepowered.mixin' version '0.7.+'
+    id 'net.minecraftforge.gradle' version '[6.0.16,6.2)'
 }
+
+version = project.mod_version + "-" + project.minecraft_version + "-forge"
+group = project.maven_group
 
 base {
     archivesBaseName = project.archives_base_name
 }
-version = project.mod_version + "-" + project.minecraft_version + "-forge"
-group = project.maven_group
-
 java.toolchain.languageVersion = JavaLanguageVersion.of(17)
 
 println "Java: ${System.getProperty 'java.version'}, JVM: ${System.getProperty 'java.vm.version'} (${System.getProperty 'java.vendor'}), Arch: ${System.getProperty 'os.arch'}"
 
 minecraft {
+
     mappings channel: 'official', version: project.minecraft_version
+
+    accessTransformer = file('src/main/resources/META-INF/accesstransformer.cfg')
     copyIdeResources = true
 
     runs {
@@ -38,9 +40,7 @@ minecraft {
 sourceSets.main.resources { srcDir 'src/generated/resources' }
 
 dependencies {
-    minecraft "net.neoforged:forge:${project.minecraft_version}-${project.forge_version}"
-    implementation 'org.spongepowered:mixin:0.8.2'
-    annotationProcessor 'org.spongepowered:mixin:0.8.5:processor'
+    minecraft "net.minecraftforge:forge:${project.minecraft_version}-${project.forge_version}"
 }
 
 afterEvaluate {
@@ -50,14 +50,14 @@ afterEvaluate {
 }
 
 sourceSets {
-	main {
-		java {
-			srcDir "../src/main/java"
-		}
-		resources {
-			srcDir "../src/main/resources"
-		}
-	}
+    main {
+        java {
+            srcDir "../src/main/java"
+        }
+        resources {
+            srcDir "../src/main/resources"
+        }
+    }
 }
 
 jar {
@@ -73,7 +73,7 @@ jar {
         ])
     }
     from("../LICENSE") {
-	}
+    }
 }
 
 java {
@@ -92,11 +92,6 @@ processResources {
 }
 
 tasks.withType(JavaCompile).configureEach {
-	it.options.encoding = "UTF-8"
-	it.options.release = 17
-}
-
-mixin {
-    config 'mcwifipnp.mixins.json'
-    disableAnnotationProcessorCheck()
+    it.options.encoding = "UTF-8"
+    it.options.release = 17
 }

@@ -1,5 +1,5 @@
 plugins {
-	id 'org.quiltmc.loom' version '1.2.+'
+    id 'org.quiltmc.loom' version '1.4+'
 }
 
 base {
@@ -9,46 +9,45 @@ version = project.mod_version + "-" + project.minecraft_version + "-quilt"
 group = project.maven_group
 
 dependencies {
-	minecraft "com.mojang:minecraft:${project.minecraft_version}"
-	mappings loom.layered {
-		officialMojangMappings()
-	}
-	modImplementation "org.quiltmc:qsl:${qsl_version}+${minecraft_version}"
-	modImplementation "org.quiltmc:quilt-loader:${project.quilt_loader_version}"
-	//modImplementation "org.quiltmc.quilted-fabric-api:quilted-fabric-api:${quilted_fabric_api_version}-${minecraft_version}"
+    minecraft "com.mojang:minecraft:${project.minecraft_version}"
+    mappings loom.layered {
+        officialMojangMappings()
+    }
+    modImplementation "org.quiltmc:quilt-loader:${project.quilt_loader_version}"
+    modImplementation "org.quiltmc:qsl:${qsl_version}+${minecraft_version}"
 }
 
 sourceSets {
-	main {
-		java {
-			srcDir "../src/main/java"
-		}
-		resources {
-			srcDir "../src/main/resources"
-		}
-	}
+    main {
+        java {
+            srcDir "../src/main/java"
+        }
+        resources {
+            srcDir "../src/main/resources"
+        }
+    }
 }
 
 processResources {
-	inputs.property "version", version
+    inputs.property "version", version
 
-	filesMatching('quilt.mod.json') {
-		expand "version": project.mod_version,"mc_version": project.quilt_minecraft_version_range, "quilted_fabric_api_version": project.quilted_fabric_api_version_range, "quilt_loader_version": project.quilt_loader_version_range
-	}
+    filesMatching('quilt.mod.json') {
+        expand "version": project.mod_version,"mc_version": project.quilt_minecraft_version_range, "quilted_fabric_api_version": project.quilted_fabric_api_version_range, "quilt_loader_version": project.quilt_loader_version_range
+    }
 }
 
 tasks.withType(JavaCompile).configureEach {
-	it.options.encoding = "UTF-8"
-	it.options.release = 17
+    it.options.encoding = "UTF-8"
+    it.options.release = 17
 }
 
 java {
-	sourceCompatibility = targetCompatibility = JavaVersion.VERSION_17
+    sourceCompatibility = targetCompatibility = JavaVersion.VERSION_17
 
-	withSourcesJar()
+    withSourcesJar()
 }
 
 jar {
-	from("../LICENSE") {
-	}
+    from("../LICENSE") {
+    }
 }
