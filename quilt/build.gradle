@@ -2,6 +2,10 @@ plugins {
     id 'org.quiltmc.loom' version '1.4+'
 }
 
+sourceCompatibility = targetCompatibility = JavaVersion.VERSION_17
+
+println "Java: ${System.getProperty 'java.version'}, JVM: ${System.getProperty 'java.vm.version'} (${System.getProperty 'java.vendor'}), Arch: ${System.getProperty 'os.arch'}"
+
 version = project.mod_version + "-" + project.minecraft_version + "-quilt"
 group = project.mod_group_id
 
@@ -33,6 +37,7 @@ sourceSets {
         }
         resources {
             srcDir "../src/main/resources"
+            srcDir "src/generated/resources"
         }
     }
 }
@@ -40,6 +45,7 @@ sourceSets {
 tasks.withType(ProcessResources).configureEach {
     var replaceProperties = [
         minecraft_version_range : project.quilt_minecraft_version_range,
+        quilt_qsl_version_range : project.quilt_qsl_version_range,
         quilt_loader_version_range : project.quilt_loader_version_range,
         version: project.mod_version,
         pack_format_number: project.pack_format_number,
@@ -55,11 +61,7 @@ tasks.withType(JavaCompile).configureEach {
     it.options.release = 17
 }
 
-java {
-    sourceCompatibility = targetCompatibility = JavaVersion.VERSION_17
-
-    withSourcesJar()
-}
+java.withSourcesJar()
 
 jar {
     from("../LICENSE") {

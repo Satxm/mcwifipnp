@@ -4,16 +4,16 @@ plugins {
     id 'net.minecraftforge.gradle' version '[6.0.16,6.2)'
 }
 
+java.toolchain.languageVersion = JavaLanguageVersion.of(17)
+
+println "Java: ${System.getProperty 'java.version'}, JVM: ${System.getProperty 'java.vm.version'} (${System.getProperty 'java.vendor'}), Arch: ${System.getProperty 'os.arch'}"
+
 version = project.mod_version + "-" + project.minecraft_version + "-forge"
 group = project.mod_group_id
 
 base {
     archivesName = project.mod_id
 }
-
-java.toolchain.languageVersion = JavaLanguageVersion.of(17)
-
-println "Java: ${System.getProperty 'java.version'}, JVM: ${System.getProperty 'java.vm.version'} (${System.getProperty 'java.vendor'}), Arch: ${System.getProperty 'os.arch'}"
 
 minecraft {
     
@@ -47,9 +47,7 @@ minecraft {
         }
     }
 }
-repositories {
-    
-}
+
 dependencies {
     minecraft "net.minecraftforge:forge:${project.minecraft_version}-${project.forge_version}"
 }
@@ -61,6 +59,7 @@ sourceSets {
         }
         resources {
             srcDir "../src/main/resources"
+            srcDir "src/generated/resources"
         }
     }
 }
@@ -79,31 +78,14 @@ tasks.named('processResources', ProcessResources).configure {
     }
 }
 
-tasks.named('jar', Jar).configure {
-    manifest {
-        attributes([
-                'Specification-Title'     : "LAN World Plug-n-Play",
-                'Specification-Vendor'    : "Satxm",
-                'Specification-Version'   : '1', 
-                'Implementation-Title'    : project.name,
-                'Implementation-Version'  : "${version}",
-                'Implementation-Vendor'   : "Satxm",
-                'Implementation-Timestamp': new Date().format("yyyy-MM-dd'T'HH:mm:ssZ")
-        ])
-    }
-    
-    finalizedBy 'reobfJar'
+tasks.withType(JavaCompile).configureEach {
+    it.options.encoding = 'UTF-8'
+    it.options.release = 17
 }
+
+java.withSourcesJar()
 
 jar {
     from("../LICENSE") {
     }
-}
-
-java {
-    withSourcesJar()
-}
-
-tasks.withType(JavaCompile).configureEach {
-    options.encoding = 'UTF-8' 
 }

@@ -71,6 +71,7 @@ public class MCWiFiPnP {
                     Button newButton = Button.builder(Component.translatable("menu.shareToLan"), $ -> {
                         minecraft.setScreen(new ShareToLanScreenNew(screen));
                     }).bounds(button.getX(), button.getY(), button.getWidth(), button.getHeight()).build();
+                    newButton.active = button.active;
                     remove.accept(button);
                     add.accept(newButton);
                 });

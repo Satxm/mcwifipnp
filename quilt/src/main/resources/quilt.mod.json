@@ -27,6 +27,10 @@
                 "versions": "${quilt_loader_version_range}"
             },
             {
+                "id": "quilted_fabric_api",
+                "versions": "${quilt_qsl_version_range}"
+            },
+            {
                 "id": "minecraft",
                 "versions": "${minecraft_version_range}"
             }

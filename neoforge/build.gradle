@@ -5,18 +5,20 @@ plugins {
     id 'net.neoforged.gradle.userdev' version '7.0.57'
 }
 
+java.toolchain.languageVersion = JavaLanguageVersion.of(17)
+
+println "Java: ${System.getProperty 'java.version'}, JVM: ${System.getProperty 'java.vm.version'} (${System.getProperty 'java.vendor'}), Arch: ${System.getProperty 'os.arch'}"
+
 version = project.mod_version + "-" + project.minecraft_version + "-neoforge"
 group = project.mod_group_id
 
 base {
-    archivesName = mod_id
+    archivesName = project.mod_id
 }
 
 repositories {
     mavenLocal()
 }
-
-java.toolchain.languageVersion = JavaLanguageVersion.of(17)
 
 minecraft.accessTransformers.file rootProject.file('src/main/resources/META-INF/accesstransformer.cfg')
 
@@ -35,6 +37,10 @@ runs {
     }
 }
 
+dependencies {
+    implementation "net.neoforged:neoforge:${project.neo_version}"
+}
+
 sourceSets {
     main {
         java {
@@ -45,10 +51,6 @@ sourceSets {
             srcDir "src/generated/resources"
         }
     }
-}
-
-dependencies {
-    implementation "net.neoforged:neoforge:${project.neo_version}"
 }
 
 tasks.withType(ProcessResources).configureEach {
@@ -66,14 +68,13 @@ tasks.withType(ProcessResources).configureEach {
 }
 
 tasks.withType(JavaCompile).configureEach {
-    options.encoding = 'UTF-8'
+    it.options.encoding = 'UTF-8'
+    it.options.release = 17
 }
+
+java.withSourcesJar()
 
 jar {
     from("../LICENSE") {
     }
-}
-
-java {
-    withSourcesJar()
 }

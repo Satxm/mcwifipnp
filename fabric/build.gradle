@@ -4,6 +4,8 @@ plugins {
 
 sourceCompatibility = targetCompatibility = JavaVersion.VERSION_17
 
+println "Java: ${System.getProperty 'java.version'}, JVM: ${System.getProperty 'java.vm.version'} (${System.getProperty 'java.vendor'}), Arch: ${System.getProperty 'os.arch'}"
+
 version = project.mod_version + "-" + project.minecraft_version + "-fabric"
 group = project.mod_group_id
 
@@ -15,9 +17,19 @@ dependencies {
     minecraft "com.mojang:minecraft:${project.minecraft_version}"
     mappings loom.officialMojangMappings()
     modImplementation "net.fabricmc:fabric-loader:${project.fabric_loader_version}"
-
     modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
+}
 
+sourceSets {
+    main {
+        java {
+            srcDir "../src/main/java"
+        }
+        resources {
+            srcDir "../src/main/resources"
+            srcDir "src/generated/resources"
+        }
+    }
 }
 
 tasks.withType(ProcessResources).configureEach {
@@ -39,22 +51,9 @@ tasks.withType(JavaCompile).configureEach {
     it.options.release = 17
 }
 
-sourceSets {
-    main {
-        java {
-            srcDir "../src/main/java"
-        }
-        resources {
-            srcDir "../src/main/resources"
-        }
-    }
-}
+java.withSourcesJar()
 
 jar {
     from("../LICENSE") {
     }
-}
-
-java {
-    withSourcesJar()
 }

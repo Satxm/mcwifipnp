@@ -11,7 +11,6 @@ import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.PauseScreen;
 import net.minecraft.client.gui.screens.Screen;
-import net.minecraft.client.gui.screens.ShareToLanScreen;
 import net.minecraft.client.server.IntegratedServer;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.MinecraftServer;
@@ -32,6 +31,7 @@ public class MCWiFiPnP implements ModInitializer {
         ServerLifecycleEvents.STARTING.register(this::onServerLoad);
         ServerLifecycleEvents.STOPPING.register(this::onServerStop);
         ScreenEvents.AFTER_INIT.register(MCWiFiPnP::afterScreenInit);
+
         CommandRegistrationCallback.EVENT.register((dispatcher, registryAccess, environment) -> {
             DeOpCommands.register(dispatcher);
             OpCommand.register(dispatcher);
@@ -44,10 +44,11 @@ public class MCWiFiPnP implements ModInitializer {
 
     public static void afterScreenInit(Screen screen, Minecraft client, boolean i) {
         if (screen instanceof PauseScreen) {
-            for (AbstractWidget button :screen.getButtons()) {
+            for (AbstractWidget button : screen.getButtons()) {
                 if (button.getMessage().equals(Component.translatable("menu.shareToLan"))) {
-                    screen.getButtons().remove(button);
                     Button newButton = Button.builder(Component.translatable("menu.shareToLan"), $ -> client.setScreen(new ShareToLanScreenNew(screen))).bounds(button.getX(), button.getY(), button.getWidth(), button.getHeight()).build();
+                    newButton.active = button.active;
+                    screen.getButtons().remove(button);
                     screen.getButtons().add(newButton);
                 }
             }
@@ -64,7 +65,7 @@ public class MCWiFiPnP implements ModInitializer {
 
     public static void setMaxPlayers(IntegratedServer server, int num) {
         PlayerList playerList = server.getPlayerList();
-        ((PlayerListAccessor)playerList).setMaxPlayers(num);
+        ((PlayerListAccessor) playerList).setMaxPlayers(num);
     }
 
 }
