@@ -7,10 +7,10 @@
 </div>
 
 [1]: https://img.shields.io/modrinth/dt/RTWpcTBp?label=Modrinth%0aDownloads&logo=modrinth&style=flat&color=45A35F&labelColor=2D2D2D
-[2]: https://www.curseforge.com/minecraft/mc-mods/mcwifipnp
+[2]: https://modrinth.com/mod/mcwifipnp
 
 [3]: https://img.shields.io/curseforge/dt/450250?label=CurseForge%0aDownloads&logo=curseforge&style=flat&color=E36639&labelColor=2D2D2D
-[4]: https://modrinth.com/mod/mcwifipnp
+[4]: https://www.curseforge.com/minecraft/mc-mods/mcwifipnp
 
 [5]: https://img.shields.io/badge/Available%20for-%201.15%20to%201.20-47376F?color=377BCB&labelColor=2D2D2D
 [6]: https://github.com/satxm/mcwifipnp
