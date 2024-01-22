@@ -1,6 +1,5 @@
 package io.github.satxm.mcwifipnp;
 
-import io.github.satxm.mcwifipnp.mixin.PlayerListAccessor;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.client.screen.v1.ScreenEvents;
 import net.fabricmc.fabric.api.client.screen.v1.Screens;
@@ -21,6 +20,7 @@ import net.minecraft.server.commands.DeOpCommands;
 import net.minecraft.server.commands.OpCommand;
 import net.minecraft.server.commands.WhitelistCommand;
 import net.minecraft.server.players.PlayerList;
+import io.github.satxm.mcwifipnp.mixin.PlayerListAccessor;
 
 public class MCWiFiPnP implements ModInitializer {
     public static final String MODID = "mcwifipnp";
@@ -46,6 +46,7 @@ public class MCWiFiPnP implements ModInitializer {
             for (AbstractWidget button :Screens.getButtons(screen)) {
                 if (button.getMessage().equals(Component.translatable("menu.shareToLan"))) {
                     Button newButton = Button.builder(Component.translatable("menu.shareToLan"), $ -> client.setScreen(new ShareToLanScreenNew(screen))).bounds(button.getX(), button.getY(), button.getWidth(), button.getHeight()).build();
+                    newButton.active = button.active;
                     Screens.getButtons(screen).remove(button);
                     Screens.getButtons(screen).add(newButton);
                 }

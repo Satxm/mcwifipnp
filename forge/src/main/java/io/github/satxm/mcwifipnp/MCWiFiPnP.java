@@ -69,9 +69,8 @@ public class MCWiFiPnP {
         if (screen instanceof PauseScreen pauseScreen && screen.getClass() == PauseScreen.class) {
             if (ObfuscationReflectionHelper.<Boolean, PauseScreen>getPrivateValue(PauseScreen.class, (PauseScreen) screen, "f_96306_")) {
                 findButton(children, "menu.shareToLan").ifPresent(button -> {
-                    Button newButton = Button.builder(Component.translatable("menu.shareToLan"), $ -> {
-                        minecraft.setScreen(new ShareToLanScreenNew(screen));
-                    }).bounds(button.getX(), button.getY(), button.getWidth(), button.getHeight()).build();
+                    Button newButton = Button.builder(Component.translatable("menu.shareToLan"), $ -> {minecraft.setScreen(new ShareToLanScreenNew(screen));}).bounds(button.getX(), button.getY(), button.getWidth(), button.getHeight()).build();
+                    newButton.active = button.active;
                     remove.accept(button);
                     add.accept(newButton);
                 });
