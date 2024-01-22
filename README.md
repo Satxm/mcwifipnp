@@ -21,8 +21,6 @@
 
 **Fabric: Requires [Fabric Loader](https://fabricmc.net/use/) and [Fabric API](https://modrinth.com/mod/fabric-api)**,
 
-**Quilt: Requires [Quilt Loader](https://quiltmc.org/install/) and [QFAPI/QSL](https://modrinth.com/mod/qsl)**,
-
 **Forge: Requires [Forge](https://files.minecraftforge.net/net/minecraftforge/forge/)**.
 
 ## Download - 下载
