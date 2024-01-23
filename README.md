@@ -19,13 +19,13 @@
 [8]: https://github.com/satxm/mcwifipnp
 
 
-**Fabric: Requires [Fabric Loader](https://fabricmc.net/use/) and [Fabric API](https://modrinth.com/mod/fabric-api)**,
+**Fabric: Requires [Fabric Loader](https://fabricmc.net/use/) and [Fabric API](https://modrinth.com/mod/fabric-api)**.
 
-**Quilt: Requires [Quilt Loader](https://quiltmc.org/install/) and [QFAPI/QSL](https://modrinth.com/mod/qsl)**,
+**Quilt: Requires [Quilt Loader](https://quiltmc.org/install/) and [QFAPI/QSL](https://modrinth.com/mod/qsl)**.
 
 **Forge: Requires [Forge](https://files.minecraftforge.net/net/minecraftforge/forge/)**.
 
-**NeoForge：Requires [NeoForge](https://projects.neoforged.net/neoforged/neoforge/)**。
+**NeoForge：Requires [NeoForge](https://projects.neoforged.net/neoforged/neoforge/)**.
 
 ## Download - 下载
 
@@ -33,18 +33,18 @@ CurseForge : [https://www.curseforge.com/minecraft/mc-mods/mcwifipnp](https://ww
 
 Modrinth : [https://modrinth.com/mod/mcwifipnp](https://modrinth.com/mod/mcwifipnp)
 
-MC百科： [https://www.mcmod.cn/class/4498.html](https://www.mcmod.cn/class/4498.html)
+MC百科 : [https://www.mcmod.cn/class/4498.html](https://www.mcmod.cn/class/4498.html)
 
-GitHub 源码: [https://github.com/Satxm/mcwifipnp](https://github.com/Satxm/mcwifipnp)
+GitHub 源码 : [https://github.com/Satxm/mcwifipnp](https://github.com/Satxm/mcwifipnp)
 
 ## Introduction - 简介
 
 **This Branch is for Minecraft 1.20.2+ only!**
 **这个分支仅适用于 Minecraft 版本 1.20.2+ ！**
 
-Updated to Minecraft 1.20.x, Uses the vanilla Minecraft GUI style, Uses the official mojang mappings.
+Uses the vanilla Minecraft GUI style, Uses the official mojang mappings.
 
-已经更新到1.20.x，使用Minecraft原生界面样式，使用Mojang官方混淆表。
+使用Minecraft原生界面样式，使用Mojang官方混淆表。
 
 Modified from [TheGlitch76/mcpnp](https://github.com/TheGlitch76/mcpnp) project and UPnP module from [adolfintel/WaifUPnP](https://github.com/adolfintel/WaifUPnP).
 
