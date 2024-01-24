@@ -12,16 +12,16 @@
 [3]: https://img.shields.io/curseforge/dt/450250?label=CurseForge%0aDownloads&logo=curseforge&style=flat&color=E36639&labelColor=2D2D2D
 [4]: https://www.curseforge.com/minecraft/mc-mods/mcwifipnp
 
-[5]: https://img.shields.io/badge/Available%20for-%201.15%20to%201.20-47376F?color=377BCB&labelColor=2D2D2D
-[6]: https://github.com/satxm/mcwifipnp
+[5]: https://img.shields.io/badge/Available%20for-%201.15%20to%201.20-47376F?logo=files&color=377BCB&labelColor=2D2D2D
+[6]: https://modrinth.com/mod/mcwifipnp/versions
 
 [7]: https://img.shields.io/github/license/Satxm/mcwifipnp?label=License&logo=github&style=flat&color=E51050&labelColor=2D2D2D
 [8]: https://github.com/satxm/mcwifipnp
 
 
-**Fabric: Requires [Fabric Loader](https://fabricmc.net/use/) and [Fabric API](https://modrinth.com/mod/fabric-api)**,
+**Fabric: Requires [Fabric Loader](https://fabricmc.net/use/) and [Fabric API](https://modrinth.com/mod/fabric-api)**.
 
-**Quilt: Requires [Quilt Loader](https://quiltmc.org/install/) and [QFAPI/QSL](https://modrinth.com/mod/qsl)**,
+**Quilt: Requires [Quilt Loader](https://quiltmc.org/install/) and [QFAPI/QSL](https://modrinth.com/mod/qsl)**.
 
 **Forge: Requires [Forge](https://files.minecraftforge.net/net/minecraftforge/forge/)**.
 
