@@ -37,6 +37,7 @@ GitHub 源码: [https://github.com/Satxm/mcwifipnp](https://github.com/Satxm/mcw
 ## Introduction - 简介
 
 **This Branch is for Minecraft 1.15.2 only!**
+
 **这个分支仅适用于 Minecraft 版本 1.15.2 ！**
 
 Updated to Minecraft 1.15.2, Uses the vanilla Minecraft GUI style, Uses the official mojang mappings.
@@ -47,7 +48,7 @@ Modified from [TheGlitch76/mcpnp](https://github.com/TheGlitch76/mcpnp) project 
 
 修改自[TheGlitch76/mcpnp](https://github.com/TheGlitch76/mcpnp)项目，UPnP模块来自[adolfintel/WaifUPnP](https://github.com/adolfintel/WaifUPnP)。
 
-## Screenshots of LAN World Screen - 一些局域网世界界面截图
+## Screenshots - 界面截图
 
 <div align="center">
 
