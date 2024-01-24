@@ -40,6 +40,7 @@ GitHub 源码 : [https://github.com/Satxm/mcwifipnp](https://github.com/Satxm/mc
 ## Introduction - 简介
 
 **This Branch is for Minecraft 1.20.2+ only!**
+
 **这个分支仅适用于 Minecraft 版本 1.20.2+ ！**
 
 Uses the vanilla Minecraft GUI style, Uses the official mojang mappings.
