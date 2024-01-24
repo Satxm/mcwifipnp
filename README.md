@@ -51,7 +51,7 @@ Modified from [TheGlitch76/mcpnp](https://github.com/TheGlitch76/mcpnp) project 
 
 修改自[TheGlitch76/mcpnp](https://github.com/TheGlitch76/mcpnp)项目，UPnP模块来自[adolfintel/WaifUPnP](https://github.com/adolfintel/WaifUPnP)。
 
-## Screenshots of LAN World Screen - 一些局域网世界界面截图
+## Screenshots - 界面截图
 
 <div align="center">
 
