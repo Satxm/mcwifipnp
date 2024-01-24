@@ -13,7 +13,7 @@
 [4]: https://www.curseforge.com/minecraft/mc-mods/mcwifipnp
 
 [5]: https://img.shields.io/badge/Available%20for-%201.15%20to%201.20-47376F?logo=files&color=377BCB&labelColor=2D2D2D
-[6]: https://github.com/satxm/mcwifipnp
+[6]: https://modrinth.com/mod/mcwifipnp/versions
 
 [7]: https://img.shields.io/github/license/Satxm/mcwifipnp?label=License&logo=github&style=flat&color=E51050&labelColor=2D2D2D
 [8]: https://github.com/satxm/mcwifipnp
