@@ -63,14 +63,14 @@ public class MCWiFiPnP {
         PlayerList playerList = server.getPlayerList();
         playerList.maxPlayers = num;
     }
-    
-    public static void onAfterInitScreen(Minecraft minecraft, Screen screen, List<GuiEventListener> children,
+
+    public static void onAfterInitScreen(Minecraft client, Screen screen, List<GuiEventListener> children,
             Consumer<GuiEventListener> add, Consumer<GuiEventListener> remove) {
         if (screen instanceof PauseScreen pauseScreen && screen.getClass() == PauseScreen.class) {
             if (pauseScreen.showsPauseMenu()) {
-                findButton(children, "menu.shareToLan").ifPresent(button -> {
+                findButton(children).ifPresent(button -> {
                     Button newButton = Button.builder(Component.translatable("menu.shareToLan"), $ -> {
-                        minecraft.setScreen(new ShareToLanScreenNew(screen));
+                        client.setScreen(new ShareToLanScreenNew(screen));
                     }).bounds(button.getX(), button.getY(), button.getWidth(), button.getHeight()).build();
                     newButton.active = button.active;
                     remove.accept(button);
@@ -80,7 +80,7 @@ public class MCWiFiPnP {
         }
     }
 
-    private static Optional<Button> findButton(List<GuiEventListener> widgets, String s) {
+    private static Optional<Button> findButton(List<GuiEventListener> widgets) {
         for (GuiEventListener widget : widgets) {
             if (widget instanceof Button button) {
                 if (button.getMessage().equals(Component.translatable("menu.shareToLan")))

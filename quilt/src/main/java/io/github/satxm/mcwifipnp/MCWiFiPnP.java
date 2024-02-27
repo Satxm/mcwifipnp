@@ -46,7 +46,9 @@ public class MCWiFiPnP implements ModInitializer {
         if (screen instanceof PauseScreen) {
             for (AbstractWidget button : screen.getButtons()) {
                 if (button.getMessage().equals(Component.translatable("menu.shareToLan"))) {
-                    Button newButton = Button.builder(Component.translatable("menu.shareToLan"), $ -> client.setScreen(new ShareToLanScreenNew(screen))).bounds(button.getX(), button.getY(), button.getWidth(), button.getHeight()).build();
+                    Button newButton = Button.builder(Component.translatable("menu.shareToLan"), $ -> {
+                        client.setScreen(new ShareToLanScreenNew(screen));
+                    }).bounds(button.getX(), button.getY(), button.getWidth(), button.getHeight()).build();
                     newButton.active = button.active;
                     screen.getButtons().remove(button);
                     screen.getButtons().add(newButton);
