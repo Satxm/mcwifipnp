@@ -4,6 +4,8 @@ plugins {
 
 sourceCompatibility = targetCompatibility = JavaVersion.VERSION_17
 
+println "Java: ${System.getProperty 'java.version'}, JVM: ${System.getProperty 'java.vm.version'} (${System.getProperty 'java.vendor'}), Arch: ${System.getProperty 'os.arch'}"
+
 version = project.mod_version + "-" + project.minecraft_version + "-quilt"
 group = project.mod_group_id
 
@@ -25,7 +27,7 @@ dependencies {
         officialMojangMappings()
     }
     modImplementation "org.quiltmc:quilt-loader:${project.quilt_loader_version}"
-    modImplementation "org.quiltmc:qsl:${project.qsl_version}+${project.minecraft_version}"
+    modImplementation "org.quiltmc.quilted-fabric-api:quilted-fabric-api:${project.qfapi_version}"
 }
 
 sourceSets {
