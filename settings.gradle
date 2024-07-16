@@ -27,5 +27,4 @@ rootProject.name = "mcwifipnp"
 include("fabric")
 include("forge")
 include("neoforge")
-//include("quilt")
-//Quilt is not support mc 1.20.6.
+include("quilt")

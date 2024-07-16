@@ -1,5 +1,5 @@
 plugins {
-    id 'org.quiltmc.loom' version '1.6+'
+    id 'org.quiltmc.loom' version '1.7+'
 }
 
 sourceCompatibility = targetCompatibility = JavaVersion.VERSION_21
@@ -27,9 +27,7 @@ dependencies {
         officialMojangMappings()
     }
     modImplementation "org.quiltmc:quilt-loader:${project.quilt_loader_version}"
-    //modImplementation "org.quiltmc:qsl:${project.qsl_version}+${project.minecraft_version}"
     modImplementation "org.quiltmc.quilted-fabric-api:quilted-fabric-api:${qfapi_version}"
-    modImplementation "org.quiltmc.quilted-fabric-api:quilted-fabric-api-deprecated${qfapi_version}"
 }
 
 sourceSets {
