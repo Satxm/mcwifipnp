@@ -100,4 +100,4 @@ classes.configure {
 	dependsOn(replaceResources)
 }
 
-buildDir = "../build"
+buildDir="../build"

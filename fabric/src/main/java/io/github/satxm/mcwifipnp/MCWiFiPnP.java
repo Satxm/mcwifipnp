@@ -95,7 +95,7 @@ public class MCWiFiPnP implements ModInitializer {
 		Path location = server.getWorldPath(LevelResource.ROOT).resolve("mcwifipnp.json");
 		Config cfg;
 		try {
-			cfg = gson.fromJson(new String(Files.readAllBytes(location)), Config.class);
+			cfg = gson.fromJson(new String(Files.readAllBytes(location),"utf-8"), Config.class);
 			cfg.location = location;
 		} catch (IOException | JsonParseException e) {
 			try {
@@ -205,7 +205,7 @@ public class MCWiFiPnP implements ModInitializer {
 	static void saveConfig(Config cfg) {
 		if (!cfg.needsDefaults) {
 			try {
-				Files.write(cfg.location, toPrettyFormat(cfg).getBytes(), StandardOpenOption.TRUNCATE_EXISTING,
+				Files.write(cfg.location, toPrettyFormat(cfg).getBytes("utf-8"), StandardOpenOption.TRUNCATE_EXISTING,
 						StandardOpenOption.CREATE);
 			} catch (IOException e) {
 				LOGGER.warn("Unable to write config file!", e);
@@ -215,9 +215,9 @@ public class MCWiFiPnP implements ModInitializer {
 
 	public static class Config {
 		public int port = HttpUtil.getAvailablePort();
-		public int maxPlayers = 10;
+		public int maxPlayers = 8;
 		public String GameMode = "survival";
-		public String motd = "A Minecraft LAN World";
+		public String motd = new TranslatableComponent("lanServer.title").getString();
 		public boolean UseUPnP = true;
 		public boolean AllowCommands = false;
 		public boolean OnlineMode = true;
