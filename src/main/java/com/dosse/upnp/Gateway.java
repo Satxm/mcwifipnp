@@ -46,7 +46,7 @@ class Gateway {
 
     public Gateway(byte[] data, Inet4Address ip, InetAddress gatewayip) throws Exception {
         iface = ip;
-        routerip=gatewayip;
+        routerip = gatewayip;
         String location = null;
         StringTokenizer st = new StringTokenizer(new String(data), "\n");
         while (st.hasMoreTokens()) {
