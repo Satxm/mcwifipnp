@@ -27,6 +27,7 @@ dependencies {
         officialMojangMappings()
     }
     modImplementation "org.quiltmc:quilt-loader:${project.quilt_loader_version}"
+    modImplementation "org.quiltmc:qsl:${project.qsl_version}"
     modImplementation "org.quiltmc.quilted-fabric-api:quilted-fabric-api:${project.qfapi_version}"
 }
 
