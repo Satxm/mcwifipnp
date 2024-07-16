@@ -156,7 +156,7 @@ public class MCWiFiPnPUnit {
         Path location = server.getWorldPath(LevelResource.ROOT).resolve("mcwifipnp.json");
         MCWiFiPnPUnit.Config cfg;
         try {
-            cfg = gson.fromJson(new String(Files.readAllBytes(location)), MCWiFiPnPUnit.Config.class);
+            cfg = gson.fromJson(new String(Files.readAllBytes(location),"utf-8"), MCWiFiPnPUnit.Config.class);
             cfg.location = location;
         } catch (IOException | JsonParseException e) {
             try {
@@ -182,7 +182,7 @@ public class MCWiFiPnPUnit {
     static void saveConfig(Config cfg) {
         if (!cfg.needsDefaults) {
             try {
-                Files.write(cfg.location, toPrettyFormat(cfg).getBytes(), StandardOpenOption.TRUNCATE_EXISTING,
+                Files.write(cfg.location, toPrettyFormat(cfg).getBytes("utf-8"), StandardOpenOption.TRUNCATE_EXISTING,
                         StandardOpenOption.CREATE);
             } catch (IOException e) {
                 LOGGER.warn("Unable to write config file!", e);
@@ -192,9 +192,9 @@ public class MCWiFiPnPUnit {
 
     public static class Config {
         public int port = 25565;
-        public int maxPlayers = 10;
+        public int maxPlayers = 8;
         public String GameMode = "survival";
-        public String motd = "A Minecraft LAN World";
+        public String motd = new TranslatableComponent("lanServer.title").getString();
         public boolean AllPlayersCheats = false;
         public boolean Whitelist = false;
         public boolean UseUPnP = true;
