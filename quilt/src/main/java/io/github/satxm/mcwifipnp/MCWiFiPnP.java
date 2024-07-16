@@ -1,10 +1,11 @@
 package io.github.satxm.mcwifipnp;
 
+import net.fabricmc.fabric.api.client.screen.v1.Screens;
+import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import org.quiltmc.loader.api.ModContainer;
 import org.quiltmc.qsl.base.api.entrypoint.ModInitializer;
-import org.quiltmc.qsl.command.api.CommandRegistrationCallback;
-import org.quiltmc.qsl.lifecycle.api.event.ServerLifecycleEvents;
-import org.quiltmc.qsl.screen.api.client.ScreenEvents;
+import net.fabricmc.fabric.api.client.screen.v1.ScreenEvents;
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.AbstractWidget;
@@ -28,8 +29,8 @@ public class MCWiFiPnP implements ModInitializer {
 
     @Override
     public void onInitialize(ModContainer mod) {
-        ServerLifecycleEvents.STARTING.register(this::onServerLoad);
-        ServerLifecycleEvents.STOPPING.register(this::onServerStop);
+        ServerLifecycleEvents.SERVER_STOPPING.register(this::onServerLoad);
+        ServerLifecycleEvents.SERVER_STOPPING.register(this::onServerStop);
         ScreenEvents.AFTER_INIT.register(MCWiFiPnP::afterScreenInit);
 
         CommandRegistrationCallback.EVENT.register((dispatcher, registryAccess, environment) -> {
@@ -42,16 +43,16 @@ public class MCWiFiPnP implements ModInitializer {
         });
     }
 
-    public static void afterScreenInit(Screen screen, Minecraft client, boolean i) {
+    public static void afterScreenInit(Minecraft client, Screen screen, int x, int y) {
         if (screen instanceof PauseScreen) {
-            for (AbstractWidget button : screen.getButtons()) {
+            for (AbstractWidget button : Screens.getButtons(screen)) {
                 if (button.getMessage().equals(Component.translatable("menu.shareToLan"))) {
                     Button newButton = Button.builder(Component.translatable("menu.shareToLan"), $ -> {
                         client.setScreen(new ShareToLanScreenNew(screen));
                     }).bounds(button.getX(), button.getY(), button.getWidth(), button.getHeight()).build();
                     newButton.active = button.active;
-                    screen.getButtons().remove(button);
-                    screen.getButtons().add(newButton);
+                    Screens.getButtons(screen).remove(button);
+                    Screens.getButtons(screen).add(newButton);
                 }
             }
         }
