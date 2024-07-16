@@ -19,4 +19,4 @@ include("fabric")
 include("forge")
 include("quilt")
 
-rootProject.name = "mcwifipnp"
+rootProject.name="mcwifipnp"
