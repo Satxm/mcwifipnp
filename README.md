@@ -6,16 +6,16 @@
 
 </div>
 
-[1]: https://img.shields.io/modrinth/dt/RTWpcTBp?label=Modrinth%0aDownloads&logo=modrinth&style=flat&color=45A35F&labelColor=2D2D2D
+[1]: https://img.shields.io/modrinth/dt/RTWpcTBp?label=Modrinth%0aDownloads&logo=modrinth&style=flat&color=45A35F&labelcolor=2D2D2D
 [2]: https://modrinth.com/mod/mcwifipnp
 
-[3]: https://img.shields.io/curseforge/dt/450250?label=CurseForge%0aDownloads&logo=curseforge&style=flat&color=E36639&labelColor=2D2D2D
+[3]: https://img.shields.io/curseforge/dt/450250?label=CurseForge%0aDownloads&logo=curseforge&style=flat&color=E36639&labelcolor=2D2D2D
 [4]: https://www.curseforge.com/minecraft/mc-mods/mcwifipnp
 
-[5]: https://img.shields.io/badge/Available%20for-%201.15%20to%201.20-47376F?logo=files&color=377BCB&labelColor=2D2D2D
+[5]: https://img.shields.io/badge/Available%20for-%201.15%20to%201.20-47376F?logo=files&color=377BCB&labelcolor=2D2D2D
 [6]: https://modrinth.com/mod/mcwifipnp/versions
 
-[7]: https://img.shields.io/github/license/Satxm/mcwifipnp?label=License&logo=github&style=flat&color=E51050&labelColor=2D2D2D
+[7]: https://img.shields.io/github/license/Satxm/mcwifipnp?label=License&logo=github&style=flat&color=E51050&labelcolor=2D2D2D
 [8]: https://github.com/satxm/mcwifipnp
 
 
