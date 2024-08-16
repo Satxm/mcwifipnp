@@ -28,5 +28,8 @@
     "fabric": "${fabric_version}",
     "minecraft": "${mc_version}",
     "java": ">=17"
+  },
+  "breaks": {
+    "minecraft":">1.20.1"
   }
 }
