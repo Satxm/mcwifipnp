@@ -1,7 +1,7 @@
 plugins {
-    id 'eclipse'
-    id 'idea'
-    id 'net.minecraftforge.gradle' version '[6.0.16,6.2)'
+  id 'eclipse'
+  id 'idea'
+  id 'net.minecraftforge.gradle' version '[6.0.16,6.2)'
 }
 
 java.toolchain.languageVersion = JavaLanguageVersion.of(17)
@@ -12,80 +12,80 @@ version = project.mod_version + "-" + project.minecraft_version + "-forge"
 group = project.mod_group_id
 
 base {
-    archivesName = project.mod_id
+  archivesName = project.mod_id
 }
 
 minecraft {
-    
-    mappings channel: 'official', version: project.minecraft_version
+  
+  mappings channel: 'official', version: project.minecraft_version
 
-    accessTransformer = file('src/main/resources/META-INF/accesstransformer.cfg')
+  accessTransformer = file('src/main/resources/META-INF/accesstransformer.cfg')
+  
+  copyIdeResources = true
+  
+  runs {
     
-    copyIdeResources = true
-    
-    runs {
-        
-        configureEach {
-            workingDirectory project.file('run')
-            property 'forge.logging.markers', 'REGISTRIES'
-            property 'forge.logging.console.level', 'debug'
-            mods {
-                "${mod_id}" {
-                    source sourceSets.main
-                }
-            }
+    configureEach {
+      workingDirectory project.file('run')
+      property 'forge.logging.markers', 'REGISTRIES'
+      property 'forge.logging.console.level', 'debug'
+      mods {
+        "${mod_id}" {
+          source sourceSets.main
         }
-        client {
-            
-            property 'forge.enabledGameTestNamespaces', project.mod_id
-        }
-        data {
-            
-            workingDirectory project.file('run-data')
-            
-            args '--mod', project.mod_id, '--all', '--output', file('src/generated/resources/'), '--existing', file('src/main/resources/')
-        }
+      }
     }
+    client {
+      
+      property 'forge.enabledGameTestNamespaces', project.mod_id
+    }
+    data {
+      
+      workingDirectory project.file('run-data')
+      
+      args '--mod', project.mod_id, '--all', '--output', file('src/generated/resources/'), '--existing', file('src/main/resources/')
+    }
+  }
 }
 
 dependencies {
-    minecraft "net.minecraftforge:forge:${project.minecraft_version}-${project.forge_version}"
+  minecraft "net.minecraftforge:forge:${project.minecraft_version}-${project.forge_version}"
 }
 
 sourceSets {
-    main {
-        java {
-            srcDir "../src/main/java"
-        }
-        resources {
-            srcDir "../src/main/resources"
-            srcDir "src/generated/resources"
-        }
+  main {
+    java {
+      srcDir "../src/main/java"
     }
+    resources {
+      srcDir "../src/main/resources"
+      srcDir "src/generated/resources"
+    }
+  }
 }
 
 tasks.named('processResources', ProcessResources).configure {
-    var replaceProperties = [
-        mod_version : project.mod_version,
-        forge_version_range : project.forge_version_range,
-        minecraft_version_range : project.forge_minecraft_version_range,
-        forge_loader_version_range : project.forge_loader_version_range,
-        pack_format_number: pack_format_number,
-    ]
-    inputs.properties replaceProperties
-    filesMatching(['META-INF/mods.toml', 'pack.mcmeta']) {
-        expand replaceProperties + [project: project]
-    }
+  var replaceProperties = [
+    mod_version : project.mod_version,
+    forge_version_range : project.forge_version_range,
+    minecraft_version_range : project.forge_minecraft_version_range,
+    forge_loader_version_range : project.forge_loader_version_range,
+    pack_format_number: pack_format_number,
+  ]
+  inputs.properties replaceProperties
+  filesMatching(['META-INF/mods.toml', 'pack.mcmeta']) {
+    expand replaceProperties + [project: project]
+  }
 }
 
 tasks.withType(JavaCompile).configureEach {
-    it.options.encoding = 'UTF-8'
-    it.options.release = 17
+  it.options.encoding = 'UTF-8'
+  it.options.release = 17
 }
 
 java.withSourcesJar()
 
 jar {
-    from("../LICENSE") {
-    }
+  from("../LICENSE") {
+  }
 }
