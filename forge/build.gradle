@@ -43,14 +43,14 @@ afterEvaluate {
 }
 
 sourceSets {
-	main {
-		java {
-			srcDir "../src/main/java"
-		}
-		resources {
-			srcDir "../src/main/resources"
-		}
-	}
+    main {
+        java {
+            srcDir "../src/main/java"
+        }
+        resources {
+            srcDir "../src/main/resources"
+        }
+    }
 }
 
 jar {
@@ -66,7 +66,7 @@ jar {
         ])
     }
     from("../LICENSE") {
-	}
+    }
 }
 
 java {
@@ -74,25 +74,25 @@ java {
 }
 
 def replaceResources = tasks.register("replaceResources", Copy) {
-	it.outputs.upToDateWhen { false }
-	it.from(sourceSets.main.resources) {
-		include "META-INF/mods.toml"
-		expand 'version': project.mod_version, 'mc_version': project.forge_minecraft_version_range, 'forge_version': project.forge_version_range, "loader_version": project.forge_version_range
-	}
-	it.into "$buildDir/resources/main/"
+    it.outputs.upToDateWhen { false }
+    it.from(sourceSets.main.resources) {
+        include "META-INF/mods.toml"
+        expand 'version': project.mod_version, 'mc_version': project.forge_minecraft_version_range, 'forge_version': project.forge_version_range, "loader_version": project.forge_version_range
+    }
+    it.into "$buildDir/resources/main/"
 }
 
 processResources {
-	duplicatesStrategy(DuplicatesStrategy.FAIL)
-	exclude('META-INF/mods.toml')
-	configure { finalizedBy(replaceResources) }
+    duplicatesStrategy(DuplicatesStrategy.FAIL)
+    exclude('META-INF/mods.toml')
+    configure { finalizedBy(replaceResources) }
 }
 
 classes.configure {
-	dependsOn(replaceResources)
+    dependsOn(replaceResources)
 }
 
 tasks.withType(JavaCompile).configureEach {
-	it.options.encoding = "UTF-8"
-	it.options.release = 16
+    it.options.encoding = "UTF-8"
+    it.options.release = 16
 }

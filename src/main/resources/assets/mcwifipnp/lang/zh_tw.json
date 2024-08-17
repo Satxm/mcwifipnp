@@ -20,7 +20,7 @@
     "mcwifipnp.gui.Local": "內網",
     "mcwifipnp.gui.Global": "公網",
     "mcwifipnp.gui.CopyIP": "取得 IP",
-    "mcwifipnp.gui.CopyToClipboard": "取得內網 IP 地址及公網 IP 地址",
+    "mcwifipnp.gui.CopyIP.info": "取得內網 IP 地址及公網 IP 地址",
     "mcwifipnp.upnp.success": "成功連接埠轉送 %s",
     "mcwifipnp.upnp.clipboard": "成功取得到 %s，由於 NAT 等因素，這些 IP 可能仍舊無法直接聯機。",
     "mcwifipnp.upnp.cantgetip": "無法取得 IP！請檢查你的網路設定。你的 IPv4 可能包含多級 NAT 或者你無 IPv6。",
