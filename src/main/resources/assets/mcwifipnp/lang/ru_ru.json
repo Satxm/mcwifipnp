@@ -20,7 +20,7 @@
     "mcwifipnp.gui.Local": "Локальный",
     "mcwifipnp.gui.Global": "Глобалный",
     "mcwifipnp.gui.CopyIP": "Получить IP",
-    "mcwifipnp.gui.CopyToClipboard": "Получить IP для копирования в буфер обмена",
+    "mcwifipnp.gui.CopyIP.info": "Получить IP для копирования в буфер обмена",
     "mcwifipnp.upnp.success": "Порт %s успешно переадресован",
     "mcwifipnp.upnp.clipboard": "Успешно получен %s, из-за таких факторов, как NAT, эти IP-адреса, возможно, по-прежнему не смогут подключиться напрямую.",
     "mcwifipnp.upnp.cantgetip": "Не удалось получить публичный IP! Пожалуйста, проверьте настройки вашей сети. Возможно, ваш IPv4 содержит несколько NAT-адресов или у вас нет IPv6.",
