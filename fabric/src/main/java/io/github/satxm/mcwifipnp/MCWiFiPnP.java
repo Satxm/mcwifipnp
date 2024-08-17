@@ -37,170 +37,170 @@ import net.minecraft.util.Formatting;
 import net.minecraft.world.GameMode;
 
 public class MCWiFiPnP implements ModInitializer {
-	public static final String MODID = "mcwifipnp";
-	private static final Map<MinecraftServer, Config> configMap = Collections.synchronizedMap(new WeakHashMap<>());
-	private static final Gson gson = new GsonBuilder().create();
-	private static final Logger LOGGER = LogManager.getLogger(MCWiFiPnP.class);
+    public static final String MODID = "mcwifipnp";
+    private static final Map<MinecraftServer, Config> configMap = Collections.synchronizedMap(new WeakHashMap<>());
+    private static final Gson gson = new GsonBuilder().create();
+    private static final Logger LOGGER = LogManager.getLogger(MCWiFiPnP.class);
 
-	@Override
-	public void onInitialize() {
-		ServerLifecycleEvents.SERVER_STARTING.register(this::onServerLoad);
-		ServerLifecycleEvents.SERVER_STOPPING.register(this::onServerStop);
-	}
-	
-	private void onServerLoad(MinecraftServer server) {
-		File cfgfile = server.getLevelStorage().resolveFile(server.getLevelName(), "mcwifipnp.json");
-		Path location = cfgfile.toPath();
-		Config cfg;
-		try {
-			cfg = gson.fromJson(new String(Files.readAllBytes(location)), Config.class);
-			cfg.location = location;
-		} catch (IOException | JsonParseException e) {
-			try {
-				Files.deleteIfExists(location);
-			} catch (IOException ioException) {
-				//
-			}
-			cfg = new Config();
-			cfg.location = location;
-			cfg.needsDefaults = true;
-		}
-		configMap.put(server, cfg);
-	}
+    @Override
+    public void onInitialize() {
+        ServerLifecycleEvents.SERVER_STARTING.register(this::onServerLoad);
+        ServerLifecycleEvents.SERVER_STOPPING.register(this::onServerStop);
+    }
+    
+    private void onServerLoad(MinecraftServer server) {
+        File cfgfile = server.getLevelStorage().resolveFile(server.getLevelName(), "mcwifipnp.json");
+        Path location = cfgfile.toPath();
+        Config cfg;
+        try {
+            cfg = gson.fromJson(new String(Files.readAllBytes(location)), Config.class);
+            cfg.location = location;
+        } catch (IOException | JsonParseException e) {
+            try {
+                Files.deleteIfExists(location);
+            } catch (IOException ioException) {
+                //
+            }
+            cfg = new Config();
+            cfg.location = location;
+            cfg.needsDefaults = true;
+        }
+        configMap.put(server, cfg);
+    }
 
-	private void onServerStop(MinecraftServer server) {
-		Config cfg = configMap.get(server);
-		if (server.isRemote() && cfg.UseUPnP) {
-			UPnP.closePortTCP(cfg.port);
-			LOGGER.info("Stopped forwarded port " + cfg.port + ".");
-		}
-	}
+    private void onServerStop(MinecraftServer server) {
+        Config cfg = configMap.get(server);
+        if (server.isRemote() && cfg.UseUPnP) {
+            UPnP.closePortTCP(cfg.port);
+            LOGGER.info("Stopped forwarded port " + cfg.port + ".");
+        }
+    }
 
-	@NotNull
-	public static Config getConfig(MinecraftServer server) {
-		return Objects.requireNonNull(configMap.get(server), "no config for server???");
-	}
+    @NotNull
+    public static Config getConfig(MinecraftServer server) {
+        return Objects.requireNonNull(configMap.get(server), "no config for server???");
+    }
 
-	public static void openToLan(MinecraftServer server) {
-		MinecraftClient client = MinecraftClient.getInstance();
+    public static void openToLan(MinecraftServer server) {
+        MinecraftClient client = MinecraftClient.getInstance();
 
-		Config cfg = configMap.get(server);
-		saveConfig(cfg);
-		
-		server.setMotd(cfg.motd);
-		server.getServerMetadata().setDescription(new LiteralText(cfg.motd));
-		server.openToLan(GameMode.byName(cfg.GameMode), cfg.AllowCommands, cfg.port);
-		server.setOnlineMode(cfg.OnlineMode);
-		server.setPvpEnabled(cfg.EnablePvP);
-		client.inGameHud.getChatHud().addMessage(new TranslatableText("commands.publish.started", cfg.port));
+        Config cfg = configMap.get(server);
+        saveConfig(cfg);
+        
+        server.setMotd(cfg.motd);
+        server.getServerMetadata().setDescription(new LiteralText(cfg.motd));
+        server.openToLan(GameMode.byName(cfg.GameMode), cfg.AllowCommands, cfg.port);
+        server.setOnlineMode(cfg.OnlineMode);
+        server.setPvpEnabled(cfg.EnablePvP);
+        client.inGameHud.getChatHud().addMessage(new TranslatableText("commands.publish.started", cfg.port));
 
-		new Thread(() -> {
+        new Thread(() -> {
 
-			if (cfg.UseUPnP) {
-				if (UPnP.isUPnPAvailable()) {
-					if (UPnP.isMappedTCP(cfg.port)) {
-						client.inGameHud.getChatHud().addMessage(new TranslatableText("mcwifipnp.upnp.failed.mapped", cfg.port));
-					} else if (UPnP.openPortTCP(cfg.port, cfg.motd)) {
-						client.inGameHud.getChatHud().addMessage(new TranslatableText("mcwifipnp.upnp.success", cfg.port));							LOGGER.info("Started forwarded port " + cfg.port + ".");
-					} else {
-						client.inGameHud.getChatHud().addMessage(new TranslatableText("mcwifipnp.upnp.failed", cfg.port));
-					}
-				} else {
-					client.inGameHud.getChatHud().addMessage(new TranslatableText("mcwifipnp.upnp.failed.disabled", cfg.port));
-				}
-			}
+            if (cfg.UseUPnP) {
+                if (UPnP.isUPnPAvailable()) {
+                    if (UPnP.isMappedTCP(cfg.port)) {
+                        client.inGameHud.getChatHud().addMessage(new TranslatableText("mcwifipnp.upnp.failed.mapped", cfg.port));
+                    } else if (UPnP.openPortTCP(cfg.port, cfg.motd)) {
+                        client.inGameHud.getChatHud().addMessage(new TranslatableText("mcwifipnp.upnp.success", cfg.port));                            LOGGER.info("Started forwarded port " + cfg.port + ".");
+                    } else {
+                        client.inGameHud.getChatHud().addMessage(new TranslatableText("mcwifipnp.upnp.failed", cfg.port));
+                    }
+                } else {
+                    client.inGameHud.getChatHud().addMessage(new TranslatableText("mcwifipnp.upnp.failed.disabled", cfg.port));
+                }
+            }
 
 
-			if (cfg.CopyToClipboard) {
-				ArrayList<Text> IPComponentList = new ArrayList<Text>();
-				Boolean NoneIPv4 = false;
-				Boolean NoneIPv6 = false;
-				if (GetIP.IPv4AddressList().size() > 0 || GetIP.GetGlobalIPv4() != null
-						|| UPnP.getExternalIP() != null) {
-					for (int i = 0; i < GetIP.IPv4AddressList().size(); i++) {
-						String IP = GetIP.IPv4AddressList().get(i) + ":" + cfg.port;
-						IPComponentList.add(IPComponent("IPv4", IP));
-					}
-					if (GetIP.GetGlobalIPv4() != null & !GetIP.IPv4AddressList().contains(GetIP.GetGlobalIPv4())) {
-						String IP = GetIP.GetGlobalIPv4() + ":" + cfg.port;
-						IPComponentList.add(IPComponent("IPv4", IP));
-					}
-					if (UPnP.getExternalIP() != null & !GetIP.IPv4AddressList().contains(UPnP.getExternalIP())) {
-						String IP = UPnP.getExternalIP() + ":" + cfg.port;
-						IPComponentList.add(IPComponent("IPv4", IP));
-					}
-				} else {
-					NoneIPv4 = true;
-				}
-				if (GetIP.IPv6AddressList().size() > 0 || GetIP.GetGlobalIPv6() != null) {
-					for (int i = 0; i < GetIP.IPv6AddressList().size(); i++) {
-						String IP = "[" + GetIP.IPv6AddressList().get(i) + "]:" + cfg.port;
-						IPComponentList.add(IPComponent("IPv6", IP));
-					}
-					if (GetIP.GetGlobalIPv6() != null & !GetIP.IPv6AddressList().contains(GetIP.GetGlobalIPv6())) {
-						String IP = "[" + GetIP.GetGlobalIPv6() + "]:" + cfg.port;
-						IPComponentList.add(IPComponent("IPv6", IP));
-					}
-				} else {
-					NoneIPv6 = true;
-				}
-				if (NoneIPv4 == true && NoneIPv6 == true) {
-					client.inGameHud.getChatHud().addMessage(new TranslatableText("mcwifipnp.upnp.success.cantgetip"));
-				} else {
-					Text component = null;
-					for (int i = 0; i < IPComponentList.size(); i++) {
-						if (component == null) {
-							component = IPComponentList.get(i).deepCopy();
-						} else {
-							component.append(IPComponentList.get(i));
-						}
-					}
-					client.inGameHud.getChatHud().addMessage(new TranslatableText("mcwifipnp.upnp.success.clipboard", new Object[] { component }));
-				}
-			}
-		}, "MCWiFiPnP").start();
-	}
+            if (cfg.CopyToClipboard) {
+                ArrayList<Text> IPComponentList = new ArrayList<Text>();
+                Boolean NoneIPv4 = false;
+                Boolean NoneIPv6 = false;
+                if (GetIP.IPv4AddressList().size() > 0 || GetIP.GetGlobalIPv4() != null
+                        || UPnP.getExternalIP() != null) {
+                    for (int i = 0; i < GetIP.IPv4AddressList().size(); i++) {
+                        String IP = GetIP.IPv4AddressList().get(i) + ":" + cfg.port;
+                        IPComponentList.add(IPComponent("IPv4", IP));
+                    }
+                    if (GetIP.GetGlobalIPv4() != null & !GetIP.IPv4AddressList().contains(GetIP.GetGlobalIPv4())) {
+                        String IP = GetIP.GetGlobalIPv4() + ":" + cfg.port;
+                        IPComponentList.add(IPComponent("IPv4", IP));
+                    }
+                    if (UPnP.getExternalIP() != null & !GetIP.IPv4AddressList().contains(UPnP.getExternalIP())) {
+                        String IP = UPnP.getExternalIP() + ":" + cfg.port;
+                        IPComponentList.add(IPComponent("IPv4", IP));
+                    }
+                } else {
+                    NoneIPv4 = true;
+                }
+                if (GetIP.IPv6AddressList().size() > 0 || GetIP.GetGlobalIPv6() != null) {
+                    for (int i = 0; i < GetIP.IPv6AddressList().size(); i++) {
+                        String IP = "[" + GetIP.IPv6AddressList().get(i) + "]:" + cfg.port;
+                        IPComponentList.add(IPComponent("IPv6", IP));
+                    }
+                    if (GetIP.GetGlobalIPv6() != null & !GetIP.IPv6AddressList().contains(GetIP.GetGlobalIPv6())) {
+                        String IP = "[" + GetIP.GetGlobalIPv6() + "]:" + cfg.port;
+                        IPComponentList.add(IPComponent("IPv6", IP));
+                    }
+                } else {
+                    NoneIPv6 = true;
+                }
+                if (NoneIPv4 == true && NoneIPv6 == true) {
+                    client.inGameHud.getChatHud().addMessage(new TranslatableText("mcwifipnp.upnp.cantgetip"));
+                } else {
+                    Text component = null;
+                    for (int i = 0; i < IPComponentList.size(); i++) {
+                        if (component == null) {
+                            component = IPComponentList.get(i).deepCopy();
+                        } else {
+                            component.append(IPComponentList.get(i));
+                        }
+                    }
+                    client.inGameHud.getChatHud().addMessage(new TranslatableText("mcwifipnp.upnp.clipboard", new Object[] { component }));
+                }
+            }
+        }, "MCWiFiPnP").start();
+    }
 
-	private static void saveConfig(Config cfg) {
-		if (!cfg.needsDefaults) {
-			try {
-				Files.write(cfg.location, toPrettyFormat(cfg).getBytes(), StandardOpenOption.TRUNCATE_EXISTING,
-						StandardOpenOption.CREATE);
-			} catch (IOException e) {
-				LOGGER.warn("Unable to write config file!", e);
-			}
-		}
-	}
+    private static void saveConfig(Config cfg) {
+        if (!cfg.needsDefaults) {
+            try {
+                Files.write(cfg.location, toPrettyFormat(cfg).getBytes(), StandardOpenOption.TRUNCATE_EXISTING,
+                        StandardOpenOption.CREATE);
+            } catch (IOException e) {
+                LOGGER.warn("Unable to write config file!", e);
+            }
+        }
+    }
 
-	public static class Config {
-		public int port = NetworkUtils.findLocalPort();
-		public String GameMode = "survival";
-		public String motd = "A Minecraft LAN World";
-		public boolean UseUPnP = true;
-		public boolean AllowCommands = false;
-		public boolean OnlineMode = true;
-		public boolean EnablePvP = true;
-		public boolean CopyToClipboard = true;
-		public transient Path location;
-		public transient boolean needsDefaults = false;
-	}
+    public static class Config {
+        public int port = NetworkUtils.findLocalPort();
+        public String GameMode = "survival";
+        public String motd = "A Minecraft LAN World";
+        public boolean UseUPnP = true;
+        public boolean AllowCommands = false;
+        public boolean OnlineMode = true;
+        public boolean EnablePvP = true;
+        public boolean CopyToClipboard = true;
+        public transient Path location;
+        public transient boolean needsDefaults = false;
+    }
 
-	private static String toPrettyFormat(Object src) {
-		String json = gson.toJson(src);
-		JsonParser jsonParser = new JsonParser();
-		JsonObject jsonObject = jsonParser.parse(json).getAsJsonObject();
-		Gson gson = new GsonBuilder().setPrettyPrinting().create();
-		return gson.toJson(jsonObject);
-	}
+    private static String toPrettyFormat(Object src) {
+        String json = gson.toJson(src);
+        JsonParser jsonParser = new JsonParser();
+        JsonObject jsonObject = jsonParser.parse(json).getAsJsonObject();
+        Gson gson = new GsonBuilder().setPrettyPrinting().create();
+        return gson.toJson(jsonObject);
+    }
 
-	private static Text IPComponent(String Type, String IP) {
-		return Texts.bracketed((new LiteralText(Type)).styled((style) -> {
-			style.setColor(Formatting.GREEN)
-					.setClickEvent(
-							new ClickEvent(ClickEvent.Action.COPY_TO_CLIPBOARD, String.valueOf(IP)))
-					.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT,
-							new TranslatableText("chat.copy.click", new Object[0]).append("\n").append(IP)))
-					.setInsertion(String.valueOf(IP));
-		}));
-	}
+    private static Text IPComponent(String Type, String IP) {
+        return Texts.bracketed((new LiteralText(Type)).styled((style) -> {
+            style.setColor(Formatting.GREEN)
+                    .setClickEvent(
+                            new ClickEvent(ClickEvent.Action.COPY_TO_CLIPBOARD, String.valueOf(IP)))
+                    .setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT,
+                            new TranslatableText("chat.copy.click", new Object[0]).append("\n").append(IP)))
+                    .setInsertion(String.valueOf(IP));
+        }));
+    }
 }
