@@ -15,15 +15,15 @@ authors="Satxm"
 description="A Minecraft LAN World Tool With WLAN UPnP."
 
 [[dependencies.mcwifipnp]]
-    modId="forge"
-    mandatory=true
-    versionRange="${forge_version_range}"
-    ordering="NONE"
-    side="CLIENT"
+  modId="forge"
+  mandatory=true
+  versionRange="${forge_version_range}"
+  ordering="NONE"
+  side="CLIENT"
 
 [[dependencies.mcwifipnp]]
-    modId="minecraft"
-    mandatory=true
-    versionRange="${minecraft_version_range}"
-    ordering="NONE"
-    side="CLIENT"
+  modId="minecraft"
+  mandatory=true
+  versionRange="${minecraft_version_range}"
+  ordering="NONE"
+  side="CLIENT"

@@ -1,7 +1,8 @@
 plugins {
-    id 'eclipse'
-    id 'idea'
-    id 'net.minecraftforge.gradle' version '[6.0.24,6.2)'
+  id 'eclipse'
+  id 'idea'
+  id 'net.minecraftforge.gradle' version '[6.0.24,6.2)'
+  id 'org.spongepowered.mixin' version '0.7.+'
 }
 
 java.toolchain.languageVersion = JavaLanguageVersion.of(21)
@@ -12,89 +13,98 @@ version = project.mod_version + "-" + project.minecraft_version + "-forge"
 group = project.mod_group_id
 
 base {
-    archivesName = project.mod_id
+  archivesName = project.mod_id
 }
 
 minecraft {
-    mappings channel: 'official', version: project.minecraft_version
-    reobf = false
+  mappings channel: 'official', version: project.minecraft_version
+  reobf = false
 
-    copyIdeResources = true
+  copyIdeResources = true
 
-    accessTransformer = file('src/main/resources/META-INF/accesstransformer.cfg')
-
-    runs {
-        
-        configureEach {
-            workingDirectory project.file('run')
-            property 'forge.logging.markers', 'REGISTRIES'
-            property 'forge.logging.console.level', 'debug'
-            mods {
-                "${mod_id}" {
-                    source sourceSets.main
-                }
-            }
+  runs {
+    
+    configureEach {
+      workingDirectory project.file('run')
+      property 'forge.logging.markers', 'REGISTRIES'
+      property 'forge.logging.console.level', 'debug'
+      mods {
+        "${mod_id}" {
+          source sourceSets.main
         }
-
-        client {
-            property 'forge.enabledGameTestNamespaces', project.mod_id
-        }
-        data {
-            workingDirectory project.file('run-data')
-            args '--mod', project.mod_id, '--all', '--output', file('src/generated/resources/'), '--existing', file('src/main/resources/')
-        }
+      }
     }
+
+    client {
+      property 'forge.enabledGameTestNamespaces', project.mod_id
+    }
+    data {
+      workingDirectory project.file('run-data')
+      args '--mod', project.mod_id, '--all', '--output', file('src/generated/resources/'), '--existing', file('src/main/resources/')
+    }
+  }
 }
 
 dependencies {
-    minecraft "net.minecraftforge:forge:${project.minecraft_version}-${project.forge_version}"
-    implementation('net.sf.jopt-simple:jopt-simple:5.0.4') { version { strictly '5.0.4' } }
+  minecraft "net.minecraftforge:forge:${project.minecraft_version}-${project.forge_version}"
+  annotationProcessor "org.spongepowered:mixin:0.8.5:processor"
+  implementation('net.sf.jopt-simple:jopt-simple:5.0.4') { version { strictly '5.0.4' } }
+  implementation "com.google.code.findbugs:jsr305:3.0.2"
 }
 
 sourceSets {
-    main {
-        java {
-            srcDir "../src/main/java"
-        }
-        resources {
-            srcDir "../src/main/resources"
-            srcDir "src/generated/resources"
-        }
+  main {
+    java {
+      srcDir "../src/main/java"
     }
+    resources {
+      srcDir "../src/main/resources"
+      srcDir "src/generated/resources"
+    }
+  }
+}
+
+mixin {
+  // MixinGradle Settings
+  add sourceSets.main, 'mcwifipnp.refmap.json'
+  config 'mcwifipnp.mixins.json'
+
+  debug.verbose = true
+  debug.export = true
 }
 
 tasks.named('processResources', ProcessResources).configure {
-    var replaceProperties = [
-        mod_version : project.mod_version,
-        forge_version_range : project.forge_version_range,
-        minecraft_version_range : project.forge_minecraft_version_range,
-        forge_loader_version_range : project.forge_loader_version_range,
-        pack_format_number: pack_format_number,
-    ]
-    inputs.properties replaceProperties
-    filesMatching(['META-INF/mods.toml', 'pack.mcmeta']) {
-        expand replaceProperties + [project: project]
-    }
+  var replaceProperties = [
+    mod_version : project.mod_version,
+    forge_version_range : project.forge_version_range,
+    minecraft_version_range : project.forge_minecraft_version_range,
+    forge_loader_version_range : project.forge_loader_version_range,
+    pack_format_number: pack_format_number,
+  ]
+  inputs.properties replaceProperties
+  filesMatching(['META-INF/mods.toml', 'pack.mcmeta']) {
+    expand replaceProperties + [project: project]
+  }
 }
 
 tasks.withType(JavaCompile).configureEach {
-    it.options.encoding = 'UTF-8'
-    it.options.release = 21
+  it.options.encoding = 'UTF-8'
+  it.options.release = 21
 }
 
 java.withSourcesJar()
 
 jar {
-    from("../LICENSE") {
-    }
+  from("../LICENSE") {
+  }
 }
 
 eclipse {
-    synchronizationTasks 'genEclipseRuns'
+  synchronizationTasks 'genEclipseRuns'
 }
 
 sourceSets.each {
-    def dir = layout.buildDirectory.dir("sourcesSets/$it.name")
-    it.output.resourcesDir = dir
-    it.java.destinationDirectory = dir
+  def dir = layout.buildDirectory.dir("sourcesSets/$it.name")
+  it.output.resourcesDir = dir
+  it.java.destinationDirectory = dir
 }

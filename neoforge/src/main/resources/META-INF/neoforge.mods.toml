@@ -13,22 +13,19 @@ logoFile="mcwifipnp.png"
 authors="Satxm"
 description="A Minecraft LAN World Tool With WLAN UPnP."
 
-#[[mixins]]
-#config="mcwifipnp.mixins.json"
-
-[[accessTransformers]]
-file="META-INF/accesstransformer.cfg"
+[[mixins]]
+config="mcwifipnp.mixins.json"
 
 [[dependencies.mcwifipnp]]
-    modId="neoforge"
-    type="required"
-    versionRange="${neo_version_range}"
-    ordering="NONE"
-    side="CLIENT"
+  modId="neoforge"
+  type="required"
+  versionRange="${neo_version_range}"
+  ordering="NONE"
+  side="CLIENT"
 
 [[dependencies.mcwifipnp]]
-    modId="minecraft"
-    type="required"
-    versionRange="${minecraft_version_range}"
-    ordering="NONE"
-    side="CLIENT"
+  modId="minecraft"
+  type="required"
+  versionRange="${minecraft_version_range}"
+  ordering="NONE"
+  side="CLIENT"

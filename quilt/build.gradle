@@ -1,5 +1,5 @@
 plugins {
-    id 'org.quiltmc.loom' version '1.7+'
+  id 'org.quiltmc.loom' version '1.7+'
 }
 
 sourceCompatibility = targetCompatibility = JavaVersion.VERSION_21
@@ -10,61 +10,62 @@ version = project.mod_version + "-" + project.minecraft_version + "-quilt"
 group = project.mod_group_id
 
 base {
-    archivesBaseName = project.mod_id
+  archivesName = project.mod_id
 }
 
 loom {
-    mods {
-        "${project.mod_id}" {
-            sourceSet("main")
-        }
+  mods {
+    "${project.mod_id}" {
+      sourceSet("main")
     }
+  }
 }
 
 dependencies {
-    minecraft "com.mojang:minecraft:${project.minecraft_version}"
-    mappings loom.layered {
-        officialMojangMappings()
-    }
-    modImplementation "org.quiltmc:quilt-loader:${project.quilt_loader_version}"
-    modImplementation "org.quiltmc:qsl:${project.qsl_version}"
-    modImplementation "org.quiltmc.quilted-fabric-api:quilted-fabric-api:${project.qfapi_version}"
+  minecraft "com.mojang:minecraft:${project.minecraft_version}"
+  mappings loom.layered {
+    officialMojangMappings()
+  }
+  modImplementation "org.quiltmc:quilt-loader:${project.quilt_loader_version}"
+  modImplementation "org.quiltmc:qsl:${project.qsl_version}"
+  modImplementation "org.quiltmc.quilted-fabric-api:quilted-fabric-api:${qfapi_version}"
+  modImplementation "com.google.code.findbugs:jsr305:3.0.2"
 }
 
 sourceSets {
-    main {
-        java {
-            srcDir "../src/main/java"
-        }
-        resources {
-            srcDir "../src/main/resources"
-            srcDir "src/generated/resources"
-        }
+  main {
+    java {
+      srcDir "../src/main/java"
     }
+    resources {
+      srcDir "../src/main/resources"
+      srcDir "src/generated/resources"
+    }
+  }
 }
 
 tasks.withType(ProcessResources).configureEach {
-    var replaceProperties = [
-        minecraft_version_range : project.quilt_minecraft_version_range,
-        quilt_qsl_version_range : project.quilt_qsl_version_range,
-        quilt_loader_version_range : project.quilt_loader_version_range,
-        version: project.mod_version,
-        pack_format_number: project.pack_format_number,
-    ]
-    inputs.properties replaceProperties
-    filesMatching(['quilt.mod.json', 'pack.mcmeta']) {
-        expand replaceProperties + [project: project]
-    }
+  var replaceProperties = [
+      minecraft_version_range : project.quilt_minecraft_version_range,
+      quilt_qsl_version_range : project.quilt_qsl_version_range,
+      quilt_loader_version_range : project.quilt_loader_version_range,
+      version: project.mod_version,
+      pack_format_number: project.pack_format_number,
+  ]
+  inputs.properties replaceProperties
+  filesMatching(['quilt.mod.json', 'pack.mcmeta']) {
+    expand replaceProperties + [project: project]
+  }
 }
 
 tasks.withType(JavaCompile).configureEach {
-    it.options.encoding = "UTF-8"
-    it.options.release = 21
+  it.options.encoding = "UTF-8"
+  it.options.release = 21
 }
 
 java.withSourcesJar()
 
 jar {
-    from("../LICENSE") {
-    }
+  from("../LICENSE") {
+  }
 }

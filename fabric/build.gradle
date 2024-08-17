@@ -1,5 +1,5 @@
 plugins {
-    id 'fabric-loom' version '1.7+'
+  id 'fabric-loom' version '1.7+'
 }
 
 sourceCompatibility = targetCompatibility = JavaVersion.VERSION_21
@@ -10,50 +10,51 @@ version = project.mod_version + "-" + project.minecraft_version + "-fabric"
 group = project.mod_group_id
 
 base {
-    archivesBaseName = project.mod_id
+  archivesName = project.mod_id
 }
 
 dependencies {
-    minecraft "com.mojang:minecraft:${project.minecraft_version}"
-    mappings loom.officialMojangMappings()
-    modImplementation "net.fabricmc:fabric-loader:${project.fabric_loader_version}"
-    modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
+  minecraft "com.mojang:minecraft:${project.minecraft_version}"
+  mappings loom.officialMojangMappings()
+  modImplementation "net.fabricmc:fabric-loader:${project.fabric_loader_version}"
+  modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
+  modImplementation "com.google.code.findbugs:jsr305:3.0.2"
 }
 
 sourceSets {
-    main {
-        java {
-            srcDir "../src/main/java"
-        }
-        resources {
-            srcDir "../src/main/resources"
-            srcDir "src/generated/resources"
-        }
+  main {
+    java {
+      srcDir "../src/main/java"
     }
+    resources {
+      srcDir "../src/main/resources"
+      srcDir "src/generated/resources"
+    }
+  }
 }
 
 tasks.withType(ProcessResources).configureEach {
-    var replaceProperties = [
-        minecraft_version_range : project.fabric_minecraft_version_range,
-        fabric_version_range : project.fabric_version_range,
-        fabric_loader_version_range : project.fabric_loader_version_range,
-        version: project.mod_version,
-        pack_format_number: project.pack_format_number,
-    ]
-    inputs.properties replaceProperties
-    filesMatching(['fabric.mod.json', 'pack.mcmeta']) {
-        expand replaceProperties + [project: project]
-    }
+  var replaceProperties = [
+    minecraft_version_range : project.fabric_minecraft_version_range,
+    fabric_version_range : project.fabric_version_range,
+    fabric_loader_version_range : project.fabric_loader_version_range,
+    version: project.mod_version,
+    pack_format_number: project.pack_format_number,
+  ]
+  inputs.properties replaceProperties
+  filesMatching(['fabric.mod.json', 'pack.mcmeta']) {
+    expand replaceProperties + [project: project]
+  }
 }
 
 tasks.withType(JavaCompile).configureEach {
-    it.options.encoding = "UTF-8"
-    it.options.release = 21
+  it.options.encoding = "UTF-8"
+  it.options.release = 21
 }
 
 java.withSourcesJar()
 
 jar {
-    from("../LICENSE") {
-    }
+  from("../LICENSE") {
+  }
 }

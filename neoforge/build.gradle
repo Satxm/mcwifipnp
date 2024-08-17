@@ -1,8 +1,8 @@
 plugins {
-    id 'java-library'
-    id 'eclipse'
-    id 'idea'
-    id 'net.neoforged.gradle.userdev' version '7.0.+'
+  id 'java-library'
+  id 'eclipse'
+  id 'idea'
+  id 'net.neoforged.gradle.userdev' version '7.0.+'
 }
 
 java.toolchain.languageVersion = JavaLanguageVersion.of(21)
@@ -13,72 +13,76 @@ version = project.mod_version + "-" + project.minecraft_version + "-neoforge"
 group = project.mod_group_id
 
 base {
-    archivesName = project.mod_id
+  archivesName = project.mod_id
 }
 
 repositories {
-    mavenLocal()
+  mavenLocal()
 }
 
 minecraft {
-    accessTransformers {
-        file('src/main/resources/META-INF/accesstransformer.cfg')
+  runs {
+    configureEach {
+      workingDirectory project.file('run')
+      systemProperty 'forge.logging.markers', 'REGISTRIES'
+      systemProperty 'forge.logging.console.level', 'debug'
+      modSource project.sourceSets.main
     }
-
-    runs {
-        configureEach {
-            workingDirectory project.file('run')
-            systemProperty 'forge.logging.markers', 'REGISTRIES'
-            systemProperty 'forge.logging.console.level', 'debug'
-            modSource project.sourceSets.main
-        }
-        client {
-            systemProperty 'forge.enabledGameTestNamespaces', project.mod_id
-        }
-        data {
-            programArguments.addAll '--mod', project.mod_id, '--all', '--output', file('src/generated/resources/').getAbsolutePath(), '--existing', file('src/main/resources/').getAbsolutePath()
-        }
+    client {
+      systemProperty 'forge.enabledGameTestNamespaces', project.mod_id
     }
+    data {
+      programArguments.addAll '--mod', project.mod_id, '--all', '--output', file('src/generated/resources/').getAbsolutePath(), '--existing', file('src/main/resources/').getAbsolutePath()
+    }
+  }
 }
 
 dependencies {
-    implementation "net.neoforged:neoforge:${project.neo_version}"
+  implementation "net.neoforged:neoforge:${project.neo_version}"
+  implementation "com.google.code.findbugs:jsr305:3.0.2"
 }
 
 sourceSets {
-    main {
-        java {
-            srcDir "../src/main/java"
-        }
-        resources {
-            srcDir "../src/main/resources"
-            srcDir "src/generated/resources"
-        }
+  main {
+    java {
+      srcDir "../src/main/java"
     }
+    resources {
+      srcDir "../src/main/resources"
+      srcDir "src/generated/resources"
+    }
+  }
 }
 
 tasks.withType(ProcessResources).configureEach {
-    var replaceProperties = [
-        minecraft_version_range : project.neo_minecraft_version_range,
-        neo_version_range : project.neo_version_range,
-        neo_loader_version_range : project.neo_loader_version_range,
-        mod_version: project.mod_version,
-        pack_format_number: project.pack_format_number,
-    ]
-    inputs.properties replaceProperties
-    filesMatching(['META-INF/neoforge.mods.toml', 'pack.mcmeta']) {
-        expand replaceProperties + [project: project]
-    }
+  var replaceProperties = [
+    minecraft_version_range : project.neo_minecraft_version_range,
+    neo_version_range : project.neo_version_range,
+    neo_loader_version_range : project.neo_loader_version_range,
+    mod_version: project.mod_version,
+    pack_format_number: project.pack_format_number,
+  ]
+  inputs.properties replaceProperties
+  filesMatching(['META-INF/neoforge.mods.toml', 'pack.mcmeta']) {
+    expand replaceProperties + [project: project]
+  }
 }
 
 tasks.withType(JavaCompile).configureEach {
-    it.options.encoding = 'UTF-8'
-    it.options.release = 21
+  it.options.encoding = 'UTF-8'
+  it.options.release = 21
 }
 
 java.withSourcesJar()
 
 jar {
-    from("../LICENSE") {
-    }
+  from("../LICENSE") {
+  }
+}
+
+idea {
+  module {
+    downloadSources = true
+    downloadJavadoc = true
+  }
 }
