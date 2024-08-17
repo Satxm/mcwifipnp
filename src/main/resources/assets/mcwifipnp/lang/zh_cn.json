@@ -20,7 +20,7 @@
     "mcwifipnp.gui.Local": "内网",
     "mcwifipnp.gui.Global": "公网",
     "mcwifipnp.gui.CopyIP": "获取IP",
-    "mcwifipnp.gui.CopyIP.info": "是否获取你当前设备的IP地址，以便于你直接复制。",
+    "mcwifipnp.gui.CopyIP.info": "获取你的IP地址到剪切板。",
     "mcwifipnp.upnp.success": "成功转发端口%s",
     "mcwifipnp.upnp.clipboard": "成功获取到%s，由于NAT等因素，这些IP可能仍旧无法直接联机。",
     "mcwifipnp.upnp.cantgetip": "无法获取IP！请检查你的网络设置。你的IPv4可能包含多级NAT或者你无IPv6。",
