@@ -8,7 +8,6 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import net.minecraft.core.UUIDUtil;
 
-
 @Mixin(UUIDUtil.class)
 public abstract class MixinUUIDUtil {
   @Inject(method = "createOfflinePlayerUUID", at = @At("HEAD"), cancellable = true)

@@ -35,8 +35,8 @@ public class MCWiFiPnP implements ModInitializer {
       BanIpCommands.register(dispatcher);
       BanListCommands.register(dispatcher);
       BanPlayerCommands.register(dispatcher);
-			OfflinePlayerCommand.register(dispatcher);
-		});
+      ForceOfflineCommand.register(dispatcher);
+    });
   }
 
   public static void afterScreenInit(Minecraft client, Screen screen, int i, int j) {

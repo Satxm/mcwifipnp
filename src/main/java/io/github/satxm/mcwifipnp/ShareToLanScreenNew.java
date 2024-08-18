@@ -34,8 +34,8 @@ public class ShareToLanScreenNew extends Screen {
     cfg.AllowCommands = client.getSingleplayerServer().getWorldData().getAllowCommands();
     cfg.GameMode = client.getSingleplayerServer().getDefaultGameType().getName();
     cfg.OnlineMode = client.getSingleplayerServer().usesAuthentication();
-			cfg.alwaysOfflinePlayers = Collections.emptyList();
-			cfg.needsDefaults = false;
+      cfg.ForceOfflinePlayers = Collections.emptyList();
+      cfg.needsDefaults = false;
   }
   }
 
@@ -167,11 +167,11 @@ public class ShareToLanScreenNew extends Screen {
 
   this.addRenderableWidget(CycleButton.builder(OnlineMode::getDisplayName)
   .withValues(OnlineMode.values())
-  .withInitialValue(OnlineMode.of(cfg.OnlineMode, cfg.EnableUUIDFix)).withTooltip((OnlineMode) -> Tooltip.create(OnlineMode.gettoolTip()))
+  .withInitialValue(OnlineMode.of(cfg.OnlineMode, cfg.EnableUUIDFixer)).withTooltip((OnlineMode) -> Tooltip.create(OnlineMode.gettoolTip()))
   .create(this.width / 2 - 155, 148, 150, 20,
   Component.translatable("mcwifipnp.gui.OnlineMode"), (cycleButton, OnlineMode) -> {
     cfg.OnlineMode = OnlineMode.getOnlieMode();
-    cfg.EnableUUIDFix = OnlineMode.getFixUUID();
+    cfg.EnableUUIDFixer = OnlineMode.getFixUUID();
   }));
 
   this.addRenderableWidget(CycleButton.onOffBuilder(cfg.PvP).create(this.width / 2 + 5, 148, 150, 20,

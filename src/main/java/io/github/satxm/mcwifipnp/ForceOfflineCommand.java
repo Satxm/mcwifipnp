@@ -19,15 +19,15 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.players.PlayerList;
 import org.apache.commons.lang3.StringUtils;
 
-public class OfflinePlayerCommand {
-  private static final SimpleCommandExceptionType ERROR_ALREADY_IN = new SimpleCommandExceptionType(Component.translatable("mcwifipnp.commands.offlineplayers.add.failed"));
-  private static final SimpleCommandExceptionType ERROR_NOT_IN = new SimpleCommandExceptionType(Component.translatable("mcwifipnp.commands.offlineplayers.remove.failed"));
+public class ForceOfflineCommand {
+  private static final SimpleCommandExceptionType ERROR_ALREADY_IN = new SimpleCommandExceptionType(Component.translatable("mcwifipnp.commands.forceoffline.add.failed"));
+  private static final SimpleCommandExceptionType ERROR_NOT_IN = new SimpleCommandExceptionType(Component.translatable("mcwifipnp.commands.forceoffline.remove.failed"));
 
-  public OfflinePlayerCommand() {
+  public ForceOfflineCommand() {
   }
 
   public static void register(CommandDispatcher<CommandSourceStack> commandDispatcher) {
-    commandDispatcher.register((LiteralArgumentBuilder)((LiteralArgumentBuilder)((LiteralArgumentBuilder)((LiteralArgumentBuilder)Commands.literal("offlineplayer").requires((commandSourceStack) -> {
+    commandDispatcher.register((LiteralArgumentBuilder)((LiteralArgumentBuilder)((LiteralArgumentBuilder)((LiteralArgumentBuilder)Commands.literal("forceoffline").requires((commandSourceStack) -> {
       return commandSourceStack.hasPermission(3);
     })).then(Commands.literal("list").executes((commandContext) -> {
       return showList((CommandSourceStack)commandContext.getSource());
@@ -36,9 +36,9 @@ public class OfflinePlayerCommand {
       PlayerList playerList = server.getPlayerList();
       MCWiFiPnPUnit.ReadingConfig(server);
       MCWiFiPnPUnit.Config cfg = MCWiFiPnPUnit.getConfig(server);
-      List<String> alwaysOfflinePlayers = cfg.alwaysOfflinePlayers;
+      List<String> ForceOfflinePlayers = cfg.ForceOfflinePlayers;
       return SharedSuggestionProvider.suggest(playerList.getPlayers().stream().filter((serverPlayer) -> {
-        return !alwaysOfflinePlayers.contains(serverPlayer.getGameProfile().getName());
+        return !ForceOfflinePlayers.contains(serverPlayer.getGameProfile().getName());
       }).map((serverPlayer) -> {
         return serverPlayer.getGameProfile().getName();
       }), suggestionsBuilder);
@@ -48,29 +48,28 @@ public class OfflinePlayerCommand {
       MinecraftServer server = ((CommandSourceStack) commandContext.getSource()).getServer();
       MCWiFiPnPUnit.ReadingConfig(server);
       MCWiFiPnPUnit.Config cfg = MCWiFiPnPUnit.getConfig(server);
-      List<String> alwaysOfflinePlayers = cfg.alwaysOfflinePlayers;
-      return SharedSuggestionProvider.suggest(alwaysOfflinePlayers.stream(), suggestionsBuilder);
+      List<String> ForceOfflinePlayers = cfg.ForceOfflinePlayers;
+      return SharedSuggestionProvider.suggest(ForceOfflinePlayers.stream(), suggestionsBuilder);
     }).executes((commandContext) -> {
       return removePlayers((CommandSourceStack)commandContext.getSource(), GameProfileArgument.getGameProfiles(commandContext, "targets"));
     }))));
   }
 
-
   private static int addPlayers(CommandSourceStack commandSourceStack, Collection<GameProfile> collection) throws CommandSyntaxException {
   MinecraftServer server = commandSourceStack.getServer();
   MCWiFiPnPUnit.ReadingConfig(server);
   MCWiFiPnPUnit.Config cfg = MCWiFiPnPUnit.getConfig(server);
-    List<String> alwaysOfflinePlayers = cfg.alwaysOfflinePlayers;
+    List<String> ForceOfflinePlayers = cfg.ForceOfflinePlayers;
 
   int i = 0;
   Iterator var4 = collection.iterator();
 
   while (var4.hasNext()) {
     GameProfile gameProfile = (GameProfile) var4.next();
-    if (!alwaysOfflinePlayers.contains(gameProfile.getName())) {
-        alwaysOfflinePlayers.add(gameProfile.getName());
+    if (!ForceOfflinePlayers.contains(gameProfile.getName())) {
+        ForceOfflinePlayers.add(gameProfile.getName());
         MCWiFiPnPUnit.saveConfig(cfg);
-    commandSourceStack.sendSuccess(Component.translatable("mcwifipnp.commands.offlineplayers.add.success",
+    commandSourceStack.sendSuccess(Component.translatable("mcwifipnp.commands.forceoffline.add.success",
       new Object[] { ComponentUtils.getDisplayName(gameProfile) }), true);
     ++i;
     }
@@ -87,17 +86,17 @@ public class OfflinePlayerCommand {
   MinecraftServer server = commandSourceStack.getServer();
   MCWiFiPnPUnit.ReadingConfig(server);
   MCWiFiPnPUnit.Config cfg = MCWiFiPnPUnit.getConfig(server);
-  List<String> alwaysOfflinePlayers = cfg.alwaysOfflinePlayers;
+  List<String> ForceOfflinePlayers = cfg.ForceOfflinePlayers;
 
   int i = 0;
   Iterator var4 = collection.iterator();
 
   while (var4.hasNext()) {
     GameProfile gameProfile = (GameProfile) var4.next();
-    if (alwaysOfflinePlayers.contains(gameProfile.getName())) {
-    alwaysOfflinePlayers.remove(gameProfile.getName());
+    if (ForceOfflinePlayers.contains(gameProfile.getName())) {
+    ForceOfflinePlayers.remove(gameProfile.getName());
     MCWiFiPnPUnit.saveConfig(cfg);
-    commandSourceStack.sendSuccess(Component.translatable("mcwifipnp.commands.offlineplayers.remove.success",
+    commandSourceStack.sendSuccess(Component.translatable("mcwifipnp.commands.forceoffline.remove.success",
       new Object[] { ComponentUtils.getDisplayName(gameProfile) }), true);
     ++i;
     }
@@ -115,15 +114,15 @@ public class OfflinePlayerCommand {
   MinecraftServer server = commandSourceStack.getServer();
   MCWiFiPnPUnit.ReadingConfig(server);
   MCWiFiPnPUnit.Config cfg = MCWiFiPnPUnit.getConfig(server);
-  List<String> alwaysOfflinePlayers = cfg.alwaysOfflinePlayers;
+  List<String> ForceOfflinePlayers = cfg.ForceOfflinePlayers;
 
-  if (alwaysOfflinePlayers.size() == 0) {
-    commandSourceStack.sendSuccess(Component.translatable("mcwifipnp.commands.offlineplayers.none"), false);
+  if (ForceOfflinePlayers.size() == 0) {
+    commandSourceStack.sendSuccess(Component.translatable("mcwifipnp.commands.forceoffline.none"), false);
   } else {
-    commandSourceStack.sendSuccess(Component.translatable("mcwifipnp.commands.offlineplayers.list",
-      new Object[] { alwaysOfflinePlayers.size(), StringUtils.join(alwaysOfflinePlayers, ", ") }), false);
+    commandSourceStack.sendSuccess(Component.translatable("mcwifipnp.commands.forceoffline.list",
+      new Object[] { ForceOfflinePlayers.size(), StringUtils.join(ForceOfflinePlayers, ", ") }), false);
   }
 
-  return alwaysOfflinePlayers.size();
+  return ForceOfflinePlayers.size();
   }
 }
