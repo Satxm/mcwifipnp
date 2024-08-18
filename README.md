@@ -18,7 +18,6 @@
 [7]: https://img.shields.io/github/license/Satxm/mcwifipnp?label=License&logo=github&style=flat&color=E51050&labelcolor=2D2D2D
 [8]: https://github.com/satxm/mcwifipnp
 
-
 **Fabric: Requires [Fabric Loader](https://fabricmc.net/use/) and [Fabric API](https://modrinth.com/mod/fabric-api)**.
 
 **Quilt: Requires [Quilt Loader](https://quiltmc.org/install/) and [QFAPI/QSL](https://modrinth.com/mod/qsl)**.
@@ -63,7 +62,17 @@ Modified from [TheGlitch76/mcpnp](https://github.com/TheGlitch76/mcpnp) project 
 
 ## What Can It Do - 它的作用
 
-添加了 UUID 修复模块，对于离线玩家，可以使离线玩家从mojang服务器获取对应的UUID，使UUID固定，不会因为客户端变化而变化。
+Added UUID Fixer module, which allows offline players to obtain a unique UUID from the Mojang server, keeping the UUID fixed and not changing due to client changes.
+
+添加了 UUID 修复模块，对于离线玩家，可以使离线玩家从 Mojang 服务器获取唯一的 UUID，使 UUID 固定，不会因为客户端变化而变化。
+
+Added a new command `/forceoffline` to control whether players are forced into offline mode without obtaining UUIDs from Mojang servers. `/forceoffline list` command can list players who in the force offline list, `/forceoffline add` command can add players to the force offline list, `/forceoffline remove` command can remove players from the force offline list.
+
+添加了一个新指令 `/forceoffline` 以便于控制玩家是否强制玩家为离线模式，不从 Mojang 服务器获取 UUID。`/forceoffline list` 指令可以查看列表中玩家，`/forceoffline add` 指令可以添加玩家到列表，`/forceoffline remove` 指令可以从列表中移除玩家。
+
+For the `Oline Mode` button, there are now three options: 'Enable': enable genuine verification, which will verify login information against the Mojang server database, only allowing players who login with a Microsoft account to join, `Disable`: not verify login information, allows offline players to join, `Disable + UUID Fixer`: Attempt to match the Mojang server user name with the player name for offline mode players to obtain a unique UUID, Meanwhile, UUIDs are retained for users logging in with Microsoft accounts, It can also prevent the loss of backpack and inventory items.
+
+对于`正版验证`按钮，现在有三个选项：`启用`：启用正版验证，将会比对Mojang服务器数据库验证登录信息，即只允许使用微软帐户登录的玩家加入；`禁用`：即不验证登录信息，允许使用离线模式登录的玩家加入；`禁用 + 修复UUID`：尝试使用离线模式登录的玩家名匹配Mojang服务器用户名称以获取唯一UUID，同时为使用微软帐户登录的用户保留UUID，它也可以防止背包和物品栏内容丢失。
 
 Allows you to change the port number of the LAN world and choose whether to map this port to the public network using UPnP (if your router supports UPnP).
 
@@ -81,10 +90,9 @@ Allows you control other players' op permissions when they join your world, and 
 
 你可以控制其他玩家加入时是否有op权限、是否可以作弊，你也可以使用```/op``` ```/deop```命令进行控制。
 
+You can control haw many players can join your world. You can use whitelist (command `/whitelist`) to block other players join your world.
 
-You can control haw many players can join your world. You can use whitelist to block other players join your world.
-
-你可以决定有多少玩家可以加入你的世界，你可以使用白名单来组建其他玩家进加入你的游戏世界。
+你可以决定有多少玩家可以加入你的世界，你可以使用白名单（命令 `/whitelist`）来组建其他玩家进加入你的游戏世界。
 
 Allows players to connect your world from anywhere, this includes toggling online mode.
 
