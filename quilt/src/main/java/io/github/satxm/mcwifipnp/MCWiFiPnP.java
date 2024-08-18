@@ -23,46 +23,46 @@ import net.minecraft.server.commands.OpCommand;
 import net.minecraft.server.commands.WhitelistCommand;
 
 public class MCWiFiPnP implements ModInitializer {
-    public static final String MODID = "mcwifipnp";
+  public static final String MODID = "mcwifipnp";
 
-    @Override
-    public void onInitialize(ModContainer mod) {
-        ServerLifecycleEvents.STARTING.register(this::onServerLoad);
-        ServerLifecycleEvents.STOPPING.register(this::onServerStop);
-        ScreenEvents.AFTER_INIT.register(MCWiFiPnP::afterScreenInit);
-        CommandRegistrationCallback.EVENT.register((dispatcher, registryAccess, environment) -> {
-            DeOpCommands.register(dispatcher);
-            OpCommand.register(dispatcher);
-            WhitelistCommand.register(dispatcher);
-            BanIpCommands.register(dispatcher);
-            BanListCommands.register(dispatcher);
-            BanPlayerCommands.register(dispatcher);
-        });
-    }
+  @Override
+  public void onInitialize(ModContainer mod) {
+    ServerLifecycleEvents.STARTING.register(this::onServerLoad);
+    ServerLifecycleEvents.STOPPING.register(this::onServerStop);
+    ScreenEvents.AFTER_INIT.register(MCWiFiPnP::afterScreenInit);
+    CommandRegistrationCallback.EVENT.register((dispatcher, registryAccess, environment) -> {
+      DeOpCommands.register(dispatcher);
+      OpCommand.register(dispatcher);
+      WhitelistCommand.register(dispatcher);
+      BanIpCommands.register(dispatcher);
+      BanListCommands.register(dispatcher);
+      BanPlayerCommands.register(dispatcher);
+    });
+  }
 
-    public static void afterScreenInit(Screen screen, Minecraft client, int i, int j) {
-        if (screen instanceof PauseScreen) {
-            final List<AbstractWidget> buttons = screen.getButtons();
-            for (int k = 0; k < buttons.size(); k++) {
-                AbstractWidget ShareToLanOld = buttons.get(k);
-                if (buttons.size() != 0 && ShareToLanOld.getMessage().getString()
-                        .equals(Component.translatable("menu.shareToLan").getString())) {
-                    AbstractWidget ShareToLanNew = new Button(ShareToLanOld.x, ShareToLanOld.y, ShareToLanOld.getWidth(), ShareToLanOld.getHeight(), Component.translatable("menu.shareToLan"),
-                            (button) -> client.setScreen(new ShareToLanScreenNew(screen)));
-                    ShareToLanNew.active = ShareToLanOld.active;
-                    buttons.remove(ShareToLanOld);
-                    buttons.add(ShareToLanNew);
-                }
-            }
+  public static void afterScreenInit(Screen screen, Minecraft client, int i, int j) {
+    if (screen instanceof PauseScreen) {
+      final List<AbstractWidget> buttons = screen.getButtons();
+      for (int k = 0; k < buttons.size(); k++) {
+        AbstractWidget ShareToLanOld = buttons.get(k);
+        if (buttons.size() != 0 && ShareToLanOld.getMessage().getString()
+            .equals(Component.translatable("menu.shareToLan").getString())) {
+          AbstractWidget ShareToLanNew = new Button(ShareToLanOld.x, ShareToLanOld.y, ShareToLanOld.getWidth(), ShareToLanOld.getHeight(), Component.translatable("menu.shareToLan"),
+              (button) -> client.setScreen(new ShareToLanScreenNew(screen)));
+          ShareToLanNew.active = ShareToLanOld.active;
+          buttons.remove(ShareToLanOld);
+          buttons.add(ShareToLanNew);
         }
+      }
     }
+  }
 
-    private void onServerLoad(MinecraftServer server) {
-        MCWiFiPnPUnit.ReadingConfig(server);
-    }
+  private void onServerLoad(MinecraftServer server) {
+    MCWiFiPnPUnit.ReadingConfig(server);
+  }
 
-    private void onServerStop(MinecraftServer server) {
-        MCWiFiPnPUnit.CloseUPnPPort(server);
-    }
+  private void onServerStop(MinecraftServer server) {
+    MCWiFiPnPUnit.CloseUPnPPort(server);
+  }
 
 }

@@ -20,48 +20,48 @@ import net.minecraftforge.fml.common.Mod;
 
 @Mod(MCWiFiPnP.MODID)
 public class MCWiFiPnP {
-    public static final String MODID = "mcwifipnp";
+  public static final String MODID = "mcwifipnp";
 
-    public MCWiFiPnP() {
-        MinecraftForge.EVENT_BUS.register(this);
-        MinecraftForge.EVENT_BUS.addListener(MCWiFiPnP::afterScreenInit);
-    }
+  public MCWiFiPnP() {
+    MinecraftForge.EVENT_BUS.register(this);
+    MinecraftForge.EVENT_BUS.addListener(MCWiFiPnP::afterScreenInit);
+  }
 
-    
-    @SubscribeEvent
-    public static void afterScreenInit(final ScreenEvent.Init.Post event) {
-        Minecraft client = Minecraft.getInstance();
-        Screen screen = event.getScreen();
-        if (screen instanceof PauseScreen && event.getListenersList().size() != 0) {
-            for (int k = 0; k < event.getListenersList().size(); k++) {
-                Button ShareToLanOld = (Button) event.getListenersList().get(k);
-                if (ShareToLanOld.getMessage().getString()
-                        .equals(Component.translatable("menu.shareToLan").getString())) {
-                    Button ShareToLanNew = new Button(ShareToLanOld.x, ShareToLanOld.y, ShareToLanOld.getWidth(), ShareToLanOld.getHeight(), Component.translatable("menu.shareToLan"),
-                            (button) -> client.setScreen(new ShareToLanScreenNew(screen)));
-                    ShareToLanNew.active = ShareToLanOld.active;
-                    event.removeListener(ShareToLanOld);
-                    event.addListener(ShareToLanNew);
-                }
-            }
+  
+  @SubscribeEvent
+  public static void afterScreenInit(final ScreenEvent.Init.Post event) {
+    Minecraft client = Minecraft.getInstance();
+    Screen screen = event.getScreen();
+    if (screen instanceof PauseScreen && event.getListenersList().size() != 0) {
+      for (int k = 0; k < event.getListenersList().size(); k++) {
+        Button ShareToLanOld = (Button) event.getListenersList().get(k);
+        if (ShareToLanOld.getMessage().getString()
+            .equals(Component.translatable("menu.shareToLan").getString())) {
+          Button ShareToLanNew = new Button(ShareToLanOld.x, ShareToLanOld.y, ShareToLanOld.getWidth(), ShareToLanOld.getHeight(), Component.translatable("menu.shareToLan"),
+              (button) -> client.setScreen(new ShareToLanScreenNew(screen)));
+          ShareToLanNew.active = ShareToLanOld.active;
+          event.removeListener(ShareToLanOld);
+          event.addListener(ShareToLanNew);
         }
+      }
     }
+  }
 
-    @SubscribeEvent
-    public void onServerStarting(ServerStartingEvent event) {
-        MCWiFiPnPUnit.ReadingConfig(event.getServer());
-        DeOpCommands.register(event.getServer().getCommands().getDispatcher());
-        OpCommand.register(event.getServer().getCommands().getDispatcher());
-        WhitelistCommand.register(event.getServer().getCommands().getDispatcher());
-        BanIpCommands.register(event.getServer().getCommands().getDispatcher());
-        BanListCommands.register(event.getServer().getCommands().getDispatcher());
-        BanPlayerCommands.register(event.getServer().getCommands().getDispatcher());
-    	OfflinePlayerCommand.register(event.getServer().getCommands().getDispatcher());
-    }
+  @SubscribeEvent
+  public void onServerStarting(ServerStartingEvent event) {
+    MCWiFiPnPUnit.ReadingConfig(event.getServer());
+    DeOpCommands.register(event.getServer().getCommands().getDispatcher());
+    OpCommand.register(event.getServer().getCommands().getDispatcher());
+    WhitelistCommand.register(event.getServer().getCommands().getDispatcher());
+    BanIpCommands.register(event.getServer().getCommands().getDispatcher());
+    BanListCommands.register(event.getServer().getCommands().getDispatcher());
+    BanPlayerCommands.register(event.getServer().getCommands().getDispatcher());
+    ForceOfflineCommand.register(event.getServer().getCommands().getDispatcher());
+  }
 
-    @SubscribeEvent
-    public void onServerStopping(ServerStoppingEvent event) {
-        MCWiFiPnPUnit.CloseUPnPPort(event.getServer());
-    }
+  @SubscribeEvent
+  public void onServerStopping(ServerStoppingEvent event) {
+    MCWiFiPnPUnit.CloseUPnPPort(event.getServer());
+  }
 
 }

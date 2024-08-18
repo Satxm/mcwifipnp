@@ -4,10 +4,10 @@
   "package": "io.github.satxm.mcwifipnp.mixin",
   "compatibilityLevel": "JAVA_17",
   "client": [
-    "PlayerListAccessor",
-    "MixinUUIDUtil"
+  "PlayerListAccessor",
+  "MixinUUIDUtil"
   ],
   "injectors": {
-    "defaultRequire": 1
+  "defaultRequire": 1
   }
 }

@@ -34,10 +34,10 @@
   "mcwifipnp.upnp.failed.disabled": "Unable to forward port %s: UPnP is not enabled on your router, You may need to use port mapping software.",
   "mcwifipnp.upnp.failed.unknownerror": "Unable to forward port %s: Unknown error while adding port mapping, Please use a port mapping software.",
   "mcwifipnp.upnp.failed": "Unable to forward port %s!",
-  "mcwifipnp.commands.offlineplayers.add.failed": "Player is already in force offline list",
-  "mcwifipnp.commands.offlineplayers.add.success": "Added %s to the force offline list",
-  "mcwifipnp.commands.offlineplayers.list": "There are %s players in force offline list: %s",
-  "mcwifipnp.commands.offlineplayers.none": "There are no players in force offline list",
-  "mcwifipnp.commands.offlineplayers.remove.failed": "Player is not in force offline list",
-  "mcwifipnp.commands.offlineplayers.remove.success": "Removed %s from the force offline list"
+  "mcwifipnp.commands.forceoffline.add.failed": "Player is already in force offline list",
+  "mcwifipnp.commands.forceoffline.add.success": "Added %s to the force offline list",
+  "mcwifipnp.commands.forceoffline.list": "There are %s players in force offline list: %s",
+  "mcwifipnp.commands.forceoffline.none": "There are no players in force offline list",
+  "mcwifipnp.commands.forceoffline.remove.failed": "Player is not in force offline list",
+  "mcwifipnp.commands.forceoffline.remove.success": "Removed %s from the force offline list"
 }
