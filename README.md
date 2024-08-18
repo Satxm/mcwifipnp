@@ -18,7 +18,6 @@
 [7]: https://img.shields.io/github/license/Satxm/mcwifipnp?label=License&logo=github&style=flat&color=E51050&labelcolor=2D2D2D
 [8]: https://github.com/satxm/mcwifipnp
 
-
 **Fabric: Requires [Fabric Loader](https://fabricmc.net/use/) and [Fabric API](https://modrinth.com/mod/fabric-api)**,
 
 **Forge: Requires [Forge](https://files.minecraftforge.net/net/minecraftforge/forge/)**.
@@ -75,10 +74,9 @@ Allows you control other players' op permissions when they join your world, and 
 
 你可以控制其他玩家加入时是否有op权限、是否可以作弊，你也可以使用```/op``` ```/deop```命令进行控制。
 
+You can control haw many players can join your world. You can use whitelist (command `/whitelist`) to block other players join your world.
 
-You can control haw many players can join your world. You can use whitelist to block other players join your world.
-
-你可以决定有多少玩家可以加入你的世界，你可以使用白名单来组建其他玩家进加入你的游戏世界。
+你可以决定有多少玩家可以加入你的世界，你可以使用白名单（命令 `/whitelist`）来组建其他玩家进加入你的游戏世界。
 
 Allows players to connect your world from anywhere, this includes toggling online mode.
 
