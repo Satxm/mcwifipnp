@@ -8,7 +8,7 @@ import net.minecraft.server.players.PlayerList;
 
 @Mixin(PlayerList.class)
 public interface PlayerListAccessor {
-    @Accessor
-    @Mutable
-    public void setMaxPlayers(int maxPlayers);
+  @Accessor
+  @Mutable
+  public void setMaxPlayers(int maxPlayers);
 }

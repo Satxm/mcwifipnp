@@ -12,7 +12,7 @@
 [3]: https://img.shields.io/curseforge/dt/450250?label=CurseForge%0aDownloads&logo=curseforge&style=flat&color=E36639&labelcolor=2D2D2D
 [4]: https://www.curseforge.com/minecraft/mc-mods/mcwifipnp
 
-[5]: https://img.shields.io/badge/Available%20for-%201.15%20to%201.20-47376F?logo=files&color=377BCB&labelcolor=2D2D2D
+[5]: https://img.shields.io/badge/Available%20for-%201.15%20to%201.21-47376F?logo=files&color=377BCB&labelcolor=2D2D2D
 [6]: https://modrinth.com/mod/mcwifipnp/versions
 
 [7]: https://img.shields.io/github/license/Satxm/mcwifipnp?label=License&logo=github&style=flat&color=E51050&labelcolor=2D2D2D
@@ -57,6 +57,18 @@ Modified from [TheGlitch76/mcpnp](https://github.com/TheGlitch76/mcpnp) project 
 </div>
 
 ## What Can It Do - 它的作用
+
+Added UUID Fixer module, which allows offline players to obtain a unique UUID from the Mojang server, keeping the UUID fixed and not changing due to client changes.
+
+添加了 UUID 修复模块，对于离线玩家，可以使离线玩家从 Mojang 服务器获取唯一的 UUID，使 UUID 固定，不会因为客户端变化而变化。
+
+Added a new command `/forceoffline` to control whether players are forced into offline mode without obtaining UUIDs from Mojang servers. `/forceoffline list` command can list players who in the force offline list, `/forceoffline add` command can add players to the force offline list, `/forceoffline remove` command can remove players from the force offline list.
+
+添加了一个新指令 `/forceoffline` 以便于控制玩家是否强制玩家为离线模式，不从 Mojang 服务器获取 UUID。`/forceoffline list` 指令可以查看列表中玩家，`/forceoffline add` 指令可以添加玩家到列表，`/forceoffline remove` 指令可以从列表中移除玩家。
+
+For the `Oline Mode` button, there are now three options: 'Enable': enable genuine verification, which will verify login information against the Mojang server database, only allowing players who login with a Microsoft account to join, `Disable`: not verify login information, allows offline players to join, `Disable + UUID Fixer`: Attempt to match the Mojang server user name with the player name for offline mode players to obtain a unique UUID, Meanwhile, UUIDs are retained for users logging in with Microsoft accounts, It can also prevent the loss of backpack and inventory items.
+
+对于`正版验证`按钮，现在有三个选项：`启用`：启用正版验证，将会比对Mojang服务器数据库验证登录信息，即只允许使用微软帐户登录的玩家加入；`禁用`：即不验证登录信息，允许使用离线模式登录的玩家加入；`禁用 + 修复UUID`：尝试使用离线模式登录的玩家名匹配Mojang服务器用户名称以获取唯一UUID，同时为使用微软帐户登录的用户保留UUID，它也可以防止背包和物品栏内容丢失。
 
 Allows you to change the port number of the LAN world and choose whether to map this port to the public network using UPnP (if your router supports UPnP).
 
