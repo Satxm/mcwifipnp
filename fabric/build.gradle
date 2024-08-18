@@ -5,7 +5,7 @@ plugins {
 sourceCompatibility = targetCompatibility = JavaVersion.VERSION_17
 
 base {
-    archivesBaseName = project.archives_base_name
+    archivesName = project.mod_id
 }
 version = project.mod_version + "-" + project.minecraft_version + "-fabric"
 group = project.maven_group
@@ -14,8 +14,8 @@ dependencies {
     minecraft "com.mojang:minecraft:${project.minecraft_version}"
     mappings loom.officialMojangMappings()
     modImplementation "net.fabricmc:fabric-loader:${project.fabric_loader_version}"
-
     modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
+    modImplementation "com.google.code.findbugs:jsr305:3.0.2"
 
 }
 

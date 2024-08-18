@@ -2,18 +2,19 @@ plugins {
     id 'eclipse'
     id 'idea'
     id 'net.minecraftforge.gradle' version '[6.0.16,6.2)'
+  id 'org.spongepowered.mixin' version '0.7.+'
 }
+
+java.toolchain.languageVersion = JavaLanguageVersion.of(17)
+
+println "Java: ${System.getProperty 'java.version'}, JVM: ${System.getProperty 'java.vm.version'} (${System.getProperty 'java.vendor'}), Arch: ${System.getProperty 'os.arch'}"
 
 version = project.mod_version + "-" + project.minecraft_version + "-forge"
 group = project.maven_group
 
 base {
-    archivesBaseName = project.archives_base_name
+    archivesName = project.mod_id
 }
-java.toolchain.languageVersion = JavaLanguageVersion.of(17)
-
-println "Java: ${System.getProperty 'java.version'}, JVM: ${System.getProperty 'java.vm.version'} (${System.getProperty 'java.vendor'}), Arch: ${System.getProperty 'os.arch'}"
-
 minecraft {
 
     mappings channel: 'official', version: project.minecraft_version
@@ -58,6 +59,15 @@ sourceSets {
             srcDir "../src/main/resources"
         }
     }
+}
+
+mixin {
+  // MixinGradle Settings
+  add sourceSets.main, 'mcwifipnp.refmap.json'
+  config 'mcwifipnp.mixins.json'
+
+  debug.verbose = true
+  debug.export = true
 }
 
 jar {
