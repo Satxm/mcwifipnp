@@ -3,15 +3,17 @@ package io.github.satxm.mcwifipnp;
 import com.mojang.blaze3d.vertex.PoseStack;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.components.Button;
-import net.minecraft.client.gui.components.CycleButton;
-import net.minecraft.client.gui.components.EditBox;
+import net.minecraft.client.gui.components.*;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.HttpUtil;
 import net.minecraft.world.level.GameType;
+
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 
 public class ShareToLanScreenNew extends Screen {
     private final MCWiFiPnPUnit.Config cfg;
@@ -35,6 +37,7 @@ public class ShareToLanScreenNew extends Screen {
             cfg.AllowCommands = client.getSingleplayerServer().getWorldData().getAllowCommands();
             cfg.GameMode = client.getSingleplayerServer().getWorldData().getGameType().getName();
             cfg.OnlineMode = client.getSingleplayerServer().usesAuthentication();
+			cfg.alwaysOfflinePlayers = Collections.emptyList();
             cfg.needsDefaults = false;
         }
     }
@@ -125,10 +128,13 @@ public class ShareToLanScreenNew extends Screen {
                     cfg.Whitelist = Whitelist;
                 }));
 
-        this.addRenderableWidget(CycleButton.onOffBuilder(cfg.OnlineMode).create(this.width / 2 - 155, 148, 150, 20,
-                Component.translatable("mcwifipnp.gui.OnlineMode"), (button, OnlineMode) -> {
-                    cfg.OnlineMode = OnlineMode;
-                }));
+        this.addRenderableWidget(CycleButton.builder(OnlineMode::getDisplayName)
+                .withValues(OnlineMode.values())
+                .withInitialValue(OnlineMode.of(cfg.OnlineMode, cfg.EnableUUIDFix)).create(this.width / 2 - 155, 148, 150, 20,
+                        Component.translatable("mcwifipnp.gui.OnlineMode"), (button, OnlineMode) -> {
+                    cfg.OnlineMode = OnlineMode.getOnlieMode();
+                    cfg.EnableUUIDFix = OnlineMode.getFixUUID();
+                        }));
 
         this.addRenderableWidget(CycleButton.onOffBuilder(cfg.PvP).create(this.width / 2 + 5, 148, 150, 20,
                 Component.translatable("mcwifipnp.gui.PvP"), (button, PvP) -> {

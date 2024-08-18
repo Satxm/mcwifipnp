@@ -12,14 +12,9 @@ import java.net.URLConnection;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
-import java.util.WeakHashMap;
+import java.util.*;
 
+import io.github.satxm.mcwifipnp.mixin.PlayerListAccessor;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -66,13 +61,15 @@ public class MCWiFiPnPUnit {
                 : Component.translatable("commands.publish.failed");
         client.gui.getChat().addMessage(component);
 
-        MCWiFiPnP.setMaxPlayers(server, cfg.maxPlayers);
+        ((PlayerListAccessor) playerList).setMaxPlayers(cfg.maxPlayers);
         server.setUsesAuthentication(cfg.OnlineMode);
         server.setPvpAllowed(cfg.PvP);
         server.setEnforceWhitelist(cfg.Whitelist);
         playerList.setUsingWhiteList(cfg.Whitelist);
         playerList.getOps().add(new ServerOpListEntry(client.player.getGameProfile(), 4, playerList.canBypassPlayerLimit(client.player.getGameProfile())));
         playerList.setAllowCheatsForAllPlayers(cfg.AllPlayersCheats);
+    	UUIDFixer.EnableUUIDFix = cfg.EnableUUIDFix;
+    	UUIDFixer.alwaysOfflinePlayers = cfg.alwaysOfflinePlayers;
 
         new Thread(() -> {
             MCWiFiPnPUnit.UseUPnP(cfg, client);
@@ -104,8 +101,7 @@ public class MCWiFiPnPUnit {
             for (int i = 0; i < IPAddressList().size(); i++) {
                 Map<String, String> NewMap = IPAddressList().get(i);
                 if (NewMap.get("Type") == "IPv4") {
-                    IPComponentList.add(
-                            IPComponent(
+                    IPComponentList.add(IPComponent(
                                     Component.translatable(NewMap.get("Local")).getString() + " " + NewMap.get("Type"),
                                     NewMap.get("IP") + ":" + cfg.port));
                 } else {
@@ -123,10 +119,8 @@ public class MCWiFiPnPUnit {
                 IPList.add(GetGlobalIPv4().get("IP"));
             }
             if (!GetGlobalIPv6().isEmpty() && !IPList.contains(GetGlobalIPv6().get("IP"))) {
-                IPComponentList.add(IPComponent(
-                        Component.translatable(GetGlobalIPv6().get("Local")).getString() + " "
-                                + GetGlobalIPv6().get("Type"),
-                        "[" + GetGlobalIPv6().get("IP") + "]:" + cfg.port));
+				IPComponentList.add(IPComponent(Component.translatable(GetGlobalIPv6().get("Local")).getString() + " "
+				+ GetGlobalIPv6().get("Type"),"[" + GetGlobalIPv6().get("IP") + "]:" + cfg.port));
                 IPList.add(GetGlobalIPv4().get("IP"));
             }
             if (cfg.UseUPnP && UPnP.getExternalIP() != null && !IPList.contains(GetGlobalIPv6().get("IP"))) {
@@ -177,7 +171,7 @@ public class MCWiFiPnPUnit {
         }
     }
 
-    static void saveConfig(Config cfg) {
+    public static void saveConfig(Config cfg) {
         if (!cfg.needsDefaults) {
             try {
                 Files.write(cfg.location, toPrettyFormat(cfg).getBytes("utf-8"), StandardOpenOption.TRUNCATE_EXISTING,
@@ -198,6 +192,8 @@ public class MCWiFiPnPUnit {
         public boolean UseUPnP = true;
         public boolean AllowCommands = false;
         public boolean OnlineMode = true;
+    	public boolean EnableUUIDFix = false;
+    	public List<String> alwaysOfflinePlayers = Collections.emptyList();
         public boolean PvP = true;
         public boolean CopyToClipboard = true;
         public transient Path location;

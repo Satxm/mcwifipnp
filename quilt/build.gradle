@@ -12,7 +12,16 @@ dependencies {
         officialMojangMappings()
     }
     modImplementation "org.quiltmc:quilt-loader:${project.quilt_loader_version}"
-    modImplementation "org.quiltmc:qsl:${qsl_version}+${minecraft_version}"
+    modImplementation "org.quiltmc:qsl:${project.qsl_version}"
+    modImplementation "com.google.code.findbugs:jsr305:3.0.2"
+}
+
+loom {
+    mods {
+        "mcwifipnp" {
+            sourceSet sourceSets.main
+        }
+    }
 }
 
 sourceSets {

@@ -4,7 +4,6 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.PauseScreen;
 import net.minecraft.client.gui.screens.Screen;
-import net.minecraft.client.server.IntegratedServer;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.commands.BanIpCommands;
 import net.minecraft.server.commands.BanListCommands;
@@ -12,7 +11,6 @@ import net.minecraft.server.commands.BanPlayerCommands;
 import net.minecraft.server.commands.DeOpCommands;
 import net.minecraft.server.commands.OpCommand;
 import net.minecraft.server.commands.WhitelistCommand;
-import net.minecraft.server.players.PlayerList;
 import net.minecraftforge.client.event.ScreenEvent;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.server.ServerStartingEvent;
@@ -58,16 +56,12 @@ public class MCWiFiPnP {
         BanIpCommands.register(event.getServer().getCommands().getDispatcher());
         BanListCommands.register(event.getServer().getCommands().getDispatcher());
         BanPlayerCommands.register(event.getServer().getCommands().getDispatcher());
+    	OfflinePlayerCommand.register(event.getServer().getCommands().getDispatcher());
     }
 
     @SubscribeEvent
     public void onServerStopping(ServerStoppingEvent event) {
         MCWiFiPnPUnit.CloseUPnPPort(event.getServer());
-    }
-
-    public static void setMaxPlayers(IntegratedServer server, int num) {
-        PlayerList playerList = server.getPlayerList();
-        playerList.maxPlayers = num;
     }
 
 }
