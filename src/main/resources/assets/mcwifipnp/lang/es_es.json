@@ -34,10 +34,10 @@
   "mcwifipnp.upnp.failed.disabled": "No se pudo reenviar el puerto %s: UPnP no estaba habilitado en tu enrutador. Puede que necesites usar software de asignación de puertos.",
   "mcwifipnp.upnp.failed.unknownerror": "No se pudo reenviar el puerto %s: Error desconocido al agregar la asignación de puertos. Usa un software de asignación de puertos.",
   "mcwifipnp.upnp.failed": "No se pudo reenviar el puerto %s.",
-  "mcwifipnp.commands.offlineplayers.add.failed": "El jugador ya estaba en la lista fuera de línea",
-  "mcwifipnp.commands.offlineplayers.add.success": "Se ha añadido a %s a la lista fuera de línea",
-  "mcwifipnp.commands.offlineplayers.list": "Hay %s jugador(es) en la lista fuera de línea: %s",
-  "mcwifipnp.commands.offlineplayers.none": "No hay jugadores en la lista fuera de línea",
-  "mcwifipnp.commands.offlineplayers.remove.failed": "El jugador no estaba en la lista fuera de línea",
-  "mcwifipnp.commands.offlineplayers.remove.success": "Se ha eliminado a %s de la lista fuera de línea"
+  "mcwifipnp.commands.forceoffline.add.failed": "El jugador ya estaba en la lista fuera de línea",
+  "mcwifipnp.commands.forceoffline.add.success": "Se ha añadido a %s a la lista fuera de línea",
+  "mcwifipnp.commands.forceoffline.list": "Hay %s jugador(es) en la lista fuera de línea: %s",
+  "mcwifipnp.commands.forceoffline.none": "No hay jugadores en la lista fuera de línea",
+  "mcwifipnp.commands.forceoffline.remove.failed": "El jugador no estaba en la lista fuera de línea",
+  "mcwifipnp.commands.forceoffline.remove.success": "Se ha eliminado a %s de la lista fuera de línea"
 }

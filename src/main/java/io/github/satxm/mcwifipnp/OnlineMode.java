@@ -41,5 +41,4 @@ public enum OnlineMode {
     return this.fixuuid;
   }
 
-
 }

@@ -140,7 +140,6 @@ class Gateway {
     return iface.getHostAddress();
   }
 
-
   public String getExternalIP() {
     try {
       Map<String, String> r = command("GetExternalIPAddress", null);

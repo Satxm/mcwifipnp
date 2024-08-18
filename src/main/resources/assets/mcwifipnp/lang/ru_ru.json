@@ -34,10 +34,10 @@
   "mcwifipnp.upnp.failed.disabled": "Не удаётся переадресовать порт %s: UPnP на вашем маршрутизаторе не включен. Возможно, вам потребуется использовать программное обеспечение для сопоставления портов.",
   "mcwifipnp.upnp.failed.unknownerror": "Не удаётся переадресовать порт %s: неизвестная ошибка при добавлении сопоставления портов. Пожалуйста, используйте программное обеспечение для сопоставления портов.",
   "mcwifipnp.upnp.failed": "Не удаётся переадресовать порт %s!",
-  "mcwifipnp.commands.offlineplayers.add.failed": "Игрок уже находится в принудительном автономном списке",
-  "mcwifipnp.commands.offlineplayers.add.success": "%s добавлен в принудительный автономный список",
-  "mcwifipnp.commands.offlineplayers.list": "В принудительном автономном списке есть %s игроков: %s",
-  "mcwifipnp.commands.offlineplayers.none": "В принудительном автономном списке нет игроков",
-  "mcwifipnp.commands.offlineplayers.remove.failed": "Игрок не находится в принудительном автономном списке",
-  "mcwifipnp.commands.offlineplayers.remove.success": "%s удалён из принудительного автономного списка"
+  "mcwifipnp.commands.forceoffline.add.failed": "Игрок уже находится в принудительном автономном списке",
+  "mcwifipnp.commands.forceoffline.add.success": "%s добавлен в принудительный автономный список",
+  "mcwifipnp.commands.forceoffline.list": "В принудительном автономном списке есть %s игроков: %s",
+  "mcwifipnp.commands.forceoffline.none": "В принудительном автономном списке нет игроков",
+  "mcwifipnp.commands.forceoffline.remove.failed": "Игрок не находится в принудительном автономном списке",
+  "mcwifipnp.commands.forceoffline.remove.success": "%s удалён из принудительного автономного списка"
 }

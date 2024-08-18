@@ -34,10 +34,10 @@
   "mcwifipnp.upnp.failed.disabled": "無法連接埠轉送 %s：路由器上未啟用 UPnP，你可能需要連接埠轉送軟體。",
   "mcwifipnp.upnp.failed.unknownerror": "無法連接埠轉送 %s：增加連接埠轉送時出現未知錯誤,請使用連接埠轉送軟體。",
   "mcwifipnp.upnp.failed": "無法連接埠轉送 %s！請使用連接埠轉送軟體。",
-  "mcwifipnp.commands.offlineplayers.add.failed": "玩家已在強制離線模式清單內",
-  "mcwifipnp.commands.offlineplayers.add.success": "已將 %s 加入強制離線模式清單",
-  "mcwifipnp.commands.offlineplayers.list": "強制離線模式清單中共有%s名玩家：%s",
-  "mcwifipnp.commands.offlineplayers.none": "強制離線模式清單中沒有玩家",
-  "mcwifipnp.commands.offlineplayers.remove.failed": "玩家不在強制離線模式清單內",
-  "mcwifipnp.commands.offlineplayers.remove.success": "已將 %s 移出強制離線模式清單"
+  "mcwifipnp.commands.forceoffline.add.failed": "玩家已在強制離線模式清單內",
+  "mcwifipnp.commands.forceoffline.add.success": "已將 %s 加入強制離線模式清單",
+  "mcwifipnp.commands.forceoffline.list": "強制離線模式清單中共有%s名玩家：%s",
+  "mcwifipnp.commands.forceoffline.none": "強制離線模式清單中沒有玩家",
+  "mcwifipnp.commands.forceoffline.remove.failed": "玩家不在強制離線模式清單內",
+  "mcwifipnp.commands.forceoffline.remove.success": "已將 %s 移出強制離線模式清單"
 }

@@ -16,18 +16,17 @@ import com.google.gson.JsonParser;
 import com.google.gson.JsonSyntaxException;
 
 public class UUIDFixer {
-  public static boolean EnableUUIDFix = false;
-  public static List<String> alwaysOfflinePlayers = Collections.emptyList();
-
+  public static boolean EnableUUIDFixer = false;
+  public static List<String> ForceOfflinePlayers = Collections.emptyList();
 
   /**
    *  Mixin/ Coremod callback
    */
   public static UUID hookEntry(String playerName) {
-    if (alwaysOfflinePlayers.contains(playerName))
+    if (ForceOfflinePlayers.contains(playerName))
       return null;
 
-    if (EnableUUIDFix)
+    if (EnableUUIDFixer)
       return getOfficialUUID(playerName);
 
     return null;
