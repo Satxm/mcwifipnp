@@ -28,7 +28,7 @@ dependencies {
   }
   modImplementation "org.quiltmc:quilt-loader:${project.quilt_loader_version}"
   modImplementation "org.quiltmc:qsl:${project.qsl_version}"
-  modImplementation "org.quiltmc.quilted-fabric-api:quilted-fabric-api:${qfapi_version}"
+  modImplementation "org.quiltmc.quilted-fabric-api:quilted-fabric-api:${project.qfapi_version}"
   modImplementation "com.google.code.findbugs:jsr305:3.0.2"
 }
 
@@ -46,11 +46,11 @@ sourceSets {
 
 tasks.withType(ProcessResources).configureEach {
   var replaceProperties = [
-      minecraft_version_range : project.quilt_minecraft_version_range,
-      quilt_qsl_version_range : project.quilt_qsl_version_range,
-      quilt_loader_version_range : project.quilt_loader_version_range,
-      version: project.mod_version,
-      pack_format_number: project.pack_format_number,
+    minecraft_version_range : project.quilt_minecraft_version_range,
+    quilt_qsl_version_range : project.quilt_qsl_version_range,
+    quilt_loader_version_range : project.quilt_loader_version_range,
+    version: project.mod_version,
+    pack_format_number: project.pack_format_number,
   ]
   inputs.properties replaceProperties
   filesMatching(['quilt.mod.json', 'pack.mcmeta']) {

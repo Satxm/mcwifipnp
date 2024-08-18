@@ -68,8 +68,8 @@ public class MCWiFiPnPUnit {
     playerList.setUsingWhiteList(cfg.Whitelist);
     playerList.getOps().add(new ServerOpListEntry(server.getSingleplayerProfile(), 4, playerList.canBypassPlayerLimit(server.getSingleplayerProfile())));
     playerList.setAllowCommandsForAllPlayers(cfg.AllPlayersCheats);
-    UUIDFixer.EnableUUIDFix = cfg.EnableUUIDFix;
-    UUIDFixer.alwaysOfflinePlayers = cfg.alwaysOfflinePlayers;
+    UUIDFixer.EnableUUIDFixer = cfg.EnableUUIDFixer;
+    UUIDFixer.ForceOfflinePlayers = cfg.ForceOfflinePlayers;
 
     new Thread(() -> {
       MCWiFiPnPUnit.UseUPnP(cfg, client);
@@ -192,8 +192,8 @@ public class MCWiFiPnPUnit {
     public boolean UseUPnP = true;
     public boolean AllowCommands = false;
     public boolean OnlineMode = true;
-    public boolean EnableUUIDFix = false;
-    public List<String> alwaysOfflinePlayers = Collections.emptyList();
+    public boolean EnableUUIDFixer = false;
+    public List<String> ForceOfflinePlayers = Collections.emptyList();
     public boolean PvP = true;
     public boolean CopyToClipboard = true;
     public transient Path location;
