@@ -46,7 +46,6 @@ public class GetIP {
         return ipv6;
     }
 
-
     public static ArrayList<String> IPv4AddressList() {
         ArrayList<String> ret = new ArrayList<String>();
         try {

@@ -110,7 +110,6 @@ public class MCWiFiPnP implements ModInitializer {
                 }
             }
 
-
             if (cfg.CopyToClipboard) {
                 ArrayList<Text> IPComponentList = new ArrayList<Text>();
                 Boolean NoneIPv4 = false;
