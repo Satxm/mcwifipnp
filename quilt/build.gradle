@@ -10,7 +10,7 @@ version = project.mod_version + "-" + project.minecraft_version + "-quilt"
 group = project.mod_group_id
 
 base {
-  archivesBaseName = project.mod_id
+  archivesName = project.mod_id
 }
 
 loom {
@@ -29,6 +29,7 @@ dependencies {
   modImplementation "org.quiltmc:quilt-loader:${project.quilt_loader_version}"
   modImplementation "org.quiltmc:qsl:${project.qsl_version}"
   modImplementation "org.quiltmc.quilted-fabric-api:quilted-fabric-api:${project.qfapi_version}"
+  modImplementation "com.google.code.findbugs:jsr305:3.0.2"
 }
 
 sourceSets {

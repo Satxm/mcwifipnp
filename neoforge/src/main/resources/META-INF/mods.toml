@@ -13,6 +13,9 @@ logoFile="mcwifipnp.png"
 authors="Satxm"
 description="A Minecraft LAN World Tool With WLAN UPnP."
 
+[[mixins]]
+config="mcwifipnp.mixins.json"
+
 [[dependencies.mcwifipnp]]
   modId="neoforge"
   mandatory=true

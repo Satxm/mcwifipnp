@@ -11,7 +11,6 @@ import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.PauseScreen;
 import net.minecraft.client.gui.screens.Screen;
-import net.minecraft.client.server.IntegratedServer;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.commands.BanIpCommands;
@@ -20,8 +19,6 @@ import net.minecraft.server.commands.BanPlayerCommands;
 import net.minecraft.server.commands.DeOpCommands;
 import net.minecraft.server.commands.OpCommand;
 import net.minecraft.server.commands.WhitelistCommand;
-import net.minecraft.server.players.PlayerList;
-import io.github.satxm.mcwifipnp.mixin.PlayerListAccessor;
 
 public class MCWiFiPnP implements ModInitializer {
   public static final String MODID = "mcwifipnp";
@@ -63,11 +60,6 @@ public class MCWiFiPnP implements ModInitializer {
 
   private void onServerStop(MinecraftServer server) {
     MCWiFiPnPUnit.CloseUPnPPort(server);
-  }
-
-  public static void setMaxPlayers(IntegratedServer server, int num) {
-    PlayerList playerList = server.getPlayerList();
-    ((PlayerListAccessor) playerList).setMaxPlayers(num);
   }
 
 }

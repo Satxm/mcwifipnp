@@ -1,12 +1,14 @@
 modLoader="javafml"
 loaderVersion="${forge_loader_version_range}"
 license="Apache License 2.0"
-issueTrackerURL="https://github.com/Satxm/mcwifipnp/issues"
+issueTrackerURL="https://github.com/satxm/mcwifipnp/issues"
+clientSideOnly=true
 
 [[mods]]
 modId="mcwifipnp"
 version="${mod_version}"
 displayName="LAN World Plug-n-Play"
+#updateJSONURL=""
 displayURL="https://github.com/satxm/mcwifipnp"
 logoFile="mcwifipnp.png"
 authors="Satxm"

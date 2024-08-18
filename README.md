@@ -12,7 +12,7 @@
 [3]: https://img.shields.io/curseforge/dt/450250?label=CurseForge%0aDownloads&logo=curseforge&style=flat&color=E36639&labelcolor=2D2D2D
 [4]: https://www.curseforge.com/minecraft/mc-mods/mcwifipnp
 
-[5]: https://img.shields.io/badge/Available%20for-%201.15%20to%201.20-47376F?logo=files&color=377BCB&labelcolor=2D2D2D
+[5]: https://img.shields.io/badge/Available%20for-%201.15%20to%201.21-47376F?logo=files&color=377BCB&labelcolor=2D2D2D
 [6]: https://modrinth.com/mod/mcwifipnp/versions
 
 [7]: https://img.shields.io/github/license/Satxm/mcwifipnp?label=License&logo=github&style=flat&color=E51050&labelcolor=2D2D2D
@@ -62,6 +62,8 @@ Modified from [TheGlitch76/mcpnp](https://github.com/TheGlitch76/mcpnp) project 
 </div>
 
 ## What Can It Do - 它的作用
+
+添加了 UUID 修复模块，对于离线玩家，可以使离线玩家从mojang服务器获取对应的UUID，使UUID固定，不会因为客户端变化而变化。
 
 Allows you to change the port number of the LAN world and choose whether to map this port to the public network using UPnP (if your router supports UPnP).
 

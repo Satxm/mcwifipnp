@@ -1,7 +1,8 @@
 plugins {
   id 'eclipse'
   id 'idea'
-  id 'net.minecraftforge.gradle' version '[6.0.16,6.2)'
+  id 'net.minecraftforge.gradle' version '[6.0.24,6.2)'
+  id 'org.spongepowered.mixin' version '0.7.+'
 }
 
 java.toolchain.languageVersion = JavaLanguageVersion.of(17)
@@ -19,8 +20,6 @@ minecraft {
   
   mappings channel: 'official', version: project.minecraft_version
 
-  accessTransformer = file('src/main/resources/META-INF/accesstransformer.cfg')
-  
   copyIdeResources = true
   
   runs {
@@ -50,6 +49,8 @@ minecraft {
 
 dependencies {
   minecraft "net.minecraftforge:forge:${project.minecraft_version}-${project.forge_version}"
+  annotationProcessor "org.spongepowered:mixin:0.8.5:processor"
+  implementation "com.google.code.findbugs:jsr305:3.0.2"
 }
 
 sourceSets {
@@ -62,6 +63,15 @@ sourceSets {
       srcDir "src/generated/resources"
     }
   }
+}
+
+mixin {
+  // MixinGradle Settings
+  add sourceSets.main, 'mcwifipnp.refmap.json'
+  config 'mcwifipnp.mixins.json'
+
+  debug.verbose = true
+  debug.export = true
 }
 
 tasks.named('processResources', ProcessResources).configure {
