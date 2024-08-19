@@ -58,9 +58,9 @@ Modified from [TheGlitch76/mcpnp](https://github.com/TheGlitch76/mcpnp) project 
 
 ## What Can It Do - 它的作用
 
-Allows you to change the port number of the LAN world and choose whether to map this port to the public network using UPnP (if your router supports UPnP).
+Allows you to change and lock the port number of the LAN world and you can choose whether to map this port to the public network using UPnP (if your router supports UPnP).
 
-允许你修改局域网世界的端口号，并选择是否映射这个端口使用UPnP映射到公网（如果你的路由器支持UPnP）。
+允许你修改并锁定局域网世界的端口号，并选择是否映射这个端口使用UPnP映射到公网（如果你的路由器支持UPnP）。
 
 Automatically select game mode according to your game, allows you to enable or disable pvp.
 
@@ -70,22 +70,10 @@ Allows you to change server motd (Which is the message that is displayed in the 
 
 允许你自定义MOTD（是玩家客户端的多人游戏服务器列表中显示的服务器信息，显示于名称下方）。
 
-Allows you control other players' op permissions when they join your world, and you can use ```/op``` ```/deop``` commands to do that.
-
-你可以控制其他玩家加入时是否有op权限、是否可以作弊，你也可以使用```/op``` ```/deop```命令进行控制。
-
-You can control haw many players can join your world. You can use whitelist (command `/whitelist`) to block other players join your world.
-
-你可以决定有多少玩家可以加入你的世界，你可以使用白名单（命令 `/whitelist`）来组建其他玩家进加入你的游戏世界。
-
-Allows players to connect your world from anywhere, this includes toggling online mode.
-
-允需其他玩家从任何地方连接你的世界，并且你可以选择是否启用正版验证。
-
 Your settings will be recorded in a file, and it will be automatically loaded next time.
 
-可以自动保存配置文件，并且下次加载世界时会自动载入配置。
+本模组可以自动保存配置文件，并且下次加载世界时会自动载入配置。
 
-You can choose whether to copy the IP address (such as local IPv4, globe IPv4 IPv6) to the clipboard.
+This mod can get your IP address, and you can choose whether to copy the IP address (such as local IPv4, globe IPv4 or IPv6) to the clipboard. in order to provide the IP address to your friends.
 
-可以获取你本机的IP地址（本地IPv4，公网IPv4、IPv6[1.4.8+]），方便联机使用，你可以选择是否复制IP到剪切板。
+本模组可以获取你的IP地址（比如本地 IPv4，公网 IPv4 或 IPv6），而且你可以选择是否复制IP到剪切板，以方便联机使用。
