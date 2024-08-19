@@ -13,6 +13,8 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.server.commands.BanIpCommands;
 import net.minecraft.server.commands.BanListCommands;
 import net.minecraft.server.commands.BanPlayerCommands;
+import net.minecraft.server.commands.PardonCommand;
+import net.minecraft.server.commands.PardonIpCommand;
 import net.minecraft.server.commands.DeOpCommands;
 import net.minecraft.server.commands.OpCommand;
 import net.minecraft.server.commands.WhitelistCommand;
@@ -50,6 +52,8 @@ public class MCWiFiPnP {
     BanIpCommands.register(event.getDispatcher());
     BanListCommands.register(event.getDispatcher());
     BanPlayerCommands.register(event.getDispatcher());
+    PardonCommand.register(event.getDispatcher());
+    PardonIpCommand.register(event.getDispatcher());
     ForceOfflineCommand.register(event.getDispatcher());
   }
 
@@ -63,7 +67,9 @@ public class MCWiFiPnP {
     if (screen instanceof PauseScreen pauseScreen && screen.getClass() == PauseScreen.class) {
       if (ObfuscationReflectionHelper.<Boolean, PauseScreen>getPrivateValue(PauseScreen.class, (PauseScreen) screen, "f_96306_")) {
         findButton(children, "menu.shareToLan").ifPresent(button -> {
-          Button newButton = Button.builder(Component.translatable("menu.shareToLan"), $ -> {minecraft.setScreen(new ShareToLanScreenNew(screen));}).bounds(button.getX(), button.getY(), button.getWidth(), button.getHeight()).build();
+          Button newButton = Button.builder(Component.translatable("menu.shareToLan"), $ -> {
+            minecraft.setScreen(new ShareToLanScreenNew(screen));
+          }).bounds(button.getX(), button.getY(), button.getWidth(), button.getHeight()).build();
           newButton.active = button.active;
           remove.accept(button);
           add.accept(newButton);

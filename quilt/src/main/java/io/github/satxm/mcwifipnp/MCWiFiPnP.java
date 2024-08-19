@@ -16,6 +16,8 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.commands.BanIpCommands;
 import net.minecraft.server.commands.BanListCommands;
 import net.minecraft.server.commands.BanPlayerCommands;
+import net.minecraft.server.commands.PardonCommand;
+import net.minecraft.server.commands.PardonIpCommand;
 import net.minecraft.server.commands.DeOpCommands;
 import net.minecraft.server.commands.OpCommand;
 import net.minecraft.server.commands.WhitelistCommand;
@@ -36,15 +38,19 @@ public class MCWiFiPnP implements ModInitializer {
       BanIpCommands.register(dispatcher);
       BanListCommands.register(dispatcher);
       BanPlayerCommands.register(dispatcher);
+      PardonCommand.register(dispatcher);
+      PardonIpCommand.register(dispatcher);
       ForceOfflineCommand.register(dispatcher);
     });
   }
 
   public static void afterScreenInit(Screen screen, Minecraft client, boolean i) {
     if (screen instanceof PauseScreen) {
-      for (AbstractWidget button :screen.getButtons()) {
+      for (AbstractWidget button : screen.getButtons()) {
         if (button.getMessage().equals(Component.translatable("menu.shareToLan"))) {
-          Button newButton = Button.builder(Component.translatable("menu.shareToLan"), $ -> client.setScreen(new ShareToLanScreenNew(screen))).bounds(button.getX(), button.getY(), button.getWidth(), button.getHeight()).build();
+          Button newButton = Button.builder(Component.translatable("menu.shareToLan"),
+                  $ -> client.setScreen(new ShareToLanScreenNew(screen)))
+              .bounds(button.getX(), button.getY(), button.getWidth(), button.getHeight()).build();
           newButton.active = button.active;
           screen.getButtons().remove(button);
           screen.getButtons().add(newButton);

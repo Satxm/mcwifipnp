@@ -21,11 +21,12 @@ minecraft {
       workingDirectory project.file('run')
       property 'forge.logging.markers', 'REGISTRIES'
       property 'forge.logging.console.level', 'debug'
+      arg '-torg.spongepowered.asm.launch.MixinTweaker'
 
       mods {
         mcwifipnp {
           source sourceSets.main
-        }
+      }
       }
     }
   }
@@ -33,6 +34,7 @@ minecraft {
 
 dependencies {
   minecraft "net.minecraftforge:forge:${project.minecraft_version}-${project.forge_version}"
+  annotationProcessor "org.spongepowered:mixin:0.8.5:processor"
 }
 
 afterEvaluate {
@@ -54,7 +56,7 @@ sourceSets {
 
 mixin {
   // MixinGradle Settings
-  add sourceSets.main, 'mcwifipnp.refmap.json'
+  add sourceSets.main, 'mcwifipnp-refmap.json'
   config 'mcwifipnp.mixins.json'
 
   debug.verbose = true
@@ -64,13 +66,14 @@ mixin {
 jar {
   manifest {
     attributes([
-        "Specification-Title": "LAN World Plug-n-Play",
-        "Specification-Vendor": "Satxm",
-        "Specification-Version": "1",
-        "Implementation-Title": project.name,
-        "Implementation-Version": "${version}",
-        "Implementation-Vendor": "Satxm",
-        "Implementation-Timestamp": new Date().format("yyyy-MM-dd'T'HH:mm:ssZ"),
+      "Specification-Title": "LAN World Plug-n-Play",
+      "Specification-Vendor": "Satxm",
+      "Specification-Version": "1",
+      "Implementation-Title": project.name,
+      "Implementation-Version": "${version}",
+      "Implementation-Vendor": "Satxm",
+      "Implementation-Timestamp": new Date().format("yyyy-MM-dd'T'HH:mm:ssZ"),
+      "MixinConfigs": "mcwifipnp.mixins.json"
     ])
   }
   from("../LICENSE") {
