@@ -23,6 +23,7 @@ minecraft {
       workingDirectory project.file('run')
       property 'forge.logging.markers', 'REGISTRIES'
       property 'forge.logging.console.level', 'debug'
+      arg '-torg.spongepowered.asm.launch.MixinTweaker'
 
       mods {
         mcwifipnp {
@@ -35,7 +36,7 @@ minecraft {
 
 dependencies {
   minecraft "net.minecraftforge:forge:${project.minecraft_version}-${project.forge_version}"
-  annotationProcessor 'org.spongepowered:mixin:0.8.5:processor'
+  annotationProcessor "org.spongepowered:mixin:0.8.5:processor"
 }
 
 afterEvaluate {
