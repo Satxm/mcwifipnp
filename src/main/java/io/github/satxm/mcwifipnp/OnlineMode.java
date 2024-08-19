@@ -3,9 +3,9 @@ package io.github.satxm.mcwifipnp;
 import net.minecraft.network.chat.Component;
 
 public enum OnlineMode {
-  ONLINE(true, false,"online"),
-  OFFLINE(false, false,"offline"),
-  FIXUUID(false, true,"fixuuid");
+  ONLINE(true, false, "online"),
+  OFFLINE(false, false, "offline"),
+  FIXUUID(false, true, "fixuuid");
 
   private final boolean onlinemode, fixuuid;
   private final Component displayName, toolTip;
@@ -14,7 +14,7 @@ public enum OnlineMode {
     this.onlinemode = onlinemode;
     this.fixuuid = fixuuid;
     this.displayName = Component.translatable("mcwifipnp.gui.OnlineMode." + string);
-    this.toolTip = Component.translatable("mcwifipnp.gui.OnlineMode." + string +".info");
+    this.toolTip = Component.translatable("mcwifipnp.gui.OnlineMode." + string + ".info");
   }
 
   public Component getDisplayName() {

@@ -20,7 +20,7 @@ public class UUIDFixer {
   public static List<String> ForceOfflinePlayers = Collections.emptyList();
 
   /**
-   *  Mixin/ Coremod callback
+   * Mixin/ Coremod callback
    */
   public static UUID hookEntry(String playerName) {
     if (ForceOfflinePlayers.contains(playerName))

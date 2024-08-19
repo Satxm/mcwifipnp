@@ -49,7 +49,7 @@ public class MCWiFiPnPUnit {
   public static Config getConfig(MinecraftServer server) {
     return Objects.requireNonNull(configMap.get(server), "no config for server???");
   }
-  
+
   public static void OpenToLan() {
     Minecraft client = Minecraft.getInstance();
     IntegratedServer server = client.getSingleplayerServer();
@@ -66,7 +66,8 @@ public class MCWiFiPnPUnit {
     server.setPvpAllowed(cfg.PvP);
     server.setEnforceWhitelist(cfg.Whitelist);
     playerList.setUsingWhiteList(cfg.Whitelist);
-    playerList.getOps().add(new ServerOpListEntry(server.getSingleplayerProfile(), 4, playerList.canBypassPlayerLimit(server.getSingleplayerProfile())));
+    playerList.getOps().add(new ServerOpListEntry(server.getSingleplayerProfile(), 4,
+        playerList.canBypassPlayerLimit(server.getSingleplayerProfile())));
     playerList.setAllowCheatsForAllPlayers(cfg.AllPlayersCheats);
     UUIDFixer.EnableUUIDFixer = cfg.EnableUUIDFixer;
     UUIDFixer.ForceOfflinePlayers = cfg.ForceOfflinePlayers;
@@ -148,7 +149,7 @@ public class MCWiFiPnPUnit {
     Path location = server.getWorldPath(LevelResource.ROOT).resolve("mcwifipnp.json");
     MCWiFiPnPUnit.Config cfg;
     try {
-      cfg = gson.fromJson(new String(Files.readAllBytes(location),"utf-8"), MCWiFiPnPUnit.Config.class);
+      cfg = gson.fromJson(new String(Files.readAllBytes(location), "utf-8"), MCWiFiPnPUnit.Config.class);
       cfg.location = location;
     } catch (IOException | JsonParseException e) {
       try {

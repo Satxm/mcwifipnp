@@ -165,13 +165,14 @@ public class ShareToLanScreenNew extends Screen {
         })).setTooltip(Tooltip.create(Component.translatable("mcwifipnp.gui.Whitelist.info")));
 
     this.addRenderableWidget(CycleButton.builder(OnlineMode::getDisplayName)
-    .withValues(OnlineMode.values())
-    .withInitialValue(OnlineMode.of(cfg.OnlineMode, cfg.EnableUUIDFixer)).withTooltip((OnlineMode) -> Tooltip.create(OnlineMode.gettoolTip()))
-    .create(this.width / 2 - 155, 148, 150, 20,
-        Component.translatable("mcwifipnp.gui.OnlineMode"), (cycleButton, OnlineMode) -> {
-            cfg.OnlineMode = OnlineMode.getOnlieMode();
-            cfg.EnableUUIDFixer = OnlineMode.getFixUUID();
-        }));
+        .withValues(OnlineMode.values())
+        .withInitialValue(OnlineMode.of(cfg.OnlineMode, cfg.EnableUUIDFixer))
+        .withTooltip((OnlineMode) -> Tooltip.create(OnlineMode.gettoolTip()))
+        .create(this.width / 2 - 155, 148, 150, 20,
+            Component.translatable("mcwifipnp.gui.OnlineMode"), (cycleButton, OnlineMode) -> {
+              cfg.OnlineMode = OnlineMode.getOnlieMode();
+              cfg.EnableUUIDFixer = OnlineMode.getFixUUID();
+            }));
 
     this.addRenderableWidget(CycleButton.onOffBuilder(cfg.PvP).create(this.width / 2 + 5, 148, 150, 20,
         Component.translatable("mcwifipnp.gui.PvP"), (cycleButton, PvP) -> {

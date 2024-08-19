@@ -30,6 +30,6 @@
     "java": ">=17"
   },
   "breaks": {
-    "minecraft":">1.20.1"
+    "minecraft": ">1.20.1"
   }
 }

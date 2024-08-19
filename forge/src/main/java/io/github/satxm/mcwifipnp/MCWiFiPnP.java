@@ -13,6 +13,8 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.server.commands.BanIpCommands;
 import net.minecraft.server.commands.BanListCommands;
 import net.minecraft.server.commands.BanPlayerCommands;
+import net.minecraft.server.commands.PardonCommand;
+import net.minecraft.server.commands.PardonIpCommand;
 import net.minecraft.server.commands.DeOpCommands;
 import net.minecraft.server.commands.OpCommand;
 import net.minecraft.server.commands.WhitelistCommand;
@@ -27,58 +29,63 @@ import net.minecraftforge.fml.util.ObfuscationReflectionHelper;
 
 @Mod(MCWiFiPnP.MODID)
 public class MCWiFiPnP {
-    public static final String MODID = "mcwifipnp";
+  public static final String MODID = "mcwifipnp";
 
-    public MCWiFiPnP() {
-        MinecraftForge.EVENT_BUS.register(this);
-        MinecraftForge.EVENT_BUS.addListener(this::onRegisterCommands);
-        MinecraftForge.EVENT_BUS.addListener((final ScreenEvent.Init.Post evt) -> {
-            onAfterInitScreen(evt.getScreen().getMinecraft(), evt.getScreen(), evt.getListenersList(), evt::addListener, evt::removeListener);
+  public MCWiFiPnP() {
+    MinecraftForge.EVENT_BUS.register(this);
+    MinecraftForge.EVENT_BUS.addListener(this::onRegisterCommands);
+    MinecraftForge.EVENT_BUS.addListener((final ScreenEvent.Init.Post evt) -> {
+      onAfterInitScreen(evt.getScreen().getMinecraft(), evt.getScreen(), evt.getListenersList(), evt::addListener, evt::removeListener);
+    });
+  }
+
+  @SubscribeEvent
+  public void onServerStarting(ServerStartingEvent event) {
+    MCWiFiPnPUnit.ReadingConfig(event.getServer());
+  }
+
+  @SubscribeEvent
+  public void onRegisterCommands(RegisterCommandsEvent event) {
+    DeOpCommands.register(event.getDispatcher());
+    OpCommand.register(event.getDispatcher());
+    WhitelistCommand.register(event.getDispatcher());
+    BanIpCommands.register(event.getDispatcher());
+    BanListCommands.register(event.getDispatcher());
+    BanPlayerCommands.register(event.getDispatcher());
+    PardonCommand.register(event.getDispatcher());
+    PardonIpCommand.register(event.getDispatcher());
+    ForceOfflineCommand.register(event.getDispatcher());
+  }
+
+  @SubscribeEvent
+  public void onServerStopping(ServerStoppingEvent event) {
+    MCWiFiPnPUnit.CloseUPnPPort(event.getServer());
+  }
+
+  public static void onAfterInitScreen(Minecraft minecraft, Screen screen, List<GuiEventListener> children,
+      Consumer<GuiEventListener> add, Consumer<GuiEventListener> remove) {
+    if (screen instanceof PauseScreen && screen.getClass() == PauseScreen.class) {
+      if (ObfuscationReflectionHelper.<Boolean, PauseScreen>getPrivateValue(PauseScreen.class, (PauseScreen) screen, "f_96306_")) {
+        findButton(children, "menu.shareToLan").ifPresent(button -> {
+          Button newButton = Button.builder(Component.translatable("menu.shareToLan"), $ -> {
+            minecraft.setScreen(new ShareToLanScreenNew(screen));
+          }).bounds(button.getX(), button.getY(), button.getWidth(), button.getHeight()).build();
+          newButton.active = button.active;
+          remove.accept(button);
+          add.accept(newButton);
         });
+      }
     }
+  }
 
-    @SubscribeEvent
-    public void onServerStarting(ServerStartingEvent event) {
-        MCWiFiPnPUnit.ReadingConfig(event.getServer());
+  private static Optional<Button> findButton(List<GuiEventListener> widgets, String s) {
+    for (GuiEventListener widget : widgets) {
+      if (widget instanceof Button button) {
+        if (button.getMessage().equals(Component.translatable("menu.shareToLan")))
+          return Optional.of(button);
+      }
     }
-
-    @SubscribeEvent
-    public void onRegisterCommands(RegisterCommandsEvent event) {
-        DeOpCommands.register(event.getDispatcher());
-        OpCommand.register(event.getDispatcher());
-        WhitelistCommand.register(event.getDispatcher());
-        BanIpCommands.register(event.getDispatcher());
-        BanListCommands.register(event.getDispatcher());
-        BanPlayerCommands.register(event.getDispatcher());
-    }
-
-    @SubscribeEvent
-    public void onServerStopping(ServerStoppingEvent event) {
-        MCWiFiPnPUnit.CloseUPnPPort(event.getServer());
-    }
-
-    public static void onAfterInitScreen(Minecraft minecraft, Screen screen, List<GuiEventListener> children,
-            Consumer<GuiEventListener> add, Consumer<GuiEventListener> remove) {
-        if (screen instanceof PauseScreen pauseScreen && screen.getClass() == PauseScreen.class) {
-            if (ObfuscationReflectionHelper.<Boolean, PauseScreen>getPrivateValue(PauseScreen.class, (PauseScreen) screen, "f_96306_")) {
-                findButton(children, "menu.shareToLan").ifPresent(button -> {
-                    Button newButton = Button.builder(Component.translatable("menu.shareToLan"), $ -> {minecraft.setScreen(new ShareToLanScreenNew(screen));}).bounds(button.getX(), button.getY(), button.getWidth(), button.getHeight()).build();
-                    newButton.active = button.active;
-                    remove.accept(button);
-                    add.accept(newButton);
-                });
-            }
-        }
-    }
-
-    private static Optional<Button> findButton(List<GuiEventListener> widgets, String s) {
-        for (GuiEventListener widget : widgets) {
-            if (widget instanceof Button button) {
-                if (button.getMessage().equals(Component.translatable("menu.shareToLan")))
-                    return Optional.of(button);
-            }
-        }
-        return Optional.empty();
-    }
+    return Optional.empty();
+  }
 
 }
