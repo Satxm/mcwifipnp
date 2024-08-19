@@ -62,21 +62,33 @@ Modified from [TheGlitch76/mcpnp](https://github.com/TheGlitch76/mcpnp) project 
 
 ## What Can It Do - 它的作用
 
-Added UUID Fixer module, which allows offline players to obtain a unique UUID from the Mojang server, keeping the UUID fixed and not changing due to client changes.
+For the `Oline Mode` button, there are now three options: 
+ - `Enable`: enable genuine verification, which will verify login information against the Mojang server database, only allowing players who login with a Microsoft account to join, 
+ - `Disable`: not verify login information, allows offline players to join, 
+ - `Disable + UUID Fixer`: Attempt to match the Mojang server user name with the player name for offline mode players to obtain a unique UUID, Meanwhile, UUIDs are retained for users logging in with Microsoft accounts, It can also prevent the loss of backpack and inventory items.
 
-添加了 UUID 修复模块，对于离线玩家，可以使离线玩家从 Mojang 服务器获取唯一的 UUID，使 UUID 固定，不会因为客户端变化而变化。
+对于`正版验证`按钮，现在有三个选项：
+ - `启用`：启用正版验证，将会比对Mojang服务器数据库验证登录信息，即只允许使用微软帐户登录的玩家加入；
+ - `禁用`：即不验证登录信息，允许使用离线模式登录的玩家加入；
+ - `禁用 + 修复UUID`：尝试使用离线模式登录的玩家名匹配Mojang服务器用户名称以获取唯一UUID，同时为使用微软帐户登录的用户保留UUID，它也可以防止背包和物品栏内容丢失。
 
-Added a new command `/forceoffline` to control whether players are forced into offline mode without obtaining UUIDs from Mojang servers. `/forceoffline list` command can list players who in the force offline list, `/forceoffline add` command can add players to the force offline list, `/forceoffline remove` command can remove players from the force offline list.
+Added a new command `/forceoffline` to control whether players are forced into offline mode without obtaining UUIDs from Mojang servers. 
+ - `/forceoffline list` command can list players who in the force offline list, 
+ - `/forceoffline add` command can add players to the force offline list, 
+ - `/forceoffline remove` command can remove players from the force offline list.
 
-添加了一个新指令 `/forceoffline` 以便于控制玩家是否强制玩家为离线模式，不从 Mojang 服务器获取 UUID。`/forceoffline list` 指令可以查看列表中玩家，`/forceoffline add` 指令可以添加玩家到列表，`/forceoffline remove` 指令可以从列表中移除玩家。
+添加了一个新命令 `/forceoffline` 以便于控制玩家是否强制玩家为离线模式，不从 Mojang 服务器获取 UUID。
+ - `/forceoffline list` 命令可以查看列表中玩家，
+ - `/forceoffline add` 命令可以添加玩家到列表，
+ - `/forceoffline remove` 命令可以从列表中移除玩家。
 
-For the `Oline Mode` button, there are now three options: 'Enable': enable genuine verification, which will verify login information against the Mojang server database, only allowing players who login with a Microsoft account to join, `Disable`: not verify login information, allows offline players to join, `Disable + UUID Fixer`: Attempt to match the Mojang server user name with the player name for offline mode players to obtain a unique UUID, Meanwhile, UUIDs are retained for users logging in with Microsoft accounts, It can also prevent the loss of backpack and inventory items.
+Added `UUID Fixer module`, which allows offline players to obtain a unique UUID from the Mojang server, keeping the UUID fixed and not changing due to client changes.
 
-对于`正版验证`按钮，现在有三个选项：`启用`：启用正版验证，将会比对Mojang服务器数据库验证登录信息，即只允许使用微软帐户登录的玩家加入；`禁用`：即不验证登录信息，允许使用离线模式登录的玩家加入；`禁用 + 修复UUID`：尝试使用离线模式登录的玩家名匹配Mojang服务器用户名称以获取唯一UUID，同时为使用微软帐户登录的用户保留UUID，它也可以防止背包和物品栏内容丢失。
+添加了 `UUID 修复模块`，对于离线玩家，可以使离线玩家从 Mojang 服务器获取唯一的 UUID，使 UUID 固定，不会因为客户端变化而变化。
 
-Allows you to change the port number of the LAN world and choose whether to map this port to the public network using UPnP (if your router supports UPnP).
+Allows you to change and lock the port number of the LAN world and you can choose whether to map this port to the public network using UPnP (if your router supports UPnP).
 
-允许你修改局域网世界的端口号，并选择是否映射这个端口使用UPnP映射到公网（如果你的路由器支持UPnP）。
+允许你修改并锁定局域网世界的端口号，并选择是否映射这个端口使用UPnP映射到公网（如果你的路由器支持UPnP）。
 
 Automatically select game mode according to your game, allows you to enable or disable pvp.
 
@@ -86,22 +98,18 @@ Allows you to change server motd (Which is the message that is displayed in the 
 
 允许你自定义MOTD（是玩家客户端的多人游戏服务器列表中显示的服务器信息，显示于名称下方）。
 
-Allows you control other players' op permissions when they join your world, and you can use ```/op``` ```/deop``` commands to do that.
+Allows you control other players' op permissions when they join your world, and you can use `/op` and `/deop` commands to do that. You can use command `/whitelist` to build a whitelist, than use it to control players who can join your world.
 
-你可以控制其他玩家加入时是否有op权限、是否可以作弊，你也可以使用```/op``` ```/deop```命令进行控制。
+你可以控制其他玩家加入时是否有op权限、是否可以作弊，你也可以使用 `/op` `/deop` 命令进行控制。你可以使用 `/whitelist` 命令构建白名单，然后用其控制其他玩家进是否允许加入你的游戏世界。
 
-You can control haw many players can join your world. You can use whitelist (command `/whitelist`) to block other players join your world.
+You can use command `/ban` to add players to the blacklist, use command `/ban-ip` to add IP addresses to the blacklist, use command `/banlist` to list players who in the blacklist, use command `/pardon` to remove players from the blacklist, use command `/pardon-ip` to remove IP addresses from the blacklist
 
-你可以决定有多少玩家可以加入你的世界，你可以使用白名单（命令 `/whitelist`）来组建其他玩家进加入你的游戏世界。
-
-Allows players to connect your world from anywhere, this includes toggling online mode.
-
-允需其他玩家从任何地方连接你的世界，并且你可以选择是否启用正版验证。
+你可以使用 `/ban` 来封禁玩家、 使用 `/ban-ip` 来封禁 IP 地址、 `/banlist` 命令可以查看封禁的玩家列表；你可以使用 `/pardon` 来解封玩家、 使用 `/pardon-ip` 来解封 IP地址。
 
 Your settings will be recorded in a file, and it will be automatically loaded next time.
 
-可以自动保存配置文件，并且下次加载世界时会自动载入配置。
+本模组可以自动保存配置文件，并且下次加载世界时会自动载入配置。
 
-You can choose whether to copy the IP address (such as local IPv4, globe IPv4 IPv6) to the clipboard.
+This mod can get your IP address, and you can choose whether to copy the IP address (such as local IPv4, globe IPv4 or IPv6) to the clipboard. in order to provide the IP address to your friends.
 
-可以获取你本机的IP地址（本地IPv4，公网IPv4、IPv6[1.4.8+]），方便联机使用，你可以选择是否复制IP到剪切板。
+本模组可以获取你的IP地址（比如本地 IPv4，公网 IPv4 或 IPv6），而且你可以选择是否复制IP到剪切板，以方便联机使用。

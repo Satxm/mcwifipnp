@@ -13,6 +13,8 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.server.commands.BanIpCommands;
 import net.minecraft.server.commands.BanListCommands;
 import net.minecraft.server.commands.BanPlayerCommands;
+import net.minecraft.server.commands.PardonCommand;
+import net.minecraft.server.commands.PardonIpCommand;
 import net.minecraft.server.commands.DeOpCommands;
 import net.minecraft.server.commands.OpCommand;
 import net.minecraft.server.commands.WhitelistCommand;
@@ -50,6 +52,8 @@ public class MCWiFiPnP {
     BanIpCommands.register(event.getDispatcher());
     BanListCommands.register(event.getDispatcher());
     BanPlayerCommands.register(event.getDispatcher());
+    PardonCommand.register(event.getDispatcher());
+    PardonIpCommand.register(event.getDispatcher());
     ForceOfflineCommand.register(event.getDispatcher());
   }
 

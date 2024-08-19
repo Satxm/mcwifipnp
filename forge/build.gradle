@@ -28,6 +28,7 @@ minecraft {
       workingDirectory project.file('run')
       property 'forge.logging.markers', 'REGISTRIES'
       property 'forge.logging.console.level', 'debug'
+      arg '-torg.spongepowered.asm.launch.MixinTweaker'
       mods {
         "${mod_id}" {
           source sourceSets.main

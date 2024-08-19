@@ -17,6 +17,8 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.commands.BanIpCommands;
 import net.minecraft.server.commands.BanListCommands;
 import net.minecraft.server.commands.BanPlayerCommands;
+import net.minecraft.server.commands.PardonCommand;
+import net.minecraft.server.commands.PardonIpCommand;
 import net.minecraft.server.commands.DeOpCommands;
 import net.minecraft.server.commands.OpCommand;
 import net.minecraft.server.commands.WhitelistCommand;
@@ -37,6 +39,8 @@ public class MCWiFiPnP implements ModInitializer {
       BanIpCommands.register(dispatcher);
       BanListCommands.register(dispatcher);
       BanPlayerCommands.register(dispatcher);
+      PardonCommand.register(dispatcher);
+      PardonIpCommand.register(dispatcher);
       ForceOfflineCommand.register(dispatcher);
     });
   }
