@@ -51,8 +51,8 @@ public class MCWiFiPnP {
     BanIpCommands.register(event.getDispatcher());
     BanListCommands.register(event.getDispatcher());
     BanPlayerCommands.register(event.getDispatcher());
-      PardonCommand.register(event.getDispatcher());
-      PardonIpCommand.register(event.getDispatcher());
+    PardonCommand.register(event.getDispatcher());
+    PardonIpCommand.register(event.getDispatcher());
     ForceOfflineCommand.register(event.getDispatcher());
   }
 

@@ -35,7 +35,7 @@
         "versions": "${minecraft_version_range}"
       }
     ],
-    "breaks" : [
+    "breaks": [
       {
         "id": "minecraft",
         "versions": ">1.20.4"

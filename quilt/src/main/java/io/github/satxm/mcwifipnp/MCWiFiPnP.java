@@ -40,6 +40,7 @@ public class MCWiFiPnP implements ModInitializer {
       BanPlayerCommands.register(dispatcher);
       PardonCommand.register(dispatcher);
       PardonIpCommand.register(dispatcher);
+      ForceOfflineCommand.register(dispatcher);
     });
   }
 
