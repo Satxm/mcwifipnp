@@ -19,11 +19,9 @@ base {
 minecraft {
   mappings channel: 'official', version: project.minecraft_version
   reobf = false
-
   copyIdeResources = true
 
   runs {
-    
     configureEach {
       workingDirectory project.file('run')
       property 'forge.logging.markers', 'REGISTRIES'
@@ -35,13 +33,8 @@ minecraft {
         }
       }
     }
-
     client {
       property 'forge.enabledGameTestNamespaces', project.mod_id
-    }
-    data {
-      workingDirectory project.file('run-data')
-      args '--mod', project.mod_id, '--all', '--output', file('src/generated/resources/'), '--existing', file('src/main/resources/')
     }
   }
 }
@@ -50,7 +43,6 @@ dependencies {
   minecraft "net.minecraftforge:forge:${project.minecraft_version}-${project.forge_version}"
   annotationProcessor "org.spongepowered:mixin:0.8.5:processor"
   implementation('net.sf.jopt-simple:jopt-simple:5.0.4') { version { strictly '5.0.4' } }
-  implementation "com.google.code.findbugs:jsr305:3.0.2"
 }
 
 sourceSets {
@@ -67,11 +59,26 @@ sourceSets {
 
 mixin {
   // MixinGradle Settings
-  add sourceSets.main, 'mcwifipnp.refmap.json'
+  add sourceSets.main, 'mcwifipnp-refmap.json'
   config 'mcwifipnp.mixins.json'
 
   debug.verbose = true
   debug.export = true
+}
+
+tasks.named('jar', Jar).configure {
+  manifest {
+    attributes([
+        "Specification-Title": "LAN World Plug-n-Play",
+        "Specification-Vendor": "Satxm",
+        "Specification-Version": "1",
+        "Implementation-Title": project.name,
+        "Implementation-Version": "${version}",
+        "Implementation-Vendor": "Satxm",
+        "Implementation-Timestamp": new Date().format("yyyy-MM-dd'T'HH:mm:ssZ"),
+        "MixinConfigs": "mcwifipnp.mixins.json"
+    ])
+  }
 }
 
 tasks.named('processResources', ProcessResources).configure {
@@ -98,14 +105,4 @@ java.withSourcesJar()
 jar {
   from("../LICENSE") {
   }
-}
-
-eclipse {
-  synchronizationTasks 'genEclipseRuns'
-}
-
-sourceSets.each {
-  def dir = layout.buildDirectory.dir("sourcesSets/$it.name")
-  it.output.resourcesDir = dir
-  it.java.destinationDirectory = dir
 }

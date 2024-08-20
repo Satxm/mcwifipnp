@@ -39,7 +39,6 @@ minecraft {
 
 dependencies {
   implementation "net.neoforged:neoforge:${project.neo_version}"
-  implementation "com.google.code.findbugs:jsr305:3.0.2"
 }
 
 sourceSets {
