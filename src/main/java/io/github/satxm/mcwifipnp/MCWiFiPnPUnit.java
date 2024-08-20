@@ -153,7 +153,7 @@ public class MCWiFiPnPUnit {
     Path location = server.getWorldPath(LevelResource.ROOT).resolve("mcwifipnp.json");
     MCWiFiPnPUnit.Config cfg;
     try {
-      cfg = gson.fromJson(new String(Files.readAllBytes(location),"utf-8"), MCWiFiPnPUnit.Config.class);
+      cfg = gson.fromJson(new String(Files.readAllBytes(location), "utf-8"), MCWiFiPnPUnit.Config.class);
       cfg.location = location;
     } catch (IOException | JsonParseException e) {
       try {

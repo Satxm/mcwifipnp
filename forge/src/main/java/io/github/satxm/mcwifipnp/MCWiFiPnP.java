@@ -38,7 +38,8 @@ public class MCWiFiPnP {
         Button ShareToLanOld = (Button) event.getWidgetList().get(k);
         if (ShareToLanOld.getMessage().getString()
             .equals(new TranslatableComponent("menu.shareToLan").getString())) {
-          Button ShareToLanNew = new Button(ShareToLanOld.x, ShareToLanOld.y, ShareToLanOld.getWidth(), ShareToLanOld.getHeight(), new TranslatableComponent("menu.shareToLan"),
+          Button ShareToLanNew = new Button(ShareToLanOld.x, ShareToLanOld.y, ShareToLanOld.getWidth(),
+              ShareToLanOld.getHeight(), new TranslatableComponent("menu.shareToLan"),
               (button) -> client.setScreen(new ShareToLanScreenNew(screen)));
           ShareToLanNew.active = ShareToLanOld.active;
           event.removeWidget(ShareToLanOld);
@@ -57,8 +58,8 @@ public class MCWiFiPnP {
     BanIpCommands.register(event.getServer().getCommands().getDispatcher());
     BanListCommands.register(event.getServer().getCommands().getDispatcher());
     BanPlayerCommands.register(event.getServer().getCommands().getDispatcher());
-      PardonCommand.register(event.getServer().getCommands().getDispatcher());
-      PardonIpCommand.register(event.getServer().getCommands().getDispatcher());
+    PardonCommand.register(event.getServer().getCommands().getDispatcher());
+    PardonIpCommand.register(event.getServer().getCommands().getDispatcher());
     ForceOfflineCommand.register(event.getServer().getCommands().getDispatcher());
   }
 
