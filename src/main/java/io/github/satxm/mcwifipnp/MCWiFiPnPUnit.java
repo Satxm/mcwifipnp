@@ -66,7 +66,8 @@ public class MCWiFiPnPUnit {
     server.setPvpAllowed(cfg.PvP);
     server.setEnforceWhitelist(cfg.Whitelist);
     playerList.setUsingWhiteList(cfg.Whitelist);
-    playerList.getOps().add(new ServerOpListEntry(client.player.getGameProfile(), 4, playerList.canBypassPlayerLimit(client.player.getGameProfile())));
+    playerList.getOps().add(new ServerOpListEntry(client.player.getGameProfile(), 4,
+        playerList.canBypassPlayerLimit(client.player.getGameProfile())));
     playerList.setAllowCheatsForAllPlayers(cfg.AllPlayersCheats);
     UUIDFixer.EnableUUIDFixer = cfg.EnableUUIDFixer;
     UUIDFixer.ForceOfflinePlayers = cfg.ForceOfflinePlayers;
@@ -102,8 +103,8 @@ public class MCWiFiPnPUnit {
         Map<String, String> NewMap = IPAddressList().get(i);
         if (NewMap.get("Type") == "IPv4") {
           IPComponentList.add(IPComponent(
-                  Component.translatable(NewMap.get("Local")).getString() + " " + NewMap.get("Type"),
-                  NewMap.get("IP") + ":" + cfg.port));
+              Component.translatable(NewMap.get("Local")).getString() + " " + NewMap.get("Type"),
+              NewMap.get("IP") + ":" + cfg.port));
         } else {
           IPComponentList.add(IPComponent(
               Component.translatable(NewMap.get("Local")).getString() + " " + NewMap.get("Type"),
@@ -120,7 +121,7 @@ public class MCWiFiPnPUnit {
       }
       if (!GetGlobalIPv6().isEmpty() && !IPList.contains(GetGlobalIPv6().get("IP"))) {
         IPComponentList.add(IPComponent(Component.translatable(GetGlobalIPv6().get("Local")).getString() + " "
-        + GetGlobalIPv6().get("Type"),"[" + GetGlobalIPv6().get("IP") + "]:" + cfg.port));
+            + GetGlobalIPv6().get("Type"), "[" + GetGlobalIPv6().get("IP") + "]:" + cfg.port));
         IPList.add(GetGlobalIPv4().get("IP"));
       }
       if (cfg.UseUPnP && UPnP.getExternalIP() != null && !IPList.contains(GetGlobalIPv6().get("IP"))) {
@@ -148,7 +149,7 @@ public class MCWiFiPnPUnit {
     Path location = server.getWorldPath(LevelResource.ROOT).resolve("mcwifipnp.json");
     MCWiFiPnPUnit.Config cfg;
     try {
-      cfg = gson.fromJson(new String(Files.readAllBytes(location),"utf-8"), MCWiFiPnPUnit.Config.class);
+      cfg = gson.fromJson(new String(Files.readAllBytes(location), "utf-8"), MCWiFiPnPUnit.Config.class);
       cfg.location = location;
     } catch (IOException | JsonParseException e) {
       try {

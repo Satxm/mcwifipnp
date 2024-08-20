@@ -11,9 +11,7 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.HttpUtil;
 import net.minecraft.world.level.GameType;
 
-import java.util.Arrays;
 import java.util.Collections;
-import java.util.List;
 
 public class ShareToLanScreenNew extends Screen {
   private final MCWiFiPnPUnit.Config cfg;
@@ -132,8 +130,8 @@ public class ShareToLanScreenNew extends Screen {
         .withValues(OnlineMode.values())
         .withInitialValue(OnlineMode.of(cfg.OnlineMode, cfg.EnableUUIDFixer)).create(this.width / 2 - 155, 148, 150, 20,
             Component.translatable("mcwifipnp.gui.OnlineMode"), (button, OnlineMode) -> {
-          cfg.OnlineMode = OnlineMode.getOnlieMode();
-          cfg.EnableUUIDFixer = OnlineMode.getFixUUID();
+              cfg.OnlineMode = OnlineMode.getOnlieMode();
+              cfg.EnableUUIDFixer = OnlineMode.getFixUUID();
             }));
 
     this.addRenderableWidget(CycleButton.onOffBuilder(cfg.PvP).create(this.width / 2 + 5, 148, 150, 20,

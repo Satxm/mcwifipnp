@@ -52,7 +52,8 @@ public class MCWiFiPnP implements ModInitializer {
         AbstractWidget ShareToLanOld = buttons.get(k);
         if (buttons.size() != 0 && ShareToLanOld.getMessage().getString()
             .equals(Component.translatable("menu.shareToLan").getString())) {
-          AbstractWidget ShareToLanNew = new Button(ShareToLanOld.x, ShareToLanOld.y, ShareToLanOld.getWidth(), ShareToLanOld.getHeight(), Component.translatable("menu.shareToLan"),
+          AbstractWidget ShareToLanNew = new Button(ShareToLanOld.x, ShareToLanOld.y, ShareToLanOld.getWidth(),
+              ShareToLanOld.getHeight(), Component.translatable("menu.shareToLan"),
               (button) -> client.setScreen(new ShareToLanScreenNew(screen)));
           ShareToLanNew.active = ShareToLanOld.active;
           buttons.remove(ShareToLanOld);

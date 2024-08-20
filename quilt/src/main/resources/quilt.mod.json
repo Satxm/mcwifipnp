@@ -34,6 +34,12 @@
         "id": "minecraft",
         "versions": "${mc_version}"
       }
+    ],
+    "breaks" : [
+      {
+        "id": "minecraft",
+        "versions": ">=1.19.3"
+      }
     ]
   },
   "mixin": "mcwifipnp.mixins.json"

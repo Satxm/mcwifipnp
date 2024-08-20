@@ -29,7 +29,6 @@ public class MCWiFiPnP {
     MinecraftForge.EVENT_BUS.addListener(MCWiFiPnP::afterScreenInit);
   }
 
-  
   @SubscribeEvent
   public static void afterScreenInit(final ScreenEvent.Init.Post event) {
     Minecraft client = Minecraft.getInstance();
@@ -39,7 +38,8 @@ public class MCWiFiPnP {
         Button ShareToLanOld = (Button) event.getListenersList().get(k);
         if (ShareToLanOld.getMessage().getString()
             .equals(Component.translatable("menu.shareToLan").getString())) {
-          Button ShareToLanNew = new Button(ShareToLanOld.x, ShareToLanOld.y, ShareToLanOld.getWidth(), ShareToLanOld.getHeight(), Component.translatable("menu.shareToLan"),
+          Button ShareToLanNew = new Button(ShareToLanOld.x, ShareToLanOld.y, ShareToLanOld.getWidth(),
+              ShareToLanOld.getHeight(), Component.translatable("menu.shareToLan"),
               (button) -> client.setScreen(new ShareToLanScreenNew(screen)));
           ShareToLanNew.active = ShareToLanOld.active;
           event.removeListener(ShareToLanOld);
@@ -58,8 +58,8 @@ public class MCWiFiPnP {
     BanIpCommands.register(event.getServer().getCommands().getDispatcher());
     BanListCommands.register(event.getServer().getCommands().getDispatcher());
     BanPlayerCommands.register(event.getServer().getCommands().getDispatcher());
-      PardonCommand.register(event.getServer().getCommands().getDispatcher());
-      PardonIpCommand.register(event.getServer().getCommands().getDispatcher());
+    PardonCommand.register(event.getServer().getCommands().getDispatcher());
+    PardonIpCommand.register(event.getServer().getCommands().getDispatcher());
     ForceOfflineCommand.register(event.getServer().getCommands().getDispatcher());
   }
 

@@ -56,7 +56,7 @@ sourceSets {
 
 mixin {
   // MixinGradle Settings
-  add sourceSets.main, 'mcwifipnp.refmap.json'
+  add sourceSets.main, 'mcwifipnp-refmap.json'
   config 'mcwifipnp.mixins.json'
 
   debug.verbose = true
