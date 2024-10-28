@@ -61,7 +61,7 @@ public class MCWiFiPnPUnit {
         ? PublishCommand.getSuccessMessage(cfg.port)
         : Component.translatable("commands.publish.failed");
     client.gui.getChat().addMessage(component);
-    ((PlayerListAccessor)playerList).setMaxPlayers(cfg.maxPlayers);
+    ((PlayerListAccessor) playerList).setMaxPlayers(cfg.maxPlayers);
     server.setUsesAuthentication(cfg.OnlineMode);
     server.setPvpAllowed(cfg.PvP);
     server.setEnforceWhitelist(cfg.Whitelist);
