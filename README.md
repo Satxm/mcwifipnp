@@ -62,7 +62,7 @@ Modified from [TheGlitch76/mcpnp](https://github.com/TheGlitch76/mcpnp) project 
 
 ## What Can It Do - 它的作用
 
-For the `Oline Mode` button, there are now three options: 
+For the `Online Mode` button, there are now three options: 
  - `Enable`: enable genuine verification, which will verify login information against the Mojang server database, only allowing players who login with a Microsoft account to join, 
  - `Disable`: not verify login information, allows offline players to join, 
  - `Disable + UUID Fixer`: Attempt to match the Mojang server user name with the player name for offline mode players to obtain a unique UUID, Meanwhile, UUIDs are retained for users logging in with Microsoft accounts, It can also prevent the loss of backpack and inventory items.

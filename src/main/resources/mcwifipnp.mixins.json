@@ -6,7 +6,9 @@
   "refmap": "mcwifipnp-refmap.json",
   "client": [
     "PlayerListAccessor",
-    "MixinUUIDUtil"
+    "MixinUUIDUtil",
+    "AccessorGridLayout",
+    "MixinPauseScreen"
   ],
   "injectors": {
     "defaultRequire": 1
