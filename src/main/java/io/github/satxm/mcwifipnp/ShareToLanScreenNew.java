@@ -13,7 +13,7 @@ import net.minecraft.world.level.GameType;
 import java.util.Collections;
 
 public class ShareToLanScreenNew extends Screen {
-  private final MCWiFiPnPUnit.Config cfg;
+  private final Config cfg;
   private EditBox EditPort;
   private EditBox EditMotd;
   private EditBox EditPlayers;
@@ -31,7 +31,7 @@ public class ShareToLanScreenNew extends Screen {
     if (cfg.needsDefaults) {
       cfg.port = HttpUtil.getAvailablePort();
       cfg.AllowCommands = client.getSingleplayerServer().getWorldData().isAllowCommands();
-      cfg.GameMode = client.getSingleplayerServer().getDefaultGameType().getName();
+      cfg.GameMode = client.getSingleplayerServer().getDefaultGameType();
       cfg.OnlineMode = client.getSingleplayerServer().usesAuthentication();
       cfg.ForceOfflinePlayers = Collections.emptyList();
       cfg.needsDefaults = false;
@@ -46,7 +46,7 @@ public class ShareToLanScreenNew extends Screen {
         cfg.maxPlayers = Integer.parseInt(EditPlayers.getValue());
       if (!EditMotd.getValue().isEmpty())
         cfg.motd = EditMotd.getValue();
-      MCWiFiPnPUnit.saveConfig(cfg);
+      cfg.save();
       MCWiFiPnPUnit.OpenToLan();
       this.minecraft.updateTitle();
       this.minecraft.setScreen((Screen) null);
@@ -62,9 +62,9 @@ public class ShareToLanScreenNew extends Screen {
     this.addRenderableWidget(CycleButton.builder(GameType::getShortDisplayName)
         .withValues((GameType[]) new GameType[] { GameType.SURVIVAL, GameType.SPECTATOR, GameType.CREATIVE,
             GameType.ADVENTURE })
-        .withInitialValue(GameType.byName(cfg.GameMode)).create(this.width / 2 - 155, 36, 150, 20,
+        .withInitialValue(cfg.GameMode).create(this.width / 2 - 155, 36, 150, 20,
             Component.translatable("selectWorld.gameMode"), (cycleButton, gameMode) -> {
-              cfg.GameMode = gameMode.getName();
+              cfg.GameMode = gameMode;
             }));
 
     this.addRenderableWidget(CycleButton.onOffBuilder(cfg.AllowCommands).create(this.width / 2 + 5, 36, 150, 20,

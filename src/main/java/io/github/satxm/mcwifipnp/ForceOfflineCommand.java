@@ -35,7 +35,7 @@ public class ForceOfflineCommand {
       MinecraftServer server = ((CommandSourceStack)commandContext.getSource()).getServer();
       PlayerList playerList = server.getPlayerList();
       MCWiFiPnPUnit.ReadingConfig(server);
-      MCWiFiPnPUnit.Config cfg = MCWiFiPnPUnit.getConfig(server);
+      Config cfg = MCWiFiPnPUnit.getConfig(server);
       List<String> ForceOfflinePlayers  = cfg.ForceOfflinePlayers;
       return SharedSuggestionProvider.suggest(playerList.getPlayers().stream().filter((serverPlayer) -> {
         return !ForceOfflinePlayers.contains(serverPlayer.getGameProfile().getName());
@@ -48,7 +48,7 @@ public class ForceOfflineCommand {
       MinecraftServer server = ((CommandSourceStack)commandContext.getSource()).getServer();
       PlayerList playerList = server.getPlayerList();
       MCWiFiPnPUnit.ReadingConfig(server);
-      MCWiFiPnPUnit.Config cfg = MCWiFiPnPUnit.getConfig(server);
+      Config cfg = MCWiFiPnPUnit.getConfig(server);
       List<String> ForceOfflinePlayers  = cfg.ForceOfflinePlayers;
       return SharedSuggestionProvider.suggest(ForceOfflinePlayers.stream(), suggestionsBuilder);
     }).executes((commandContext) -> {
@@ -60,7 +60,7 @@ public class ForceOfflineCommand {
 
     MinecraftServer server = commandSourceStack.getServer();
     MCWiFiPnPUnit.ReadingConfig(server);
-    MCWiFiPnPUnit.Config cfg = MCWiFiPnPUnit.getConfig(server);
+    Config cfg = MCWiFiPnPUnit.getConfig(server);
     List<String> ForceOfflinePlayers  = cfg.ForceOfflinePlayers;
     int i = 0;
     Iterator var4 = collection.iterator();
@@ -69,7 +69,7 @@ public class ForceOfflineCommand {
       GameProfile gameProfile = (GameProfile)var4.next();
       if (!ForceOfflinePlayers.contains(gameProfile.getName())) {
         ForceOfflinePlayers.add(gameProfile.getName());
-        MCWiFiPnPUnit.saveConfig(cfg);
+        cfg.save();
         commandSourceStack.sendSuccess(() -> {
           return Component.translatable("mcwifipnp.commands.forceoffline.add.success", new Object[]{Component.literal(gameProfile.getName())});
         }, true);
@@ -87,7 +87,7 @@ public class ForceOfflineCommand {
   private static int removePlayers(CommandSourceStack commandSourceStack, Collection<GameProfile> collection) throws CommandSyntaxException {
     MinecraftServer server = commandSourceStack.getServer();
     MCWiFiPnPUnit.ReadingConfig(server);
-    MCWiFiPnPUnit.Config cfg = MCWiFiPnPUnit.getConfig(server);
+    Config cfg = MCWiFiPnPUnit.getConfig(server);
     List<String> ForceOfflinePlayers  = cfg.ForceOfflinePlayers;
 
     int i = 0;
@@ -97,7 +97,7 @@ public class ForceOfflineCommand {
       GameProfile gameProfile = (GameProfile)var4.next();
       if (ForceOfflinePlayers.contains(gameProfile.getName()))  {
         ForceOfflinePlayers.remove(gameProfile.getName());
-        MCWiFiPnPUnit.saveConfig(cfg);
+        cfg.save();
         commandSourceStack.sendSuccess(() -> {
           return Component.translatable("mcwifipnp.commands.forceoffline.remove.success", new Object[]{Component.literal(gameProfile.getName())});
         }, true);
@@ -116,7 +116,7 @@ public class ForceOfflineCommand {
   private static int showList(CommandSourceStack commandSourceStack) {
     MinecraftServer server = commandSourceStack.getServer();
     MCWiFiPnPUnit.ReadingConfig(server);
-    MCWiFiPnPUnit.Config cfg = MCWiFiPnPUnit.getConfig(server);
+    Config cfg = MCWiFiPnPUnit.getConfig(server);
     List<String> ForceOfflinePlayers  = cfg.ForceOfflinePlayers;
 
     if (ForceOfflinePlayers.size() == 0) {

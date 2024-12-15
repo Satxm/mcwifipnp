@@ -1,7 +1,6 @@
 package io.github.satxm.mcwifipnp;
 
 import java.io.BufferedReader;
-import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.Inet4Address;
 import java.net.Inet6Address;
@@ -9,9 +8,7 @@ import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.net.URL;
 import java.net.URLConnection;
-import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.StandardOpenOption;
 import java.util.*;
 
 import io.github.satxm.mcwifipnp.mixin.PlayerListAccessor;
@@ -19,11 +16,6 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import com.dosse.upnp.UPnP;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParseException;
-import com.google.gson.JsonParser;
 import com.mojang.brigadier.CommandDispatcher;
 
 import net.minecraft.ChatFormatting;
@@ -55,8 +47,7 @@ public class MCWiFiPnPUnit {
   public static final String MODID = "mcwifipnp";
 
   private static final Map<MinecraftServer, Config> configMap = Collections.synchronizedMap(new WeakHashMap<>());
-  private static final Gson gson = new GsonBuilder().create();
-  private static final Logger LOGGER = LogManager.getLogger(MCWiFiPnP.class);
+  public static final Logger LOGGER = LogManager.getLogger(MCWiFiPnP.class);
 
   public static Config getConfig(MinecraftServer server) {
     return Objects.requireNonNull(configMap.get(server), "no config for server???");
@@ -82,10 +73,10 @@ public class MCWiFiPnPUnit {
     Minecraft client = Minecraft.getInstance();
     IntegratedServer server = client.getSingleplayerServer();
     PlayerList playerList = server.getPlayerList();
-    MCWiFiPnPUnit.Config cfg = MCWiFiPnPUnit.getConfig(server);
+    Config cfg = MCWiFiPnPUnit.getConfig(server);
 
     server.setMotd(cfg.motd);
-    MutableComponent component = server.publishServer(GameType.byName(cfg.GameMode), cfg.AllowCommands, cfg.port)
+    MutableComponent component = server.publishServer(cfg.GameMode, cfg.AllowCommands, cfg.port)
         ? PublishCommand.getSuccessMessage(cfg.port)
         : Component.translatable("commands.publish.failed");
     client.gui.getChat().addMessage(component);
@@ -174,65 +165,16 @@ public class MCWiFiPnPUnit {
 
   public static void ReadingConfig(MinecraftServer server) {
     Path location = server.getWorldPath(LevelResource.ROOT).resolve("mcwifipnp.json");
-    MCWiFiPnPUnit.Config cfg;
-    try {
-      cfg = gson.fromJson(new String(Files.readAllBytes(location), "utf-8"), MCWiFiPnPUnit.Config.class);
-      cfg.location = location;
-    } catch (IOException | JsonParseException e) {
-      try {
-        Files.deleteIfExists(location);
-      } catch (IOException ie) {
-        LOGGER.warn("Unable to read config file!", ie);
-      }
-      cfg = new MCWiFiPnPUnit.Config();
-      cfg.location = location;
-      cfg.needsDefaults = true;
-    }
+    Config cfg = Config.read(location);
     configMap.put(server, cfg);
   }
 
   public static void CloseUPnPPort(MinecraftServer server) {
-    MCWiFiPnPUnit.Config cfg = configMap.get(server);
+    Config cfg = configMap.get(server);
     if (server.isPublished() && cfg.UseUPnP) {
       UPnP.closePortTCP(cfg.port);
       LOGGER.info("Stopped forwarded port " + cfg.port + ".");
     }
-  }
-
-  static void saveConfig(Config cfg) {
-    if (!cfg.needsDefaults) {
-      try {
-        Files.write(cfg.location, toPrettyFormat(cfg).getBytes("utf-8"), StandardOpenOption.TRUNCATE_EXISTING,
-            StandardOpenOption.CREATE);
-      } catch (IOException e) {
-        LOGGER.warn("Unable to write config file!", e);
-      }
-    }
-  }
-
-  public static class Config {
-    public int port = 25565;
-    public int maxPlayers = 8;
-    public String GameMode = "survival";
-    public String motd = Component.translatable("lanServer.title").getString();
-    public boolean AllPlayersCheats = false;
-    public boolean Whitelist = false;
-    public boolean UseUPnP = true;
-    public boolean AllowCommands = false;
-    public boolean OnlineMode = true;
-    public boolean EnableUUIDFixer = false;
-    public List<String> ForceOfflinePlayers = Collections.emptyList();
-    public boolean PvP = true;
-    public boolean CopyToClipboard = true;
-    public transient Path location;
-    public transient boolean needsDefaults = false;
-  }
-
-  private static String toPrettyFormat(Object src) {
-    String json = gson.toJson(src);
-    JsonObject jsonObject = JsonParser.parseString(json).getAsJsonObject();
-    Gson gson = new GsonBuilder().setPrettyPrinting().create();
-    return gson.toJson(jsonObject);
   }
 
   private static Component IPComponent(String Type, String IP) {
