@@ -12,16 +12,7 @@ import net.minecraft.world.level.GameType;
 import java.util.Collections;
 
 public class ShareToLanScreenNew extends Screen {
-  private final static Component EDITPORT_INFO = Component.translatable("mcwifipnp.gui.port.info");
-  private final static int TEXT_COLOR_HINT = 7368816;
-  private final static int TEXT_COLOR_NORMAL = 0xE0E0E0;
-  private final static int TEXT_COLOR_WARN = 0xFFFF55;
-  private final static int TEXT_COLOR_ERROR = 0xFF5555;
-
   private final Config cfg;
-  private EditBox EditPort;
-  private EditBox EditMotd;
-  private EditBox EditPlayers;
   private final Screen lastScreen;
 
   public ShareToLanScreenNew(Screen screen) {
@@ -75,127 +66,50 @@ public class ShareToLanScreenNew extends Screen {
         }));
 
     // Port field
-    final int defaultPort = cfg.port;
-    this.EditPort = new EditBox(this.font, this.width / 2 - 154, 70, 96, 20,
-        Component.translatable("mcwifipnp.gui.port")) {
-      @Override
-      public void setFocused(boolean newValue) {
-        super.setFocused(newValue);
-
-        if (!newValue && this.getValue().isBlank()) {
-          this.setValue(Integer.toString(defaultPort));
-        }
-      }
-    };
-    this.EditPort.setValue(Integer.toString(cfg.port));
-    this.EditPort.setTextColor(TEXT_COLOR_HINT);
-    this.EditPort.setMaxLength(5);
-    this.EditPort.setTooltip(Tooltip.create(EDITPORT_INFO));
-    this.addRenderableWidget(EditPort);
-
-    this.EditPort.setResponder(sPort -> {
-      if (sPort.isBlank()) {
-        this.EditPort.setTextColor(TEXT_COLOR_HINT);
-        this.EditPort.setTooltip(Tooltip.create(EDITPORT_INFO));
-        StartLanServer.active = true;
-        cfg.port = defaultPort;
-      } else {
-        try {
-          int port = Integer.parseInt(sPort);
+    this.addRenderableWidget(EditPortEx
+        .numerical(this.font, this.width / 2 - 154, 70, 96, 20, Component.translatable("mcwifipnp.gui.port"))
+        .defaults(cfg.port, EditPortEx.TEXT_COLOR_HINT,
+            Tooltip.create(Component.translatable("mcwifipnp.gui.port.info")))
+        .invalid(EditPortEx.TEXT_COLOR_ERROR, Tooltip.create(Component.translatable("mcwifipnp.gui.port.invalid")))
+        .validator((port) -> {
           if (port < 1024 || port > 65535) {
-            throw new NumberFormatException("Port out of range:" + sPort);
+            throw new NumberFormatException("Port out of range:" + port);
           } else if (!HttpUtil.isPortAvailable(port)) {
-            this.EditPort.setTextColor(TEXT_COLOR_WARN);
-            this.EditPort.setTooltip(
-                Tooltip.create(Component.translatable("mcwifipnp.gui.port.unavailable")));
-            StartLanServer.active = false;
-          } else if (defaultPort == port) {
-            this.EditPort.setTextColor(TEXT_COLOR_HINT);
-            this.EditPort.setTooltip(Tooltip.create(EDITPORT_INFO));
-            StartLanServer.active = true;
+            return new EditPortEx.ValidatorResult(EditPortEx.TEXT_COLOR_WARN,
+                Tooltip.create(Component.translatable("mcwifipnp.gui.port.unavailable")), false, true);
           } else {
-            this.EditPort.setTextColor(TEXT_COLOR_NORMAL);
-            this.EditPort.setTooltip(
-                Tooltip.create(EDITPORT_INFO));
-            StartLanServer.active = true;
+            return null;
           }
-          cfg.port = port;
-        } catch (NumberFormatException ex) {
-          this.EditPort.setTextColor(TEXT_COLOR_ERROR);
-          this.EditPort.setTooltip(
-              Tooltip.create(Component.translatable("mcwifipnp.gui.port.invalid")));
-          StartLanServer.active = false;
-        }
-      }
-    });
+        }).responder((newState, newPort) -> {
+          StartLanServer.active = newState.valid();
+          if (newState.updateBackendValue())
+            cfg.port = newPort;
+        })
+    ).setMaxLength(5);
 
     // Number of players field
-    final int defaultPlayers = cfg.maxPlayers;
-    this.EditPlayers = new EditBox(this.font, this.width / 2 - 48, 70, 96, 20,
-        Component.translatable("mcwifipnp.gui.players")) {
-      @Override
-      public void setFocused(boolean newValue) {
-        super.setFocused(newValue);
-
-        if (!newValue && this.getValue().isBlank()) {
-          this.setValue(Integer.toString(defaultPlayers));
-        }
-      }
-    };
-    this.EditPlayers.setValue(Integer.toString(cfg.maxPlayers));
-    this.EditPlayers.setTextColor(TEXT_COLOR_HINT);
-    this.EditPlayers.setTooltip(Tooltip.create(Component.translatable("mcwifipnp.gui.players.info")));
-    this.addRenderableWidget(EditPlayers);
-
-    this.EditPlayers.setResponder((sPlayers) -> {
-      if (sPlayers.isBlank()) {
-        this.EditPlayers.setTextColor(TEXT_COLOR_HINT);
-        StartLanServer.active = true;
-        cfg.port = defaultPlayers;
-      } else {
-        try {
-          int players = Integer.parseInt(sPlayers);
-          if (players < 0) {
-            throw new NumberFormatException();
-          } else if (defaultPlayers == players) {
-            this.EditPlayers.setTextColor(TEXT_COLOR_HINT);
-          } else {
-            this.EditPlayers.setTextColor(TEXT_COLOR_NORMAL);
-          }
-          StartLanServer.active = true;
-          cfg.maxPlayers = players;
-        } catch (NumberFormatException ex) {
-          StartLanServer.active = false;
-        }
-      }
-    });
+    this.addRenderableWidget(EditPortEx
+        .numerical(this.font, this.width / 2 - 48, 70, 96, 20, Component.translatable("mcwifipnp.gui.players"))
+        .bistate(cfg.maxPlayers, Tooltip.create(Component.translatable("mcwifipnp.gui.players.info")),
+            (maxPlayers) -> maxPlayers > 0)
+        .responder((newState, maxPlayers) -> {
+            StartLanServer.active = newState.valid();
+            if (newState.updateBackendValue())
+              cfg.maxPlayers = maxPlayers;
+        })
+    );
 
     // Motd field
-    final String defaultMotd = cfg.motd;
-    this.EditMotd = new EditBox(this.font, this.width / 2 + 58, 70, 96, 20,
-        Component.translatable("mcwifipnp.gui.motd")) {
-      @Override
-      public void setFocused(boolean newValue) {
-        super.setFocused(newValue);
-
-        if (!newValue && this.getValue().isBlank()) {
-          this.setValue(defaultMotd);
-        }
-      }
-    };
-    this.EditMotd.setValue(defaultMotd);
-    this.EditMotd.setTextColor(TEXT_COLOR_HINT);
-    this.EditMotd.setMaxLength(32);
-    this.EditMotd.setTooltip(Tooltip.create(Component.translatable("mcwifipnp.gui.motd.info")));
-    this.EditMotd.setResponder((sMotd) -> {
-      if (sMotd.isBlank() || defaultMotd.equals(sMotd)) {
-        this.EditMotd.setTextColor(TEXT_COLOR_HINT);
-      } else {
-        this.EditMotd.setTextColor(TEXT_COLOR_NORMAL);
-      }
-      cfg.motd = sMotd;
-    });
-    this.addRenderableWidget(EditMotd);
+    this.addRenderableWidget(EditPortEx
+        .text(this.font, this.width / 2 + 58, 70, 96, 20, Component.translatable("mcwifipnp.gui.motd"))
+        .bistate(cfg.motd, Tooltip.create(Component.translatable("mcwifipnp.gui.players.info")),
+            (newMotd) -> true)
+        .responder((newState, newMotd) -> {
+            StartLanServer.active = newState.valid();
+            if (newState.updateBackendValue())
+              cfg.motd = newMotd;
+        })
+    ).setMaxLength(32);
 
     this.addRenderableWidget(
         CycleButton.onOffBuilder(cfg.AllPlayersCheats).create(this.width / 2 - 155, 124, 150, 20,
