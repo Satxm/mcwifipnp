@@ -24,17 +24,27 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 import com.google.gson.JsonParser;
+import com.mojang.brigadier.CommandDispatcher;
 
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.server.IntegratedServer;
+import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.network.chat.ClickEvent;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.ComponentUtils;
 import net.minecraft.network.chat.HoverEvent;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.commands.BanIpCommands;
+import net.minecraft.server.commands.BanListCommands;
+import net.minecraft.server.commands.BanPlayerCommands;
+import net.minecraft.server.commands.DeOpCommands;
+import net.minecraft.server.commands.OpCommand;
+import net.minecraft.server.commands.PardonCommand;
+import net.minecraft.server.commands.PardonIpCommand;
 import net.minecraft.server.commands.PublishCommand;
+import net.minecraft.server.commands.WhitelistCommand;
 import net.minecraft.server.players.OldUsersConverter;
 import net.minecraft.server.players.PlayerList;
 import net.minecraft.server.players.ServerOpListEntry;
@@ -42,12 +52,30 @@ import net.minecraft.world.level.GameType;
 import net.minecraft.world.level.storage.LevelResource;
 
 public class MCWiFiPnPUnit {
+  public static final String MODID = "mcwifipnp";
+
   private static final Map<MinecraftServer, Config> configMap = Collections.synchronizedMap(new WeakHashMap<>());
   private static final Gson gson = new GsonBuilder().create();
   private static final Logger LOGGER = LogManager.getLogger(MCWiFiPnP.class);
 
   public static Config getConfig(MinecraftServer server) {
     return Objects.requireNonNull(configMap.get(server), "no config for server???");
+  }
+
+  /**
+   * Register commands.
+   * Should be called from platform-specific entries.
+   */
+  public static void registerCommands(CommandDispatcher<CommandSourceStack> cmdDispatcher) {
+    DeOpCommands.register(cmdDispatcher);
+    OpCommand.register(cmdDispatcher);
+    WhitelistCommand.register(cmdDispatcher);
+    BanIpCommands.register(cmdDispatcher);
+    BanListCommands.register(cmdDispatcher);
+    BanPlayerCommands.register(cmdDispatcher);
+    PardonCommand.register(cmdDispatcher);
+    PardonIpCommand.register(cmdDispatcher);
+    ForceOfflineCommand.register(cmdDispatcher);
   }
 
   public static void OpenToLan() {
