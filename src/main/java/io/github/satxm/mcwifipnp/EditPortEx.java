@@ -131,6 +131,11 @@ public class EditPortEx<T> extends EditBox {
     return this;
   }
 
+  public EditPortEx<T> maxLength(int len) {
+    this.setMaxLength(len);
+    return this;
+  }
+
   public EditPortEx<T> responder(BiConsumer<ValidatorResult, T> responder) {
     this.responder = responder;
     this.setResponder(this::onTextChanged);

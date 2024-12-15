@@ -1,8 +1,9 @@
 package io.github.satxm.mcwifipnp;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.*;
+import net.minecraft.client.gui.layouts.HeaderAndFooterLayout;
+import net.minecraft.client.gui.layouts.LinearLayout;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
@@ -11,9 +12,15 @@ import net.minecraft.util.HttpUtil;
 import net.minecraft.world.level.GameType;
 import java.util.Collections;
 
+import javax.annotation.Nullable;
+
 public class ShareToLanScreenNew extends Screen {
   private final Config cfg;
   private final Screen lastScreen;
+
+  public final HeaderAndFooterLayout layout = new HeaderAndFooterLayout(this);
+  @Nullable
+  protected OptionsList list;
 
   public ShareToLanScreenNew(Screen screen) {
     super(Component.translatable("lanServer.title"));
@@ -35,6 +42,16 @@ public class ShareToLanScreenNew extends Screen {
       cfg.ForceOfflinePlayers = Collections.emptyList();
     }
 
+    this.layout.addTitleHeader(this.title, this.font);
+    this.list = this.layout.addToContents(new OptionsList(this.minecraft, this.width, this.layout, this, this.font));
+    this.addOptions();
+    this.layout.visitWidgets(this::addRenderableWidget);
+    this.repositionElements();
+  }
+
+  protected void addOptions() {
+    // Footer
+    LinearLayout linearlayout = layout.addToFooter(LinearLayout.horizontal().spacing(8));
     // Start server button.
     Button StartLanServer = Button.builder(Component.translatable("lanServer.start"), button -> {
       cfg.save();
@@ -43,31 +60,37 @@ public class ShareToLanScreenNew extends Screen {
       this.minecraft.setScreen((Screen) null);
       if (MCWiFiPnPUnit.convertOldUsers(this.minecraft.getSingleplayerServer()))
         this.minecraft.getSingleplayerServer().getProfileCache().save();
-    }).bounds(this.width / 2 - 155, this.height - 32, 150, 20).build();
-    this.addRenderableWidget(StartLanServer);
+    }).width(150).build();
+    linearlayout.addChild(StartLanServer);
+
+
 
     // Cancel button
-    this.addRenderableWidget(
+    linearlayout.addChild(
         Button.builder(CommonComponents.GUI_CANCEL, button -> this.onClose())
-            .bounds(this.width / 2 + 5, this.height - 32, 150, 20).build());
+            .width(150).build());
 
+    // Row 1
     // GameMode toggle button
-    this.addRenderableWidget(CycleButton.builder(GameType::getShortDisplayName)
+    CycleButton<GameType> gameModeButton = CycleButton.builder(GameType::getShortDisplayName)
         .withValues(GameType.values())
-        .withInitialValue(cfg.GameMode).create(this.width / 2 - 155, 36, 150, 20,
+        .withInitialValue(cfg.GameMode).create(
             Component.translatable("selectWorld.gameMode"), (cycleButton, gameMode) -> {
               cfg.GameMode = gameMode;
-            }));
+            });
 
     // Allow Cheat button (for other joined players)
-    this.addRenderableWidget(CycleButton.onOffBuilder(cfg.AllowCommands).create(this.width / 2 + 5, 36, 150, 20,
+    CycleButton<Boolean> allowCheatButton = CycleButton.onOffBuilder(cfg.AllowCommands).create(
         Component.translatable("selectWorld.allowCommands"), (cycleButton, AllowCommands) -> {
           cfg.AllowCommands = AllowCommands;
-        }));
+        });
 
+    this.list.add(gameModeButton, allowCheatButton);
+
+    // Row 2
     // Port field
-    this.addRenderableWidget(EditPortEx
-        .numerical(this.font, this.width / 2 - 154, 70, 96, 20, Component.translatable("mcwifipnp.gui.port"))
+    EditPortEx<Integer> portField = EditPortEx
+        .numerical(this.font, 0, 0, 60, 20, Component.translatable("mcwifipnp.gui.port"))
         .defaults(cfg.port, EditPortEx.TEXT_COLOR_HINT,
             Tooltip.create(Component.translatable("mcwifipnp.gui.port.info")))
         .invalid(EditPortEx.TEXT_COLOR_ERROR, Tooltip.create(Component.translatable("mcwifipnp.gui.port.invalid")))
@@ -85,11 +108,11 @@ public class ShareToLanScreenNew extends Screen {
           if (newState.updateBackendValue())
             cfg.port = newPort;
         })
-    ).setMaxLength(5);
+        .maxLength(5);
 
     // Number of players field
-    this.addRenderableWidget(EditPortEx
-        .numerical(this.font, this.width / 2 - 48, 70, 96, 20, Component.translatable("mcwifipnp.gui.players"))
+    EditPortEx<Integer> maxPlayersField = EditPortEx
+        .numerical(this.font, 0, 0, 60, 20, Component.translatable("mcwifipnp.gui.players"))
         .bistate(cfg.maxPlayers, Tooltip.create(Component.translatable("mcwifipnp.gui.players.info")),
             (maxPlayers) -> maxPlayers > 0)
         .responder((newState, maxPlayers) -> {
@@ -97,11 +120,17 @@ public class ShareToLanScreenNew extends Screen {
             if (newState.updateBackendValue())
               cfg.maxPlayers = maxPlayers;
         })
-    );
+    ;
+
+    this.list.add(
+        Component.translatable("mcwifipnp.gui.port"), portField,
+        Component.translatable("mcwifipnp.gui.players"), maxPlayersField);
+
+    // Row3
 
     // Motd field
-    this.addRenderableWidget(EditPortEx
-        .text(this.font, this.width / 2 + 58, 70, 96, 20, Component.translatable("mcwifipnp.gui.motd"))
+    this.list.add(Component.translatable("mcwifipnp.gui.motd"), EditPortEx
+        .text(this.font, 0, 0, 220, 20, Component.translatable("mcwifipnp.gui.motd"))
         .bistate(cfg.motd, Tooltip.create(Component.translatable("mcwifipnp.gui.players.info")),
             (newMotd) -> true)
         .responder((newState, newMotd) -> {
@@ -109,43 +138,56 @@ public class ShareToLanScreenNew extends Screen {
             if (newState.updateBackendValue())
               cfg.motd = newMotd;
         })
-    ).setMaxLength(32);
+    .maxLength(32));
 
-    this.addRenderableWidget(
-        CycleButton.onOffBuilder(cfg.AllPlayersCheats).create(this.width / 2 - 155, 124, 150, 20,
+    // Row4
+    this.list.add(new StringWidget(310, 20, Component.translatable("lanServer.otherPlayers"), this.font));
+
+    // Row5
+    CycleButton<Boolean> otherCheats = CycleButton.onOffBuilder(cfg.AllPlayersCheats).create(
             Component.translatable("mcwifipnp.gui.AllPlayersCheats"), (cycleButton, AllPlayersCheats) -> {
               cfg.AllPlayersCheats = AllPlayersCheats;
-            }))
-        .setTooltip(Tooltip.create(Component.translatable("mcwifipnp.gui.AllPlayersCheats.info")));
+            });
+    otherCheats.setTooltip(Tooltip.create(Component.translatable("mcwifipnp.gui.AllPlayersCheats.info")));
 
-    this.addRenderableWidget(CycleButton.onOffBuilder(cfg.Whitelist).create(this.width / 2 + 5, 124, 150, 20,
+    CycleButton<Boolean> whiteListEnabled = CycleButton.onOffBuilder(cfg.Whitelist).create(
         Component.translatable("mcwifipnp.gui.Whitelist"), (cycleButton, Whitelist) -> {
           cfg.Whitelist = Whitelist;
-        })).setTooltip(Tooltip.create(Component.translatable("mcwifipnp.gui.Whitelist.info")));
+        });
+    whiteListEnabled.setTooltip(Tooltip.create(Component.translatable("mcwifipnp.gui.Whitelist.info")));
 
-    this.addRenderableWidget(CycleButton.builder(OnlineMode::getDisplayName)
+    this.list.add(otherCheats, whiteListEnabled);
+
+    // Row 6
+    CycleButton<OnlineMode> onlineMode = CycleButton.builder(OnlineMode::getDisplayName)
         .withValues(OnlineMode.values())
         .withInitialValue(OnlineMode.of(cfg.OnlineMode, cfg.EnableUUIDFixer)).withTooltip((OnlineMode) -> Tooltip.create(OnlineMode.gettoolTip()))
-        .create(this.width / 2 - 155, 148, 150, 20,
+        .create(
             Component.translatable("mcwifipnp.gui.OnlineMode"), (cycleButton, OnlineMode) -> {
               cfg.OnlineMode = OnlineMode.getOnlieMode();
               cfg.EnableUUIDFixer = OnlineMode.getFixUUID();
-        }));
+        });
 
-    this.addRenderableWidget(CycleButton.onOffBuilder(cfg.PvP).create(this.width / 2 + 5, 148, 150, 20,
+    CycleButton<Boolean> pvp = CycleButton.onOffBuilder(cfg.PvP).create(
         Component.translatable("mcwifipnp.gui.PvP"), (cycleButton, PvP) -> {
           cfg.PvP = PvP;
-        })).setTooltip(Tooltip.create(Component.translatable("mcwifipnp.gui.PvP.info")));
+        });
+    pvp.setTooltip(Tooltip.create(Component.translatable("mcwifipnp.gui.PvP.info")));
+    this.list.add(onlineMode, pvp);
 
-    this.addRenderableWidget(CycleButton.onOffBuilder(cfg.UseUPnP).create(this.width / 2 - 155, 172, 150, 20,
+    // Row 7
+    CycleButton<Boolean> useUPnP = CycleButton.onOffBuilder(cfg.UseUPnP).create(
         Component.translatable("mcwifipnp.gui.UseUPnP"), (cycleButton, UseUPnP) -> {
           cfg.UseUPnP = UseUPnP;
-        })).setTooltip(Tooltip.create(Component.translatable("mcwifipnp.gui.UseUPnP.info")));
+        });
+    useUPnP.setTooltip(Tooltip.create(Component.translatable("mcwifipnp.gui.UseUPnP.info")));
 
-    this.addRenderableWidget(CycleButton.onOffBuilder(cfg.CopyToClipboard).create(this.width / 2 + 5, 172, 150, 20,
+    CycleButton<Boolean> copyIP = CycleButton.onOffBuilder(cfg.CopyToClipboard).create(
         Component.translatable("mcwifipnp.gui.CopyIP"), (cycleButton, CopyToClipboard) -> {
           cfg.CopyToClipboard = CopyToClipboard;
-        })).setTooltip(Tooltip.create(Component.translatable("mcwifipnp.gui.CopyIP.info")));
+        });
+    copyIP.setTooltip(Tooltip.create(Component.translatable("mcwifipnp.gui.CopyIP.info")));
+    this.list.add(useUPnP, copyIP);
   }
 
   @Override
@@ -154,17 +196,10 @@ public class ShareToLanScreenNew extends Screen {
   }
 
   @Override
-  public void render(GuiGraphics guiGraphics, int i, int j, float f) {
-    super.render(guiGraphics, i, j, f);
-    guiGraphics.drawCenteredString(this.font, this.title, this.width / 2, 16, 16777215);
-    guiGraphics.drawString(this.font, Component.translatable("mcwifipnp.gui.port"), this.width / 2 - 149, 58,
-        16777215);
-    guiGraphics.drawString(this.font, Component.translatable("mcwifipnp.gui.players"), this.width / 2 - 43, 58,
-        16777215);
-    guiGraphics.drawString(this.font, Component.translatable("mcwifipnp.gui.motd"), this.width / 2 + 63, 58,
-        16777215);
-    guiGraphics.drawCenteredString(this.font, Component.translatable("lanServer.otherPlayers"), this.width / 2, 104,
-        16777215);
-
+  protected void repositionElements() {
+      this.layout.arrangeElements();
+      if (this.list != null) {
+          this.list.updateSize(this.width, this.layout);
+      }
   }
 }
