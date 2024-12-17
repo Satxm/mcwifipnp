@@ -5,6 +5,7 @@
   "mcwifipnp.gui.port.unavailable": "端口碼不可用。\n請闕之，抑再入 1024 至 65535 間之另數。",
   "mcwifipnp.gui.players": "允許玩家數",
   "mcwifipnp.gui.players.info": "伺服器同時能容納的最大玩家數量。",
+  "mcwifipnp.gui.lanServerOptions": "伺服器設定",
   "mcwifipnp.gui.motd": "伺服器信息",
   "mcwifipnp.gui.motd.info": "玩家客戶端的多人遊戲服務器列錶中顯示於名稱下方的服務器信息。",
   "mcwifipnp.gui.AllPlayersCheats": "其他玩家作弊",

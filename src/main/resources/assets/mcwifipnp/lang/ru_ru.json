@@ -5,6 +5,7 @@
   "mcwifipnp.gui.port.unavailable": "Порт недоступен.\nОставьте это поле пустым или введите число от 1024 до 65535.",
   "mcwifipnp.gui.players": "Лимит игроков",
   "mcwifipnp.gui.players.info": "Максимальное количество игроков, которые могут присоединиться к серверу.",
+  "mcwifipnp.gui.lanServerOptions": "Настройки сервера",
   "mcwifipnp.gui.motd": "Описание",
   "mcwifipnp.gui.motd.info": "Информация о сервере, отображаемая под названием в списке сетевой игры.",
   "mcwifipnp.gui.AllPlayersCheats": "Использование команд",

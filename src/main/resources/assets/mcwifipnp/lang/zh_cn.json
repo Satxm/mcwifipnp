@@ -5,6 +5,7 @@
   "mcwifipnp.gui.port.unavailable": "端口不可用。\n请将编辑框留空，或输入一个介于1024至65535之间的新数字。",
   "mcwifipnp.gui.players": "允许玩家数",
   "mcwifipnp.gui.players.info": "服务器同时能容纳的最大玩家数量。",
+  "mcwifipnp.gui.lanServerOptions": "局域网游戏设置",
   "mcwifipnp.gui.motd": "服务器信息",
   "mcwifipnp.gui.motd.info": "玩家客户端的多人游戏服务器列表中显示于名称下方的服务器信息。",
   "mcwifipnp.gui.AllPlayersCheats": "其他玩家作弊",

@@ -11,7 +11,6 @@ import java.net.URLConnection;
 import java.nio.file.Path;
 import java.util.*;
 
-import io.github.satxm.mcwifipnp.mixin.PlayerListAccessor;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -40,11 +39,10 @@ import net.minecraft.server.commands.WhitelistCommand;
 import net.minecraft.server.players.OldUsersConverter;
 import net.minecraft.server.players.PlayerList;
 import net.minecraft.server.players.ServerOpListEntry;
-import net.minecraft.world.level.GameType;
-import net.minecraft.world.level.storage.LevelResource;
 
 public class MCWiFiPnPUnit {
   public static final String MODID = "mcwifipnp";
+  public static final Component MODIFY_LAN_OPTIONS = Component.translatable("mcwifipnp.gui.lanServerOptions");
 
   private static final Map<MinecraftServer, Config> configMap = Collections.synchronizedMap(new WeakHashMap<>());
   public static final Logger LOGGER = LogManager.getLogger(MCWiFiPnP.class);
@@ -75,20 +73,12 @@ public class MCWiFiPnPUnit {
     PlayerList playerList = server.getPlayerList();
     Config cfg = MCWiFiPnPUnit.getConfig(server);
 
-    server.setMotd(cfg.motd);
-    MutableComponent component = server.publishServer(cfg.GameMode, cfg.AllowCommands, cfg.port)
+    MutableComponent component = server.publishServer(cfg.GameMode, cfg.enableHostCheat, cfg.port)
         ? PublishCommand.getSuccessMessage(cfg.port)
         : Component.translatable("commands.publish.failed");
     client.gui.getChat().addMessage(component);
-    ((PlayerListAccessor) playerList).setMaxPlayers(cfg.maxPlayers);
-    server.setUsesAuthentication(cfg.OnlineMode);
-    server.setPvpAllowed(cfg.PvP);
-    server.setEnforceWhitelist(cfg.Whitelist);
-    playerList.setUsingWhiteList(cfg.Whitelist);
     playerList.getOps().add(new ServerOpListEntry(server.getSingleplayerProfile(), 4, playerList.canBypassPlayerLimit(server.getSingleplayerProfile())));
-    playerList.setAllowCommandsForAllPlayers(cfg.AllPlayersCheats);
-    UUIDFixer.EnableUUIDFixer = cfg.EnableUUIDFixer;
-    UUIDFixer.ForceOfflinePlayers = cfg.ForceOfflinePlayers;
+    cfg.applyTo(server);
 
     new Thread(() -> {
       MCWiFiPnPUnit.UseUPnP(cfg, client);
@@ -164,8 +154,7 @@ public class MCWiFiPnPUnit {
   }
 
   public static void ReadingConfig(MinecraftServer server) {
-    Path location = server.getWorldPath(LevelResource.ROOT).resolve("mcwifipnp.json");
-    Config cfg = Config.read(location);
+    Config cfg = Config.read(server);
     configMap.put(server, cfg);
   }
 

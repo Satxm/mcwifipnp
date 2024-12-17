@@ -5,6 +5,7 @@
   "mcwifipnp.gui.port.unavailable": "無法使用這個連接埠。\n請將編輯欄留空，或是輸入一個 1024 到 65535 之間的新數值。",
   "mcwifipnp.gui.players": "最大玩家數",
   "mcwifipnp.gui.players.info": "可以加入伺服器的最大玩家數量。",
+  "mcwifipnp.gui.lanServerOptions": "伺服器設定",
   "mcwifipnp.gui.motd": "伺服器資訊",
   "mcwifipnp.gui.motd.info": "在多人遊戲伺服器清單中名稱下方顯示的伺服器資訊。",
   "mcwifipnp.gui.AllPlayersCheats": "其他玩家作弊",

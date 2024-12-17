@@ -5,6 +5,7 @@
   "mcwifipnp.gui.port.unavailable": "Port not available.\nLeave the edit box empty or enter a different number between 1024 and 65535.",
   "mcwifipnp.gui.players": "Max Players",
   "mcwifipnp.gui.players.info": "The maximum number of players that are able to join the server.",
+  "mcwifipnp.gui.lanServerOptions": "Lan server settings",
   "mcwifipnp.gui.motd": "The MOTD",
   "mcwifipnp.gui.motd.info": "The server information displayed below the name in the multiplayer server list.",
   "mcwifipnp.gui.AllPlayersCheats": "Other Players Cheats",
