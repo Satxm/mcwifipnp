@@ -40,26 +40,24 @@ public class ShareToLanScreenNew extends Screen {
 
 		IntegratedServer server = Minecraft.getInstance().getSingleplayerServer();
 
-		MCWiFiPnPUnit.ReadingConfig(server);
-		this.cfg = MCWiFiPnPUnit.getConfig(server);
+		this.cfg = Config.read(server);
 
 		if (serverPublished) {
-			cfg.readFromRunningServer(server);
-		} else if (cfg.usingDefaults) {
-			cfg.readFromRunningServer(server);
-			cfg.port = HttpUtil.getAvailablePort();
-			cfg.enableHostCheat = server.getWorldData().isAllowCommands();
+			this.cfg.readFromRunningServer(server);
+		} else if (this.cfg.usingDefaults) {
+			this.cfg.readFromRunningServer(server);
+			this.cfg.port = HttpUtil.getAvailablePort();
+			this.cfg.enableHostCheat = server.getWorldData().isAllowCommands();
 		}
 	}
 
 	protected void onConfirmClicked() {
-		cfg.save();
+		this.cfg.save();
 
-		if (this.serverPublished) {
-			cfg.applyTo(Minecraft.getInstance().getSingleplayerServer());
-		} else {
-			MCWiFiPnPUnit.OpenToLan();
+		if (!this.serverPublished) {
+			MCWiFiPnPUnit.publishServer(this.cfg);
 		}
+		this.cfg.applyTo(Minecraft.getInstance().getSingleplayerServer());
 
 		this.minecraft.updateTitle();
 		this.minecraft.setScreen((Screen) null);

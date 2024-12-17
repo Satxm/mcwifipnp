@@ -73,6 +73,10 @@ public class Config {
 		return server.getWorldPath(LevelResource.ROOT).resolve("mcwifipnp.json");
 	}
 
+	/**
+	 * @param server the server instance used to get the root map path
+	 * @return the latest config instance read from the path
+	 */
 	public static Config read(MinecraftServer server) {
 		return read(getConfigPath(server));
 	}

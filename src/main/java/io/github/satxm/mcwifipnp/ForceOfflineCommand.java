@@ -34,8 +34,7 @@ public class ForceOfflineCommand {
     }))).then(Commands.literal("add").then(Commands.argument("targets", GameProfileArgument.gameProfile()).suggests((commandContext, suggestionsBuilder) -> {
       MinecraftServer server = ((CommandSourceStack)commandContext.getSource()).getServer();
       PlayerList playerList = server.getPlayerList();
-      MCWiFiPnPUnit.ReadingConfig(server);
-      Config cfg = MCWiFiPnPUnit.getConfig(server);
+      Config cfg = Config.read(server);
       List<String> ForceOfflinePlayers  = cfg.ForceOfflinePlayers;
       return SharedSuggestionProvider.suggest(playerList.getPlayers().stream().filter((serverPlayer) -> {
         return !ForceOfflinePlayers.contains(serverPlayer.getGameProfile().getName());
@@ -47,8 +46,7 @@ public class ForceOfflineCommand {
     })))).then(Commands.literal("remove").then(Commands.argument("targets", GameProfileArgument.gameProfile()).suggests((commandContext, suggestionsBuilder) -> {
       MinecraftServer server = ((CommandSourceStack)commandContext.getSource()).getServer();
       PlayerList playerList = server.getPlayerList();
-      MCWiFiPnPUnit.ReadingConfig(server);
-      Config cfg = MCWiFiPnPUnit.getConfig(server);
+      Config cfg = Config.read(server);
       List<String> ForceOfflinePlayers  = cfg.ForceOfflinePlayers;
       return SharedSuggestionProvider.suggest(ForceOfflinePlayers.stream(), suggestionsBuilder);
     }).executes((commandContext) -> {
@@ -59,8 +57,7 @@ public class ForceOfflineCommand {
   private static int addPlayers(CommandSourceStack commandSourceStack, Collection<GameProfile> collection) throws CommandSyntaxException {
 
     MinecraftServer server = commandSourceStack.getServer();
-    MCWiFiPnPUnit.ReadingConfig(server);
-    Config cfg = MCWiFiPnPUnit.getConfig(server);
+    Config cfg = Config.read(server);
     List<String> ForceOfflinePlayers  = cfg.ForceOfflinePlayers;
     int i = 0;
     Iterator var4 = collection.iterator();
@@ -86,8 +83,7 @@ public class ForceOfflineCommand {
 
   private static int removePlayers(CommandSourceStack commandSourceStack, Collection<GameProfile> collection) throws CommandSyntaxException {
     MinecraftServer server = commandSourceStack.getServer();
-    MCWiFiPnPUnit.ReadingConfig(server);
-    Config cfg = MCWiFiPnPUnit.getConfig(server);
+    Config cfg = Config.read(server);
     List<String> ForceOfflinePlayers  = cfg.ForceOfflinePlayers;
 
     int i = 0;
@@ -115,8 +111,7 @@ public class ForceOfflineCommand {
 
   private static int showList(CommandSourceStack commandSourceStack) {
     MinecraftServer server = commandSourceStack.getServer();
-    MCWiFiPnPUnit.ReadingConfig(server);
-    Config cfg = MCWiFiPnPUnit.getConfig(server);
+    Config cfg = Config.read(server);
     List<String> ForceOfflinePlayers  = cfg.ForceOfflinePlayers;
 
     if (ForceOfflinePlayers.size() == 0) {

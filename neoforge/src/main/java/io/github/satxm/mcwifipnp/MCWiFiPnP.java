@@ -5,7 +5,6 @@ import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.event.RegisterCommandsEvent;
-import net.neoforged.neoforge.event.server.ServerStartingEvent;
 import net.neoforged.neoforge.event.server.ServerStoppingEvent;
 
 @Mod(MCWiFiPnPUnit.MODID)
@@ -15,17 +14,12 @@ public class MCWiFiPnP {
   }
 
   @SubscribeEvent
-  public void onServerStarting(ServerStartingEvent event) {
-    MCWiFiPnPUnit.ReadingConfig(event.getServer());
-  }
-
-  @SubscribeEvent
   public void onRegisterCommands(RegisterCommandsEvent event) {
     MCWiFiPnPUnit.registerCommands(event.getDispatcher());
   }
 
   @SubscribeEvent
   public void onServerStopping(ServerStoppingEvent event) {
-    MCWiFiPnPUnit.CloseUPnPPort(event.getServer());
+    UPnPModule.stop(event.getServer());
   }
 }

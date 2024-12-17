@@ -8,7 +8,6 @@ import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.net.URL;
 import java.net.URLConnection;
-import java.nio.file.Path;
 import java.util.*;
 
 import org.apache.logging.log4j.LogManager;
@@ -44,12 +43,7 @@ public class MCWiFiPnPUnit {
   public static final String MODID = "mcwifipnp";
   public static final Component MODIFY_LAN_OPTIONS = Component.translatable("mcwifipnp.gui.lanServerOptions");
 
-  private static final Map<MinecraftServer, Config> configMap = Collections.synchronizedMap(new WeakHashMap<>());
   public static final Logger LOGGER = LogManager.getLogger(MCWiFiPnP.class);
-
-  public static Config getConfig(MinecraftServer server) {
-    return Objects.requireNonNull(configMap.get(server), "no config for server???");
-  }
 
   /**
    * Register commands.
@@ -67,40 +61,21 @@ public class MCWiFiPnPUnit {
     ForceOfflineCommand.register(cmdDispatcher);
   }
 
-  public static void OpenToLan() {
+  public static void publishServer(Config cfg) {
     Minecraft client = Minecraft.getInstance();
     IntegratedServer server = client.getSingleplayerServer();
     PlayerList playerList = server.getPlayerList();
-    Config cfg = MCWiFiPnPUnit.getConfig(server);
 
     MutableComponent component = server.publishServer(cfg.GameMode, cfg.enableHostCheat, cfg.port)
         ? PublishCommand.getSuccessMessage(cfg.port)
         : Component.translatable("commands.publish.failed");
     client.gui.getChat().addMessage(component);
     playerList.getOps().add(new ServerOpListEntry(server.getSingleplayerProfile(), 4, playerList.canBypassPlayerLimit(server.getSingleplayerProfile())));
-    cfg.applyTo(server);
 
+    UPnPModule.startIfEnabled(server, cfg);
     new Thread(() -> {
-      MCWiFiPnPUnit.UseUPnP(cfg, client);
       MCWiFiPnPUnit.CopyToClipboard(cfg, client);
     }, "MCWiFiPnP").start();
-  }
-
-  public static void UseUPnP(Config cfg, Minecraft client) {
-    if (cfg.UseUPnP) {
-      if (UPnP.isUPnPAvailable()) {
-        if (UPnP.isMappedTCP(cfg.port)) {
-          client.gui.getChat().addMessage(Component.translatable("mcwifipnp.upnp.failed.mapped", cfg.port));
-        } else if (UPnP.openPortTCP(cfg.port, cfg.motd)) {
-          client.gui.getChat().addMessage(Component.translatable("mcwifipnp.upnp.success", cfg.port));
-          LOGGER.info("Started forwarded port " + cfg.port + ".");
-        } else {
-          client.gui.getChat().addMessage(Component.translatable("mcwifipnp.upnp.failed", cfg.port));
-        }
-      } else {
-        client.gui.getChat().addMessage(Component.translatable("mcwifipnp.upnp.failed.disabled", cfg.port));
-      }
-    }
   }
 
   public static void CopyToClipboard(Config cfg, Minecraft client) {
@@ -150,19 +125,6 @@ public class MCWiFiPnPUnit {
         client.gui.getChat().addMessage(
             Component.translatable("mcwifipnp.upnp.clipboard", new Object[] { component }));
       }
-    }
-  }
-
-  public static void ReadingConfig(MinecraftServer server) {
-    Config cfg = Config.read(server);
-    configMap.put(server, cfg);
-  }
-
-  public static void CloseUPnPPort(MinecraftServer server) {
-    Config cfg = configMap.get(server);
-    if (server.isPublished() && cfg.UseUPnP) {
-      UPnP.closePortTCP(cfg.port);
-      LOGGER.info("Stopped forwarded port " + cfg.port + ".");
     }
   }
 
