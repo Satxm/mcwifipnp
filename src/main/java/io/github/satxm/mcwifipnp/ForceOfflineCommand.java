@@ -35,7 +35,7 @@ public class ForceOfflineCommand {
       MinecraftServer server = ((CommandSourceStack)commandContext.getSource()).getServer();
       PlayerList playerList = server.getPlayerList();
       Config cfg = Config.read(server);
-      List<String> ForceOfflinePlayers  = cfg.ForceOfflinePlayers;
+      List<String> ForceOfflinePlayers  = cfg.forcedOfflinePlayers;
       return SharedSuggestionProvider.suggest(playerList.getPlayers().stream().filter((serverPlayer) -> {
         return !ForceOfflinePlayers.contains(serverPlayer.getGameProfile().getName());
       }).map((serverPlayer) -> {
@@ -47,7 +47,7 @@ public class ForceOfflineCommand {
       MinecraftServer server = ((CommandSourceStack)commandContext.getSource()).getServer();
       PlayerList playerList = server.getPlayerList();
       Config cfg = Config.read(server);
-      List<String> ForceOfflinePlayers  = cfg.ForceOfflinePlayers;
+      List<String> ForceOfflinePlayers = cfg.forcedOfflinePlayers;
       return SharedSuggestionProvider.suggest(ForceOfflinePlayers.stream(), suggestionsBuilder);
     }).executes((commandContext) -> {
       return removePlayers((CommandSourceStack)commandContext.getSource(), GameProfileArgument.getGameProfiles(commandContext, "targets"));
@@ -58,7 +58,7 @@ public class ForceOfflineCommand {
 
     MinecraftServer server = commandSourceStack.getServer();
     Config cfg = Config.read(server);
-    List<String> ForceOfflinePlayers  = cfg.ForceOfflinePlayers;
+    List<String> ForceOfflinePlayers  = cfg.forcedOfflinePlayers;
     int i = 0;
     Iterator var4 = collection.iterator();
 
@@ -84,7 +84,7 @@ public class ForceOfflineCommand {
   private static int removePlayers(CommandSourceStack commandSourceStack, Collection<GameProfile> collection) throws CommandSyntaxException {
     MinecraftServer server = commandSourceStack.getServer();
     Config cfg = Config.read(server);
-    List<String> ForceOfflinePlayers  = cfg.ForceOfflinePlayers;
+    List<String> ForceOfflinePlayers  = cfg.forcedOfflinePlayers;
 
     int i = 0;
     Iterator var4 = collection.iterator();
@@ -112,7 +112,7 @@ public class ForceOfflineCommand {
   private static int showList(CommandSourceStack commandSourceStack) {
     MinecraftServer server = commandSourceStack.getServer();
     Config cfg = Config.read(server);
-    List<String> ForceOfflinePlayers  = cfg.ForceOfflinePlayers;
+    List<String> ForceOfflinePlayers  = cfg.forcedOfflinePlayers;
 
     if (ForceOfflinePlayers.size() == 0) {
       commandSourceStack.sendSuccess(() -> {

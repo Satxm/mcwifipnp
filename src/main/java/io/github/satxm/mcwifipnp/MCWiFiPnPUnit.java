@@ -66,7 +66,7 @@ public class MCWiFiPnPUnit {
     IntegratedServer server = client.getSingleplayerServer();
     PlayerList playerList = server.getPlayerList();
 
-    MutableComponent component = server.publishServer(cfg.GameMode, cfg.enableHostCheat, cfg.port)
+    MutableComponent component = server.publishServer(cfg.gameType, cfg.allowHostCheat, cfg.port)
         ? PublishCommand.getSuccessMessage(cfg.port)
         : Component.translatable("commands.publish.failed");
     client.gui.getChat().addMessage(component);
@@ -79,7 +79,7 @@ public class MCWiFiPnPUnit {
   }
 
   public static void CopyToClipboard(Config cfg, Minecraft client) {
-    if (cfg.CopyToClipboard) {
+    if (cfg.getPublicIP) {
       ArrayList<Component> IPComponentList = new ArrayList<Component>();
       ArrayList<String> IPList = new ArrayList<String>();
       for (int i = 0; i < IPAddressList().size(); i++) {
@@ -107,7 +107,7 @@ public class MCWiFiPnPUnit {
             + GetGlobalIPv6().get("Type"), "[" + GetGlobalIPv6().get("IP") + "]:" + cfg.port));
         IPList.add(GetGlobalIPv4().get("IP"));
       }
-      if (cfg.UseUPnP && UPnP.getExternalIP() != null && !IPList.contains(GetGlobalIPv6().get("IP"))) {
+      if (cfg.useUPnP && UPnP.getExternalIP() != null && !IPList.contains(GetGlobalIPv6().get("IP"))) {
         IPComponentList.add(IPComponent("UPnP IPv4", UPnP.getExternalIP() + ":" + cfg.port));
         IPList.add(UPnP.getExternalIP());
       }

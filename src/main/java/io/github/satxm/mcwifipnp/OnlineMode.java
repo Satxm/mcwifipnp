@@ -3,42 +3,33 @@ package io.github.satxm.mcwifipnp;
 import net.minecraft.network.chat.Component;
 
 public enum OnlineMode {
-  ONLINE(true, false,"online"),
-  OFFLINE(false, false,"offline"),
-  FIXUUID(false, true,"fixuuid");
+	ONLINE(true, false, "online"),
+	OFFLINE(false, false, "offline"),
+	FIX_UUID(false, true, "fixuuid");
 
-  private final boolean onlinemode, fixuuid;
-  private final Component displayName, toolTip;
+	public final boolean onlineMode, fixUUID;
+	private final Component displayName, toolTip;
 
-  OnlineMode(boolean onlinemode, boolean fixuuid, final String string) {
-    this.onlinemode = onlinemode;
-    this.fixuuid = fixuuid;
-    this.displayName = Component.translatable("mcwifipnp.gui.OnlineMode." + string);
-    this.toolTip = Component.translatable("mcwifipnp.gui.OnlineMode." + string +".info");
-  }
+	OnlineMode(boolean onlineModeEnabled, boolean tryOnlineUUIDFirst, final String name) {
+		this.onlineMode = onlineModeEnabled;
+		this.fixUUID = tryOnlineUUIDFirst;
+		this.displayName = Component.translatable("mcwifipnp.gui.OnlineMode." + name);
+		this.toolTip = Component.translatable("mcwifipnp.gui.OnlineMode." + name + ".info");
+	}
 
-  public Component getDisplayName() {
-    return this.displayName;
-  }
+	public Component getDisplayName() {
+		return this.displayName;
+	}
 
-  public Component gettoolTip() {
-    return this.toolTip;
-  }
+	public Component gettoolTip() {
+		return this.toolTip;
+	}
 
-  public static OnlineMode of(boolean onlinemode, boolean fixuuid) {
-    if (onlinemode) {
-      return ONLINE;
-    } else {
-      return fixuuid ? FIXUUID : OFFLINE;
-    }
-  }
-
-  public boolean getOnlieMode() {
-    return this.onlinemode;
-  }
-
-  public boolean getFixUUID() {
-    return this.fixuuid;
-  }
-
+	public static OnlineMode of(boolean onlineModeEnabled, boolean tryOnlineUUIDFirst) {
+		if (onlineModeEnabled) {
+			return ONLINE;
+		} else {
+			return tryOnlineUUIDFirst ? FIX_UUID : OFFLINE;
+		}
+	}
 }

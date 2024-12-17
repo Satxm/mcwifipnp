@@ -55,11 +55,11 @@ public class ShareToLanScreenNew extends Screen {
 		} else if (this.cfg.usingDefaults) {
 			this.cfg.readFromRunningServer(server);
 			this.cfg.port = HttpUtil.getAvailablePort();
-			this.cfg.enableHostCheat = server.getWorldData().isAllowCommands();
+			this.cfg.allowHostCheat = server.getWorldData().isAllowCommands();
 		}
 
 		this.oldMotd = this.cfg.motd;
-		this.oldUPnPEnabled = this.cfg.UseUPnP;
+		this.oldUPnPEnabled = this.cfg.useUPnP;
 	}
 
 	protected void onConfirmClicked() {
@@ -67,7 +67,7 @@ public class ShareToLanScreenNew extends Screen {
 		this.cfg.save();
 
 		if (this.serverPublished) {
-			if (!this.oldMotd.equals(this.cfg.motd) || this.cfg.UseUPnP ^ oldUPnPEnabled) {
+			if (!this.oldMotd.equals(this.cfg.motd) || this.cfg.useUPnP ^ oldUPnPEnabled) {
 				// Motd has changed, update UPnP display name
 				UPnPModule.stop(server);
 				UPnPModule.startIfEnabled(server, cfg);
@@ -187,46 +187,46 @@ public class ShareToLanScreenNew extends Screen {
 			// Row3
 			// Allow Cheat button (for other joined players)
 			if (!ShareToLanScreenNew.this.serverPublished) {
-				tabContents.addChild(CycleButton.onOffBuilder(cfg.enableHostCheat)
-					.create(Component.translatable("selectWorld.allowCommands"), (cycleButton, AllowCommands) -> {
-						cfg.enableHostCheat = AllowCommands;
+				tabContents.addChild(CycleButton.onOffBuilder(cfg.allowHostCheat)
+					.create(Component.translatable("selectWorld.allowCommands"), (cycleButton, allowHostCheat) -> {
+						cfg.allowHostCheat = allowHostCheat;
 					}), 2);
 			}
 
-			tabContents.addChild(CycleButton.onOffBuilder(cfg.Whitelist)
+			tabContents.addChild(CycleButton.onOffBuilder(cfg.enforceWhitelist)
 				.withTooltip((state) -> Tooltip.create(Component.translatable("mcwifipnp.gui.Whitelist.info")))
-				.create(Component.translatable("mcwifipnp.gui.Whitelist"), (cycleButton, Whitelist) -> {
-					cfg.Whitelist = Whitelist;
+				.create(Component.translatable("mcwifipnp.gui.Whitelist"), (cycleButton, enforceWhitelist) -> {
+					cfg.enforceWhitelist = enforceWhitelist;
 				}), 2);
 
 			// Row 4
 			tabContents.addChild(CycleButton.builder(OnlineMode::getDisplayName)
 				.withValues(OnlineMode.values())
-				.withInitialValue(OnlineMode.of(cfg.OnlineMode, cfg.EnableUUIDFixer))
+				.withInitialValue(OnlineMode.of(cfg.onlineMode, cfg.enableUUIDFixer))
 				.withTooltip((OnlineMode) -> Tooltip.create(OnlineMode.gettoolTip()))
-				.create(Component.translatable("mcwifipnp.gui.OnlineMode"), (cycleButton, OnlineMode) -> {
-					cfg.OnlineMode = OnlineMode.getOnlieMode();
-					cfg.EnableUUIDFixer = OnlineMode.getFixUUID();
+				.create(Component.translatable("mcwifipnp.gui.OnlineMode"), (cycleButton, onlineMode) -> {
+					cfg.onlineMode = onlineMode.onlineMode;
+					cfg.enableUUIDFixer = onlineMode.fixUUID;
 				}), 2);
 
-			tabContents.addChild(CycleButton.onOffBuilder(cfg.PvP)
+			tabContents.addChild(CycleButton.onOffBuilder(cfg.enablePvP)
 				.withTooltip((state) -> Tooltip.create(Component.translatable("mcwifipnp.gui.PvP.info")))
 				.create(Component.translatable("mcwifipnp.gui.PvP"), (cycleButton, PvP) -> {
-					cfg.PvP = PvP;
+					cfg.enablePvP = PvP;
 				}), 2);
 
 			// Row 5
-			tabContents.addChild(CycleButton.onOffBuilder(cfg.UseUPnP)
+			tabContents.addChild(CycleButton.onOffBuilder(cfg.useUPnP)
 				.withTooltip((state) -> Tooltip.create(Component.translatable("mcwifipnp.gui.UseUPnP.info")))
-				.create(Component.translatable("mcwifipnp.gui.UseUPnP"), (cycleButton, UseUPnP) -> {
-					cfg.UseUPnP = UseUPnP;
+				.create(Component.translatable("mcwifipnp.gui.UseUPnP"), (cycleButton, useUPnP) -> {
+					cfg.useUPnP = useUPnP;
 				}), 2);
 
 			if (!ShareToLanScreenNew.this.serverPublished) {
-				tabContents.addChild(CycleButton.onOffBuilder(cfg.CopyToClipboard)
+				tabContents.addChild(CycleButton.onOffBuilder(cfg.getPublicIP)
 					.withTooltip((state) -> Tooltip.create(Component.translatable("mcwifipnp.gui.CopyIP.info")))
-					.create(Component.translatable("mcwifipnp.gui.CopyIP"), (cycleButton, CopyToClipboard) -> {
-						cfg.CopyToClipboard = CopyToClipboard;
+					.create(Component.translatable("mcwifipnp.gui.CopyIP"), (cycleButton, getPublicIP) -> {
+						cfg.getPublicIP = getPublicIP;
 					}), 2);
 			}
 
@@ -242,16 +242,16 @@ public class ShareToLanScreenNew extends Screen {
 			// Row 7
 			// GameMode toggle button
 			tabContents.addChild(CycleButton.builder(GameType::getShortDisplayName)
-					.withValues(GameType.values()).withInitialValue(cfg.GameMode)
-					.create(Component.translatable("selectWorld.gameMode"), (cycleButton, gameMode) -> {
-						cfg.GameMode = gameMode;
+					.withValues(GameType.values()).withInitialValue(cfg.gameType)
+					.create(Component.translatable("selectWorld.gameMode"), (cycleButton, gameType) -> {
+						cfg.gameType = gameType;
 					}), 2);
 
 			// Allow Cheat button (for other joined players)
-			tabContents.addChild(CycleButton.onOffBuilder(cfg.AllPlayersCheats)
+			tabContents.addChild(CycleButton.onOffBuilder(cfg.allowEveryoneCheat)
 					.withTooltip((state) ->Tooltip.create(Component.translatable("mcwifipnp.gui.AllPlayersCheats.info")))
-					.create(Component.translatable("mcwifipnp.gui.AllPlayersCheats"), (cycleButton, AllPlayersCheats) -> {
-						cfg.AllPlayersCheats = AllPlayersCheats;
+					.create(Component.translatable("mcwifipnp.gui.AllPlayersCheats"), (cycleButton, allowEveryoneCheat) -> {
+						cfg.allowEveryoneCheat = allowEveryoneCheat;
 					}), 2);
 		}
 	}

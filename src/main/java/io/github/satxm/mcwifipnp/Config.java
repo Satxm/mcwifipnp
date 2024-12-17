@@ -30,25 +30,44 @@ import net.minecraft.world.level.GameType;
 import net.minecraft.world.level.storage.LevelResource;
 
 public class Config {
-	// The initial value are the defaults
-
 	// These fields require special handling and consideration
 	public int port = 25565;
-	@SerializedName(value = "enableHostCheat", alternate = {"AllowCommands"})
-	public boolean enableHostCheat = false; // Host cheats
+
+	@SerializedName(value = "allow-host-cheat", alternate = {"AllowCommands"})
+	public boolean allowHostCheat = false;
 
 	// These fields are read, synced, and save as normal
+	@SerializedName(value = "max-players", alternate = {"maxPlayers"})
 	public int maxPlayers = 8;
-	public GameType GameMode = GameType.SURVIVAL;
+
+	@SerializedName(value = "gamemode", alternate = {"GameMode"})
+	public GameType gameType = GameType.SURVIVAL;
+
 	public String motd = Component.translatable("lanServer.title").getString();
-	public boolean AllPlayersCheats = false;
-	public boolean Whitelist = false;
-	public boolean UseUPnP = true;
-	public boolean OnlineMode = true;
-	public boolean EnableUUIDFixer = false;
-	public List<String> ForceOfflinePlayers = Collections.emptyList();
-	public boolean PvP = true;
-	public boolean CopyToClipboard = true;
+
+	@SerializedName(value = "allow-everyone-cheat", alternate = {"AllPlayersCheats"})
+	public boolean allowEveryoneCheat = false;
+
+	@SerializedName(value = "enforce-whitelist", alternate = {"Whitelist"})
+	public boolean enforceWhitelist = false;
+
+	@SerializedName(value = "enable-upnp", alternate = {"UseUPnP"})
+	public boolean useUPnP = true;
+
+	@SerializedName(value = "online-mode", alternate = {"OnlineMode"})
+	public boolean onlineMode = true;
+
+	@SerializedName(value = "enable-uuid-fixer", alternate = {"EnableUUIDFixer"})
+	public boolean enableUUIDFixer = false;
+
+	@SerializedName(value = "forced-offline-players", alternate = {"ForceOfflinePlayers"})
+	public List<String> forcedOfflinePlayers = Collections.emptyList();
+
+	@SerializedName(value = "pvp", alternate = {"PvP"})
+	public boolean enablePvP = true;
+
+	@SerializedName(value = "get-public-ip", alternate = {"CopyToClipboard"})
+	public boolean getPublicIP = true;
 
 	// These fields will not be serialized
 	public transient Path location;
@@ -128,32 +147,32 @@ public class Config {
 
 		this.port = server.getPort();
 
-		this.AllPlayersCheats = playerList.isAllowCommandsForAllPlayers();
-		this.GameMode = server.getDefaultGameType();
+		this.allowEveryoneCheat = playerList.isAllowCommandsForAllPlayers();
+		this.gameType = server.getDefaultGameType();
 
 		this.maxPlayers = playerList.getMaxPlayers();
-		this.OnlineMode = server.usesAuthentication();
-		this.PvP = server.isPvpAllowed();
-		this.Whitelist = server.isEnforceWhitelist();
+		this.onlineMode = server.usesAuthentication();
+		this.enablePvP = server.isPvpAllowed();
+		this.enforceWhitelist = server.isEnforceWhitelist();
 
 		this.motd = server.getMotd();
-		this.EnableUUIDFixer = UUIDFixer.EnableUUIDFixer;
-		this.ForceOfflinePlayers = UUIDFixer.ForceOfflinePlayers;
+		this.enableUUIDFixer = UUIDFixer.tryOnlineFirst;
+		this.forcedOfflinePlayers = UUIDFixer.alwaysOfflinePlayers;
 	}
 
 	public void applyTo(IntegratedServer server) {
 		PlayerList playerList = server.getPlayerList();
-		server.setDefaultGameType(this.GameMode);
-		playerList.setAllowCommandsForAllPlayers(this.AllPlayersCheats);
+		server.setDefaultGameType(this.gameType);
+		playerList.setAllowCommandsForAllPlayers(this.allowEveryoneCheat);
 
 		((PlayerListAccessor) playerList).setMaxPlayers(this.maxPlayers);
-		server.setUsesAuthentication(this.OnlineMode);
-		server.setPvpAllowed(this.PvP);
-		server.setEnforceWhitelist(this.Whitelist);
-		playerList.setUsingWhiteList(this.Whitelist);
+		server.setUsesAuthentication(this.onlineMode);
+		server.setPvpAllowed(this.enablePvP);
+		server.setEnforceWhitelist(this.enforceWhitelist);
+		playerList.setUsingWhiteList(this.enforceWhitelist);
 
 		server.setMotd(this.motd);
-		UUIDFixer.EnableUUIDFixer = this.EnableUUIDFixer;
-		UUIDFixer.ForceOfflinePlayers = this.ForceOfflinePlayers;
+		UUIDFixer.tryOnlineFirst = this.enableUUIDFixer;
+		UUIDFixer.alwaysOfflinePlayers = this.forcedOfflinePlayers;
 	}
 }

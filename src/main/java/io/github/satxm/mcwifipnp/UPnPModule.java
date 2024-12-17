@@ -22,7 +22,7 @@ public class UPnPModule implements Runnable {
 	}
 
 	public static void startIfEnabled(MinecraftServer server, Config cfg) {
-		if (!cfg.UseUPnP) {
+		if (!cfg.useUPnP) {
 			((IUPnPProvider) server).setUPnPInstance(null);
 			return;
 		}
