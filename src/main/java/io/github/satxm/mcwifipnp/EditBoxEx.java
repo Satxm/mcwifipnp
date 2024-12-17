@@ -9,7 +9,7 @@ import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.network.chat.Component;
 
-public class EditPortEx<T> extends EditBox {
+public class EditBoxEx<T> extends EditBox {
   public final static int TEXT_COLOR_HINT = 0x707070;
   public final static int TEXT_COLOR_NORMAL = 0xE0E0E0;
   public final static int TEXT_COLOR_WARN = 0xFFFF55;
@@ -29,7 +29,7 @@ public class EditPortEx<T> extends EditBox {
   protected Function<T, ValidatorResult> validator;
   protected ValidatorResult validatorFailedState;
 
-  public EditPortEx(Font font, int width, int height, int x, int y, Component name) {
+  public EditBoxEx(Font font, int width, int height, int x, int y, Component name) {
     super(font, width, height, x, y, name);
   }
 
@@ -79,21 +79,21 @@ public class EditPortEx<T> extends EditBox {
   }
 
   // Builder functions start
-  public static EditPortEx<Integer> numerical(Font font, int width, int height, int x, int y, Component name) {
-    EditPortEx<Integer> instance = new EditPortEx<Integer>(font, width, height, x, y, name);
+  public static EditBoxEx<Integer> numerical(Font font, int width, int height, int x, int y, Component name) {
+    EditBoxEx<Integer> instance = new EditBoxEx<Integer>(font, width, height, x, y, name);
     instance.valueToStringMap = (i) -> Integer.toString(i);
     instance.stringToValueMap = Integer::parseInt;
     return instance;
   }
 
-  public static EditPortEx<String> text(Font font, int width, int height, int x, int y, Component name) {
-    EditPortEx<String> instance = new EditPortEx<String>(font, width, height, x, y, name);
+  public static EditBoxEx<String> text(Font font, int width, int height, int x, int y, Component name) {
+    EditBoxEx<String> instance = new EditBoxEx<String>(font, width, height, x, y, name);
     instance.valueToStringMap = Function.identity();
     instance.stringToValueMap = Function.identity();
     return instance;
   }
 
-  public EditPortEx<T> defaults(T defaultValue, int textColor, Tooltip toolTip) {
+  public EditBoxEx<T> defaults(T defaultValue, int textColor, Tooltip toolTip) {
     this.defaultValue = defaultValue;
     this.defaultState = new ValidatorResult(textColor, toolTip, true, true);
     this.setValue(this.valueToStringMap.apply(defaultValue));
@@ -102,12 +102,12 @@ public class EditPortEx<T> extends EditBox {
     return this;
   }
 
-  public EditPortEx<T> invalid(int textColor, Tooltip toolTip) {
+  public EditBoxEx<T> invalid(int textColor, Tooltip toolTip) {
     this.validatorFailedState = new ValidatorResult(textColor, toolTip, false, false);
     return this;
   }
 
-  public EditPortEx<T> validator(Function<T, ValidatorResult> validator) {
+  public EditBoxEx<T> validator(Function<T, ValidatorResult> validator) {
     this.validator = validator;
     return this;
   }
@@ -121,7 +121,7 @@ public class EditPortEx<T> extends EditBox {
    * @param validator
    * @return
    */
-  public EditPortEx<T> bistate(T defaultValue, Tooltip toolTip, Predicate<T> validator) {
+  public EditBoxEx<T> bistate(T defaultValue, Tooltip toolTip, Predicate<T> validator) {
     this.defaults(defaultValue, TEXT_COLOR_HINT, toolTip);
     this.invalid(TEXT_COLOR_ERROR, toolTip);
     this.validator((t) -> {
@@ -131,12 +131,12 @@ public class EditPortEx<T> extends EditBox {
     return this;
   }
 
-  public EditPortEx<T> maxLength(int len) {
+  public EditBoxEx<T> maxLength(int len) {
     this.setMaxLength(len);
     return this;
   }
 
-  public EditPortEx<T> responder(BiConsumer<ValidatorResult, T> responder) {
+  public EditBoxEx<T> responder(BiConsumer<ValidatorResult, T> responder) {
     this.responder = responder;
     this.setResponder(this::onTextChanged);
     return this;

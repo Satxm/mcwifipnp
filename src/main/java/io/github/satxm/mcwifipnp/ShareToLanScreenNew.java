@@ -130,16 +130,16 @@ public class ShareToLanScreenNew extends Screen {
 				portField.setEditable(false);
 				portField.setValue(Integer.toString(cfg.port));
 			} else {
-				portField = EditPortEx.numerical(ShareToLanScreenNew.this.font, 0, 0, 40, 20, Component.translatable("lanServer.port"))
-					.defaults(cfg.port, EditPortEx.TEXT_COLOR_HINT,
+				portField = EditBoxEx.numerical(ShareToLanScreenNew.this.font, 0, 0, 40, 20, Component.translatable("lanServer.port"))
+					.defaults(cfg.port, EditBoxEx.TEXT_COLOR_HINT,
 							Tooltip.create(Component.translatable("mcwifipnp.gui.port.info")))
-					.invalid(EditPortEx.TEXT_COLOR_ERROR,
+					.invalid(EditBoxEx.TEXT_COLOR_ERROR,
 							Tooltip.create(Component.translatable("mcwifipnp.gui.port.invalid")))
 					.validator((port) -> {
 						if (port < 1024 || port > 65535) {
 							throw new NumberFormatException("Port out of range:" + port);
 						} else if (!HttpUtil.isPortAvailable(port)) {
-							return new EditPortEx.ValidatorResult(EditPortEx.TEXT_COLOR_WARN,
+							return new EditBoxEx.ValidatorResult(EditBoxEx.TEXT_COLOR_WARN,
 									Tooltip.create(Component.translatable("mcwifipnp.gui.port.unavailable")), false,
 									true);
 						} else {
@@ -158,7 +158,7 @@ public class ShareToLanScreenNew extends Screen {
 					1, this.layout.newCellSettings().alignHorizontallyRight());
 
 			// Number of players field
-			EditPortEx<Integer> maxPlayersField = EditPortEx
+			EditBoxEx<Integer> maxPlayersField = EditBoxEx
 				.numerical(ShareToLanScreenNew.this.font, 0, 0, 40, 20, Component.translatable("mcwifipnp.gui.players"))
 				.bistate(cfg.maxPlayers, Tooltip.create(Component.translatable("mcwifipnp.gui.players.info")),
 						(maxPlayers) -> maxPlayers > 0)
@@ -174,7 +174,7 @@ public class ShareToLanScreenNew extends Screen {
 
 			// Row2
 			// Motd field
-			tabContents.addChild(CommonLayouts.labeledElement(ShareToLanScreenNew.this.font, EditPortEx
+			tabContents.addChild(CommonLayouts.labeledElement(ShareToLanScreenNew.this.font, EditBoxEx
 				.text(ShareToLanScreenNew.this.font, 0, 0, 300, 20, Component.translatable("mcwifipnp.gui.motd"))
 				.bistate(cfg.motd, Tooltip.create(Component.translatable("mcwifipnp.gui.motd.info")), (newMotd) -> true)
 				.responder((newState, newMotd) -> {
