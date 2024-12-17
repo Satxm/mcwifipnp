@@ -33,6 +33,9 @@ public class ShareToLanScreenNew extends Screen {
 
 	protected Button confirmButton;
 
+	private boolean oldUPnPEnabled;
+	private String oldMotd;
+
 	public ShareToLanScreenNew(Screen screen, boolean serverPublished) {
 		super(Component.translatable("lanServer.title"));
 		this.lastScreen = screen;
@@ -49,15 +52,25 @@ public class ShareToLanScreenNew extends Screen {
 			this.cfg.port = HttpUtil.getAvailablePort();
 			this.cfg.enableHostCheat = server.getWorldData().isAllowCommands();
 		}
+
+		this.oldMotd = this.cfg.motd;
+		this.oldUPnPEnabled = this.cfg.UseUPnP;
 	}
 
 	protected void onConfirmClicked() {
+		IntegratedServer server = Minecraft.getInstance().getSingleplayerServer();
 		this.cfg.save();
 
-		if (!this.serverPublished) {
+		if (this.serverPublished) {
+			if (!this.oldMotd.equals(this.cfg.motd) || this.cfg.UseUPnP ^ oldUPnPEnabled) {
+				// Motd has changed, update UPnP display name
+				UPnPModule.stop(server);
+				UPnPModule.startIfEnabled(server, cfg);
+			}
+		} else {
 			MCWiFiPnPUnit.publishServer(this.cfg);
 		}
-		this.cfg.applyTo(Minecraft.getInstance().getSingleplayerServer());
+		this.cfg.applyTo(server);
 
 		this.minecraft.updateTitle();
 		this.minecraft.setScreen((Screen) null);
