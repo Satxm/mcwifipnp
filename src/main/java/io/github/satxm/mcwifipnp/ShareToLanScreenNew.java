@@ -11,9 +11,11 @@ import net.minecraft.client.gui.layouts.HeaderAndFooterLayout;
 import net.minecraft.client.gui.layouts.LinearLayout;
 import net.minecraft.client.gui.navigation.ScreenRectangle;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.gui.screens.ShareToLanScreen;
 import net.minecraft.client.server.IntegratedServer;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.HttpUtil;
 import net.minecraft.world.level.GameType;
 
@@ -32,6 +34,9 @@ public class ShareToLanScreenNew extends Screen {
 	public final HeaderAndFooterLayout layout = new HeaderAndFooterLayout(this);
 
 	protected Button confirmButton;
+
+	@Nullable
+	protected Button backToVanillaScreenButton;
 
 	private boolean oldUPnPEnabled;
 	private String oldMotd;
@@ -89,8 +94,20 @@ public class ShareToLanScreenNew extends Screen {
 		this.confirmButton = Button.builder(
 				this.serverPublished ? CommonComponents.GUI_DONE : Component.translatable("lanServer.start"),
 				button -> this.onConfirmClicked()).width(150).build();
-		footer.addChild(confirmButton);
+		footer.addChild(this.confirmButton);
 		footer.addChild(Button.builder(CommonComponents.GUI_CANCEL, p_232903_ -> this.onClose()).build());
+
+		if (this.serverPublished) {
+			this.backToVanillaScreenButton = null;
+		} else {
+			this.backToVanillaScreenButton = SpriteIconButton.builder(CommonComponents.GUI_BACK,
+					(button) -> this.minecraft.setScreen(new ShareToLanScreen(this.lastScreen)), true)
+				.width(20)
+				.sprite(ResourceLocation.withDefaultNamespace("icon/accessibility"), 15, 15)
+				.build();
+			this.backToVanillaScreenButton.setTooltip(Tooltip.create(CommonComponents.GUI_BACK));
+			this.addRenderableWidget(this.backToVanillaScreenButton);
+		}
 
 		this.layout.visitWidgets(widget -> {
 			widget.setTabOrderGroup(1);
@@ -255,6 +272,10 @@ public class ShareToLanScreenNew extends Screen {
 			this.tabManager.setTabArea(screenrectangle);
 			this.layout.setHeaderHeight(i);
 			this.layout.arrangeElements();
+		}
+
+		if (this.backToVanillaScreenButton != null) {
+			this.backToVanillaScreenButton.setPosition(5, this.confirmButton.getY());
 		}
 	}
 }
