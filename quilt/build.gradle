@@ -46,7 +46,8 @@ sourceSets {
 
 tasks.withType(ProcessResources).configureEach {
   var replaceProperties = [
-    minecraft_version_range : project.quilt_minecraft_version_range,
+    minecraft_version_min : project.minecraft_version_min,
+    minecraft_version_max : project.minecraft_version_max,
     quilt_qsl_version_range : project.quilt_qsl_version_range,
     quilt_loader_version_range : project.quilt_loader_version_range,
     version: project.mod_version,

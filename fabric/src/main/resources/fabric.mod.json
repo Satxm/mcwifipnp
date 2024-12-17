@@ -5,7 +5,8 @@
   "name": "LAN World Plug-n-Play",
   "description": "A Minecraft LAN World Tool With WLAN UPnP.",
   "authors": [
-  "Satxm"
+     "Satxm",
+    "Rikka0w0"
   ],
   "contact": {
   "homepage": "https://github.com/satxm/mcwifipnp",
@@ -25,7 +26,7 @@
   ],
   "depends": {
   "fabric": "${fabric_version_range}",
-  "minecraft": "${minecraft_version_range}",
+  "minecraft": ">=${minecraft_version_min} <${minecraft_version_max}",
   "fabricloader": "${fabric_loader_version_range}",
   "java": ">=21"
   }

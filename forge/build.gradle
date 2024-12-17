@@ -85,7 +85,8 @@ tasks.named('processResources', ProcessResources).configure {
   var replaceProperties = [
     mod_version : project.mod_version,
     forge_version_range : project.forge_version_range,
-    minecraft_version_range : project.forge_minecraft_version_range,
+    minecraft_version_min : project.minecraft_version_min,
+    minecraft_version_max : project.minecraft_version_max,
     forge_loader_version_range : project.forge_loader_version_range,
     pack_format_number: pack_format_number,
   ]

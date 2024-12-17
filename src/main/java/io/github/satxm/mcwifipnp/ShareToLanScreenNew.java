@@ -103,7 +103,7 @@ public class ShareToLanScreenNew extends Screen {
 			this.backToVanillaScreenButton = SpriteIconButton.builder(CommonComponents.GUI_BACK,
 					(button) -> this.minecraft.setScreen(new ShareToLanScreen(this.lastScreen)), true)
 				.width(20)
-				.sprite(ResourceLocation.withDefaultNamespace("icon/accessibility"), 15, 15)
+				.sprite(ResourceLocation.tryParse("icon/accessibility"), 15, 15)
 				.build();
 			this.backToVanillaScreenButton.setTooltip(Tooltip.create(CommonComponents.GUI_BACK));
 			this.addRenderableWidget(this.backToVanillaScreenButton);

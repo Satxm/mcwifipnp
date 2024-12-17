@@ -37,7 +37,7 @@ public abstract class MixinPauseScreen extends Screen {
 				SpriteIconButton lanServerSettings = SpriteIconButton
 						.builder(MCWiFiPnPUnit.MODIFY_LAN_OPTIONS,
 								(button) -> this.minecraft.setScreen(new ShareToLanScreenNew(this, true)), true)
-						.width(20).sprite(ResourceLocation.withDefaultNamespace("icon/language"), 15, 15).build();
+						.width(20).sprite(ResourceLocation.tryParse("icon/language"), 15, 15).build();
 				lanServerSettings.setPosition(this.width / 2 - 124, optionButton.getY());
 				lanServerSettings.setTooltip(Tooltip.create(MCWiFiPnPUnit.MODIFY_LAN_OPTIONS));
 				this.addRenderableWidget(lanServerSettings);

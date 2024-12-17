@@ -55,7 +55,8 @@ sourceSets {
 
 tasks.withType(ProcessResources).configureEach {
   var replaceProperties = [
-    minecraft_version_range : project.neo_minecraft_version_range,
+    minecraft_version_min : project.minecraft_version_min,
+    minecraft_version_max : project.minecraft_version_max,
     neo_version_range : project.neo_version_range,
     neo_loader_version_range : project.neo_loader_version_range,
     mod_version: project.mod_version,

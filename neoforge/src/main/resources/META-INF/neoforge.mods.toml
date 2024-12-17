@@ -10,7 +10,7 @@ displayName="LAN World Plug-n-Play"
 #updateJSONURL=""
 displayURL="https://github.com/satxm/mcwifipnp"
 logoFile="mcwifipnp.png"
-authors="Satxm"
+authors="Satxm, Rikka0w0"
 description="A Minecraft LAN World Tool With WLAN UPnP."
 
 [[mixins]]
@@ -26,6 +26,6 @@ config="mcwifipnp.mixins.json"
 [[dependencies.mcwifipnp]]
   modId="minecraft"
   type="required"
-  versionRange="${minecraft_version_range}"
+  versionRange="[${minecraft_version_min}, ${minecraft_version_max})"
   ordering="NONE"
   side="CLIENT"
