@@ -1,5 +1,4 @@
 {
-  "mcwifipnp.gui.port": "Número de puerto",
   "mcwifipnp.gui.port.info": "Número de puerto para el Mundo LAN.\nDeja el cuadro de edición vacío o ingresa un número diferente entre 1024 y 65535.",
   "mcwifipnp.gui.port.invalid": "Puerto no válido.\nDeja la caja de edición vacía o elige un número entre 1024 y 65535.",
   "mcwifipnp.gui.port.unavailable": "Puerto no disponible.\nDeja la caja de edición vacía o elige un número diferente entre 1024 y 65535.",

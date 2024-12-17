@@ -1,5 +1,4 @@
 {
-  "mcwifipnp.gui.port": "端口號",
   "mcwifipnp.gui.port.info": "局域網遊戲端口碼。\n請闕之，抑再入 1024 至 65535 間之數。",
   "mcwifipnp.gui.port.invalid": "端口碼不可用。\n請闕之，抑再入 1024 至 65535 間之數。",
   "mcwifipnp.gui.port.unavailable": "端口碼不可用。\n請闕之，抑再入 1024 至 65535 間之另數。",
