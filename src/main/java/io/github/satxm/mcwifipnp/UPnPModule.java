@@ -1,6 +1,5 @@
 package io.github.satxm.mcwifipnp;
 
-import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import com.dosse.upnp.UPnP;

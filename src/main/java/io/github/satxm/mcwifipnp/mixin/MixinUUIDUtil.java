@@ -13,6 +13,7 @@ public abstract class MixinUUIDUtil {
 	@Inject(method = "createOfflinePlayerUUID", at = @At("HEAD"), cancellable = true, require = 1, allow = 1)
 	private static void detour_createOfflinePlayerUUID(String playerName, CallbackInfoReturnable<UUID> ci) {
 		UUID uuid = UUIDFixer.hookEntry(playerName);
+
 		if (uuid != null) {
 			ci.setReturnValue(uuid);
 			ci.cancel();
