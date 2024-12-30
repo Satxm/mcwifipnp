@@ -9,16 +9,8 @@ import net.minecraft.client.gui.components.ChatComponent;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.MinecraftServer;
 
-public class UPnPModule implements Runnable {
+public record UPnPModule(int port, String displayName) implements Runnable {
 	private static final Logger LOGGER = MCWiFiPnPUnit.LOGGER;
-
-	public final int port;
-	public final String displayName;
-
-	private UPnPModule(int port, String motd) {
-		this.port = port;
-		this.displayName = motd;
-	}
 
 	public static void startIfEnabled(MinecraftServer server, Config cfg) {
 		if (!cfg.useUPnP) {
@@ -29,6 +21,10 @@ public class UPnPModule implements Runnable {
 		UPnPModule instance = new UPnPModule(cfg.port, cfg.motd);
 		((IUPnPProvider) server).setUPnPInstance(instance);
 		new Thread(instance, "MCWiFiPnP_UPnP").start();
+	}
+
+	public static boolean has(MinecraftServer server) {
+		return ((IUPnPProvider) server).getUPnPInstance() != null;
 	}
 
 	public static void stop(MinecraftServer server) {
