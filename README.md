@@ -18,15 +18,17 @@
 [7]: https://img.shields.io/github/license/Satxm/mcwifipnp?label=License&logo=github&style=flat&color=E51050&labelcolor=2D2D2D
 [8]: https://github.com/satxm/mcwifipnp
 
-**Fabric: Requires [Fabric Loader](https://fabricmc.net/use/) and [Fabric API](https://modrinth.com/mod/fabric-api)**.
+## Dependencies
 
-**Quilt: Requires [Quilt Loader](https://quiltmc.org/install/) and [QFAPI/QSL](https://modrinth.com/mod/qsl)**.
+**Fabric: [Fabric Loader](https://fabricmc.net/use/), [Fabric API](https://modrinth.com/mod/fabric-api)**.
 
-**Forge: Requires [Forge](https://files.minecraftforge.net/net/minecraftforge/forge/)**.
+**Quilt: [Quilt Loader](https://quiltmc.org/install/), [QFAPI/QSL](https://modrinth.com/mod/qsl)**.
 
-**NeoForge：Requires [NeoForge](https://projects.neoforged.net/neoforged/neoforge/)**.
+**Forge: [Forge](https://files.minecraftforge.net/net/minecraftforge/forge/)**.
 
-## Download - 下载
+**NeoForge: [NeoForge](https://projects.neoforged.net/neoforged/neoforge/)**.
+
+## Download
 
 CurseForge : [https://www.curseforge.com/minecraft/mc-mods/mcwifipnp](https://www.curseforge.com/minecraft/mc-mods/mcwifipnp)
 
@@ -34,82 +36,65 @@ Modrinth : [https://modrinth.com/mod/mcwifipnp](https://modrinth.com/mod/mcwifip
 
 MC百科 : [https://www.mcmod.cn/class/4498.html](https://www.mcmod.cn/class/4498.html)
 
-GitHub 源码 : [https://github.com/Satxm/mcwifipnp](https://github.com/Satxm/mcwifipnp)
+GitHub : [https://github.com/Satxm/mcwifipnp](https://github.com/Satxm/mcwifipnp)
 
-## Introduction - 简介
+## Introduction
 
-**This Branch is for Minecraft 1.21+ only!**
-
-**这个分支仅适用于 Minecraft 版本 1.21+ ！**
+**This Branch is for Minecraft [1.20.5, 1.21.4]!**
 
 Uses the vanilla Minecraft GUI style, Uses the official mojang mappings.
 
-使用Minecraft原生界面样式，使用Mojang官方混淆表。
+* Modified from [TheGlitch76/mcpnp](https://github.com/TheGlitch76/mcpnp)
+* UPnP module from [adolfintel/WaifUPnP](https://github.com/adolfintel/WaifUPnP).
+* `Online Mode` and `UUID Fix` from[Rikka0w0/LanServerProperties](https://github.com/rikka0w0/LanServerProperties).
 
-Modified from [TheGlitch76/mcpnp](https://github.com/TheGlitch76/mcpnp) project and UPnP module from [adolfintel/WaifUPnP](https://github.com/adolfintel/WaifUPnP).
-
-修改自[TheGlitch76/mcpnp](https://github.com/TheGlitch76/mcpnp)项目，UPnP模块来自[adolfintel/WaifUPnP](https://github.com/adolfintel/WaifUPnP)。
-
-## Screenshots - 界面截图
+## Screenshots
 
 <div align="center">
 
-![GUI EN-US](https://github.com/Satxm/images/raw/main/en.jpg)
-
-![GUI ZH-CN](https://github.com/Satxm/images/raw/main/zh.jpg)
+![GUI ZH-CN](SCREENSHOT.png)
 
 </div>
 
-## What Can It Do - 它的作用
+## Usage
 
-For the `Online Mode` button, there are now three options: 
- - `Enable`: enable genuine verification, which will verify login information against the Mojang server database, only allowing players who login with a Microsoft account to join, 
- - `Disable`: not verify login information, allows offline players to join, 
- - `Disable + UUID Fixer`: Attempt to match the Mojang server user name with the player name for offline mode players to obtain a unique UUID, Meanwhile, UUIDs are retained for users logging in with Microsoft accounts, It can also prevent the loss of backpack and inventory items.
+1. The `Online Mode` button has three options: 
+ - `Enable`: verify login information against the Mojang server database, only allow players with genuine Microsoft account to join.
+ - `Disable`: no verification, allows anyone, including offline players to join.
+ - `Disable + UUID Fixer`: Similar to above, but if a player has his name on the Mojang server, the official unique UUID will be used, just like in the "Online Mode". Exceptions can be added using the `/forceoffline add` command. This mode can be useful to preserve backpacks and inventories when switching from "Online Mode" to "Offline Mode".
 
-对于`正版验证`按钮，现在有三个选项：
- - `启用`：启用正版验证，将会比对Mojang服务器数据库验证登录信息，即只允许使用微软帐户登录的玩家加入；
- - `禁用`：即不验证登录信息，允许使用离线模式登录的玩家加入；
- - `禁用 + 修复UUID`：尝试使用离线模式登录的玩家名匹配Mojang服务器用户名称以获取唯一UUID，同时为使用微软帐户登录的用户保留UUID，它也可以防止背包和物品栏内容丢失。
+2. The command `/forceoffline` controls a list of players who are forced into offline mode. Use in conjunction with `Disable + UUID Fixer` to setup exceptions.
+ - command `/forceoffline list` can list players who in the force offline list, 
+ - command `/forceoffline add` can add players to the force offline list, 
+ - command `/forceoffline remove` can remove players from the force offline list.
 
-Added a new command `/forceoffline` to control whether players are forced into offline mode without obtaining UUIDs from Mojang servers. 
- - `/forceoffline list` command can list players who in the force offline list, 
- - `/forceoffline add` command can add players to the force offline list, 
- - `/forceoffline remove` command can remove players from the force offline list.
+3. Allows you to change server's port number and you can choose whether to map this port to the public network using UPnP (if your router supports UPnP).
 
-添加了一个新命令 `/forceoffline` 以便于控制玩家是否强制玩家为离线模式，不从 Mojang 服务器获取 UUID。
- - `/forceoffline list` 命令可以查看列表中玩家，
- - `/forceoffline add` 命令可以添加玩家到列表，
- - `/forceoffline remove` 命令可以从列表中移除玩家。
+4. Allows you to enable or disable pvp.
 
-Added `UUID Fixer module`, which allows offline players to obtain a unique UUID from the Mojang server, keeping the UUID fixed and not changing due to client changes.
+5. Allows you to change server motd (The message displayed below the server name in the server list).
 
-添加了 `UUID 修复模块`，对于离线玩家，可以使离线玩家从 Mojang 服务器获取唯一的 UUID，使 UUID 固定，不会因为客户端变化而变化。
+6. Allows you control other players' permissions when they join your world. Use `/op` and `/deop` commands to manipulate the OP list. You can also use command `/whitelist` to build a whitelist and use it to control players who can join your world.
 
-Allows you to change and lock the port number of the LAN world and you can choose whether to map this port to the public network using UPnP (if your router supports UPnP).
+7. You can use command `/ban` to blacklist players. Use command `/ban-ip` to add IP addresses to the blacklist. Use command `/banlist` to list blacklisted players. Use command `/pardon` to remove players from the blacklist, use command `/pardon-ip` to remove IP addresses from the blacklist
 
-允许你修改并锁定局域网世界的端口号，并选择是否映射这个端口使用UPnP映射到公网（如果你的路由器支持UPnP）。
+8. Your settings will be recorded in a file, and it will be automatically loaded next time.
 
-Automatically select game mode according to your game, allows you to enable or disable pvp.
+9. This mod can get your IP address, and you can choose whether to copy the IP address (such as local IPv4, globe IPv4 or IPv6) to the clipboard. in order to provide the IP address to your friends. The command `/ip` can retrieve more IP information.
 
-根据你的游戏，自动选择游戏模式，允许你启用或禁用PVP。
+10. You can change most of the above settings once the server starts, but some options are only applied to newly joined players.
 
-Allows you to change server motd (Which is the message that is displayed in the server list of the client, below the name).
+11. You can also go back to the vanilla `Open to Lan` screen by clicking in the button on the bottom-left corner.
 
-允许你自定义MOTD（是玩家客户端的多人游戏服务器列表中显示的服务器信息，显示于名称下方）。
+## For Developers
+### Compile Fabric Artifacts
+```
+git clone git@github.com:Satxm/mcwifipnp.git
+cd mcwifipnp
+.\gradlew.bat :fabric:runClient
+```
+Replace `fabric` with `forge`, `neoforge`, or `quilt` to build the corresponding artifacts.
 
-Allows you control other players' op permissions when they join your world, and you can use `/op` and `/deop` commands to do that. You can use command `/whitelist` to build a whitelist, than use it to control players who can join your world.
-
-你可以控制其他玩家加入时是否有op权限、是否可以作弊，你也可以使用 `/op` `/deop` 命令进行控制。你可以使用 `/whitelist` 命令构建白名单，然后用其控制其他玩家进是否允许加入你的游戏世界。
-
-You can use command `/ban` to add players to the blacklist, use command `/ban-ip` to add IP addresses to the blacklist, use command `/banlist` to list players who in the blacklist, use command `/pardon` to remove players from the blacklist, use command `/pardon-ip` to remove IP addresses from the blacklist
-
-你可以使用 `/ban` 来封禁玩家、 使用 `/ban-ip` 来封禁 IP 地址、 `/banlist` 命令可以查看封禁的玩家列表；你可以使用 `/pardon` 来解封玩家、 使用 `/pardon-ip` 来解封 IP地址。
-
-Your settings will be recorded in a file, and it will be automatically loaded next time.
-
-本模组可以自动保存配置文件，并且下次加载世界时会自动载入配置。
-
-This mod can get your IP address, and you can choose whether to copy the IP address (such as local IPv4, globe IPv4 or IPv6) to the clipboard. in order to provide the IP address to your friends.
-
-本模组可以获取你的IP地址（比如本地 IPv4，公网 IPv4 或 IPv6），而且你可以选择是否复制IP到剪切板，以方便联机使用。
+### Eclipse
+Import the root folder as a gradle project in Eclipse to start the development.
+You may want to disable some targets in `settings.gradle` to speed up the initial porting/development.

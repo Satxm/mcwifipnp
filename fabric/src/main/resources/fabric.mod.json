@@ -3,15 +3,15 @@
   "id": "mcwifipnp",
   "version": "${version}",
   "name": "LAN World Plug-n-Play",
-  "description": "A Minecraft LAN World Tool With WLAN UPnP.",
+  "description": "Provides a better UI than the vanilla Minecraft \"Open to LAN\" screen, which now also:\n1. Allows for a port customization\n2. Allows a user to disable the online mode, so that unauthenticated players can also join.\n3. UPnP support.",
   "authors": [
-     "Satxm",
+    "Satxm",
     "Rikka0w0"
   ],
   "contact": {
-  "homepage": "https://github.com/satxm/mcwifipnp",
-  "issues": "https://github.com/satxm/mcwifipnp/issues",
-  "sources": "https://github.com/satxm/mcwifipnp"
+    "homepage": "https://github.com/satxm/mcwifipnp",
+    "issues": "https://github.com/satxm/mcwifipnp/issues",
+    "sources": "https://github.com/satxm/mcwifipnp"
   },
   "license": "Apache License 2.0",
   "icon": "mcwifipnp.png",
@@ -22,13 +22,12 @@
   ]
   },
   "mixins": [
-  "mcwifipnp.mixins.json"
+    "mcwifipnp.mixins.json"
   ],
   "depends": {
-  "fabric": "${fabric_version_range}",
-  "minecraft": ">=${minecraft_version_min} <${minecraft_version_max}",
-  "fabricloader": "${fabric_loader_version_range}",
-  "java": ">=21"
+    "fabric": "${fabric_version_range}",
+    "minecraft": ">=${minecraft_version_min} <${minecraft_version_max}",
+    "fabricloader": "${fabric_loader_version_range}",
+    "java": ">=21"
   }
 }
-
