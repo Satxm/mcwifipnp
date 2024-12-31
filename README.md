@@ -1,3 +1,5 @@
+[__中文__![zh-cn](https://img.shields.io/badge/lang-zh--cn-green.svg)](README.zh-CN.md)
+
 # LAN World Plug-n-Play
 
 <div align="center">

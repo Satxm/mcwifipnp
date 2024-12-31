@@ -1,3 +1,5 @@
+[__English__![en](https://img.shields.io/badge/lang-en-red.svg)](README.md)
+
 # LAN World Plug-n-Play
 
 <div align="center">
