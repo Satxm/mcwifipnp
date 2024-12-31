@@ -1,4 +1,4 @@
-package io.github.satxm.mcwifipnp;
+package io.github.satxm.mcwifipnp.client;
 
 import java.util.List;
 

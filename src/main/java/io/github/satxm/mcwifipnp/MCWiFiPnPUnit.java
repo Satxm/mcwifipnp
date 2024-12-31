@@ -5,7 +5,8 @@ import org.apache.logging.log4j.Logger;
 
 import com.mojang.brigadier.CommandDispatcher;
 
-import io.github.satxm.mcwifipnp.commands.IpCommand;
+import io.github.satxm.mcwifipnp.commands.*;
+import io.github.satxm.mcwifipnp.network.UPnPModule;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.server.IntegratedServer;
 import net.minecraft.commands.CommandSourceStack;
@@ -29,6 +30,9 @@ public class MCWiFiPnPUnit {
 	public static final String MODID = "mcwifipnp";
 	public static final Component MODIFY_LAN_OPTIONS = Component.translatable("mcwifipnp.gui.lanServerOptions");
 
+	/**
+	 * The logger that should be used throughout this mod and its plugins.
+	 */
 	public static final Logger LOGGER = LogManager.getLogger(MCWiFiPnP.class);
 
 	/**
@@ -46,6 +50,13 @@ public class MCWiFiPnPUnit {
 		PardonIpCommand.register(cmdDispatcher);
 		ForceOfflineCommand.register(cmdDispatcher);
 		IpCommand.register(cmdDispatcher);
+	}
+
+	/**
+	 * Called by platform-specific hooks just before the server stops.
+	 */
+	public static void onServerStops(MinecraftServer server) {
+		UPnPModule.stop(server);
 	}
 
 	public static void publishServer(Config cfg) {
@@ -68,7 +79,12 @@ public class MCWiFiPnPUnit {
 		}
 	}
 
-	protected static boolean convertOldUsers(MinecraftServer server) {
+	/**
+	 * Copied from vanilla DedicatedServer
+	 * @param server
+	 * @return
+	 */
+	public static boolean convertOldUsers(MinecraftServer server) {
 		int i;
 		boolean bl = false;
 		for (i = 0; !bl && i <= 2; ++i) {
@@ -112,5 +128,4 @@ public class MCWiFiPnPUnit {
 			return;
 		}
 	}
-
 }

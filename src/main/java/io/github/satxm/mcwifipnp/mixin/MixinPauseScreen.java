@@ -1,8 +1,8 @@
 package io.github.satxm.mcwifipnp.mixin;
 
-import io.github.satxm.mcwifipnp.GuiUtils;
 import io.github.satxm.mcwifipnp.MCWiFiPnPUnit;
-import io.github.satxm.mcwifipnp.ShareToLanScreenNew;
+import io.github.satxm.mcwifipnp.client.GuiUtils;
+import io.github.satxm.mcwifipnp.client.ShareToLanScreenNew;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.SpriteIconButton;
 import net.minecraft.client.gui.components.Tooltip;

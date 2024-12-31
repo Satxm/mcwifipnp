@@ -1,4 +1,4 @@
-package io.github.satxm.mcwifipnp;
+package io.github.satxm.mcwifipnp.client;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.*;
@@ -20,6 +20,11 @@ import net.minecraft.util.HttpUtil;
 import net.minecraft.world.level.GameType;
 
 import javax.annotation.Nullable;
+
+import io.github.satxm.mcwifipnp.Config;
+import io.github.satxm.mcwifipnp.MCWiFiPnPUnit;
+import io.github.satxm.mcwifipnp.OnlineMode;
+import io.github.satxm.mcwifipnp.network.UPnPModule;
 
 public class ShareToLanScreenNew extends Screen {
 	private final Config cfg;

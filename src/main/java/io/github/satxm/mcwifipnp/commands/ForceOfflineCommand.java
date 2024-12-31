@@ -1,4 +1,4 @@
-package io.github.satxm.mcwifipnp;
+package io.github.satxm.mcwifipnp.commands;
 
 import com.mojang.authlib.GameProfile;
 import com.mojang.brigadier.CommandDispatcher;
@@ -12,6 +12,9 @@ import net.minecraft.server.players.PlayerList;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.builder.RequiredArgumentBuilder;
 import com.mojang.brigadier.exceptions.SimpleCommandExceptionType;
+
+import io.github.satxm.mcwifipnp.Config;
+
 import java.util.Collection;
 
 import net.minecraft.commands.CommandSourceStack;

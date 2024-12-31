@@ -5,12 +5,12 @@ import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 
 public class MCWiFiPnP implements ModInitializer {
-  @Override
-  public void onInitialize() {
-    ServerLifecycleEvents.SERVER_STOPPING.register(UPnPModule::stop);
+	@Override
+	public void onInitialize() {
+		ServerLifecycleEvents.SERVER_STOPPING.register(MCWiFiPnPUnit::onServerStops);
 
-    CommandRegistrationCallback.EVENT.register((dispatcher, registryAccess, environment) -> {
-      MCWiFiPnPUnit.registerCommands(dispatcher);
-    });
-  }
+		CommandRegistrationCallback.EVENT.register((dispatcher, registryAccess, environment) -> {
+			MCWiFiPnPUnit.registerCommands(dispatcher);
+		});
+	}
 }

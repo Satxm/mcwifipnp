@@ -9,17 +9,17 @@ import net.neoforged.neoforge.event.server.ServerStoppingEvent;
 
 @Mod(MCWiFiPnPUnit.MODID)
 public class MCWiFiPnP {
-  public MCWiFiPnP(IEventBus modEventBus) {
-    NeoForge.EVENT_BUS.register(this);
-  }
+	public MCWiFiPnP(IEventBus modEventBus) {
+		NeoForge.EVENT_BUS.register(this);
+	}
 
-  @SubscribeEvent
-  public void onRegisterCommands(RegisterCommandsEvent event) {
-    MCWiFiPnPUnit.registerCommands(event.getDispatcher());
-  }
+	@SubscribeEvent
+	public void onRegisterCommands(RegisterCommandsEvent event) {
+		MCWiFiPnPUnit.registerCommands(event.getDispatcher());
+	}
 
-  @SubscribeEvent
-  public void onServerStopping(ServerStoppingEvent event) {
-    UPnPModule.stop(event.getServer());
-  }
+	@SubscribeEvent
+	public void onServerStopping(ServerStoppingEvent event) {
+		MCWiFiPnPUnit.onServerStops(event.getServer());
+	}
 }

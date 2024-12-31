@@ -15,8 +15,8 @@ import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 
-import io.github.satxm.mcwifipnp.UPnPModule;
 import io.github.satxm.mcwifipnp.network.GlobalIPs;
+import io.github.satxm.mcwifipnp.network.UPnPModule;
 import io.netty.channel.socket.InternetProtocolFamily;
 import net.minecraft.ChatFormatting;
 import net.minecraft.commands.CommandSourceStack;

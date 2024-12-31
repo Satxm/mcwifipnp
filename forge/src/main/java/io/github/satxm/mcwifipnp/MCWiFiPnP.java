@@ -8,17 +8,17 @@ import net.minecraftforge.fml.common.Mod;
 
 @Mod(MCWiFiPnPUnit.MODID)
 public class MCWiFiPnP {
-  public MCWiFiPnP() {
-    MinecraftForge.EVENT_BUS.register(this);
-  }
+	public MCWiFiPnP() {
+		MinecraftForge.EVENT_BUS.register(this);
+	}
 
-  @SubscribeEvent
-  public void onRegisterCommands(RegisterCommandsEvent event) {
-    MCWiFiPnPUnit.registerCommands(event.getDispatcher());
-  }
+	@SubscribeEvent
+	public void onRegisterCommands(RegisterCommandsEvent event) {
+		MCWiFiPnPUnit.registerCommands(event.getDispatcher());
+	}
 
-  @SubscribeEvent
-  public void onServerStopping(ServerStoppingEvent event) {
-    UPnPModule.stop(event.getServer());
-  }
+	@SubscribeEvent
+	public void onServerStopping(ServerStoppingEvent event) {
+		MCWiFiPnPUnit.onServerStops(event.getServer());
+	}
 }
