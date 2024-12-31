@@ -22,7 +22,6 @@ import com.google.gson.JsonSerializer;
 import com.google.gson.annotations.SerializedName;
 
 import io.github.satxm.mcwifipnp.mixin.PlayerListAccessor;
-import net.minecraft.client.server.IntegratedServer;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.players.PlayerList;
@@ -142,7 +141,7 @@ public class Config {
 		}
 	}
 
-	public void readFromRunningServer(IntegratedServer server) {
+	public void readFromRunningServer(MinecraftServer server) {
 		PlayerList playerList = server.getPlayerList();
 
 		this.port = server.getPort();
@@ -160,7 +159,7 @@ public class Config {
 		this.forcedOfflinePlayers = UUIDFixer.alwaysOfflinePlayers;
 	}
 
-	public void applyTo(IntegratedServer server) {
+	public void applyTo(MinecraftServer server) {
 		PlayerList playerList = server.getPlayerList();
 		server.setDefaultGameType(this.gameType);
 		playerList.setAllowCommandsForAllPlayers(this.allowEveryoneCheat);

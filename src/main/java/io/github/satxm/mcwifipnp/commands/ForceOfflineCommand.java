@@ -14,6 +14,7 @@ import com.mojang.brigadier.builder.RequiredArgumentBuilder;
 import com.mojang.brigadier.exceptions.SimpleCommandExceptionType;
 
 import io.github.satxm.mcwifipnp.Config;
+import io.github.satxm.mcwifipnp.UUIDFixer;
 
 import java.util.Collection;
 
@@ -42,10 +43,9 @@ public class ForceOfflineCommand {
 			.suggests((commandContext, suggestionsBuilder) -> {
 				MinecraftServer server = ((CommandSourceStack) commandContext.getSource()).getServer();
 				PlayerList playerList = server.getPlayerList();
-				Config cfg = Config.read(server);
 				return SharedSuggestionProvider.suggest(playerList.getPlayers().stream()
 					.filter(
-						(serverPlayer) -> !cfg.forcedOfflinePlayers.contains(serverPlayer.getGameProfile().getName())
+						(serverPlayer) -> !UUIDFixer.alwaysOfflinePlayers.contains(serverPlayer.getGameProfile().getName())
 					).map(
 						(serverPlayer) -> serverPlayer.getGameProfile().getName()
 					), suggestionsBuilder);
@@ -58,9 +58,7 @@ public class ForceOfflineCommand {
 		RequiredArgumentBuilder<CommandSourceStack, Result> removeCmdTargets =
 			Commands.argument("targets", GameProfileArgument.gameProfile())
 			.suggests((commandContext, suggestionsBuilder) -> {
-				MinecraftServer server = ((CommandSourceStack) commandContext.getSource()).getServer();
-				Config cfg = Config.read(server);
-				return SharedSuggestionProvider.suggest(cfg.forcedOfflinePlayers.stream(), suggestionsBuilder);
+				return SharedSuggestionProvider.suggest(UUIDFixer.alwaysOfflinePlayers.stream(), suggestionsBuilder);
 			}).executes((commandContext) -> {
 				return removePlayers((CommandSourceStack) commandContext.getSource(),
 					GameProfileArgument.getGameProfiles(commandContext, "targets"));
@@ -75,11 +73,13 @@ public class ForceOfflineCommand {
 
 		MinecraftServer server = commandSourceStack.getServer();
 		Config cfg = Config.read(server);
+		if (server.isPublished())
+			cfg.readFromRunningServer(server);
 
 		int added = 0;
 		for (GameProfile gameProfile : collection) {
-			if (!cfg.forcedOfflinePlayers.contains(gameProfile.getName())) {
-				cfg.forcedOfflinePlayers.add(gameProfile.getName());
+			if (!UUIDFixer.alwaysOfflinePlayers.contains(gameProfile.getName())) {
+				UUIDFixer.alwaysOfflinePlayers.add(gameProfile.getName());
 				commandSourceStack.sendSuccess(() -> {
 					return Component.translatable("mcwifipnp.commands.forceoffline.add.success",
 						Component.literal(gameProfile.getName()));
@@ -101,11 +101,13 @@ public class ForceOfflineCommand {
 
 		MinecraftServer server = commandSourceStack.getServer();
 		Config cfg = Config.read(server);
+		if (server.isPublished())
+			cfg.readFromRunningServer(server);
 
 		int removed = 0;
 		for (GameProfile gameProfile: collection) {
-			if (cfg.forcedOfflinePlayers.contains(gameProfile.getName())) {
-				cfg.forcedOfflinePlayers.remove(gameProfile.getName());
+			if (UUIDFixer.alwaysOfflinePlayers.contains(gameProfile.getName())) {
+				UUIDFixer.alwaysOfflinePlayers.remove(gameProfile.getName());
 				commandSourceStack.sendSuccess(() -> {
 					return Component.translatable("mcwifipnp.commands.forceoffline.remove.success",
 						Component.literal(gameProfile.getName()));
@@ -124,20 +126,17 @@ public class ForceOfflineCommand {
 	}
 
 	private static int showList(CommandSourceStack commandSourceStack) {
-		MinecraftServer server = commandSourceStack.getServer();
-		Config cfg = Config.read(server);
-
-		if (cfg.forcedOfflinePlayers.size() == 0) {
+		if (UUIDFixer.alwaysOfflinePlayers.size() == 0) {
 			commandSourceStack.sendSuccess(() -> {
 				return Component.translatable("mcwifipnp.commands.forceoffline.none");
 			}, false);
 		} else {
 			commandSourceStack.sendSuccess(() -> {
 				return Component.translatable("mcwifipnp.commands.forceoffline.list",
-					cfg.forcedOfflinePlayers.size(), StringUtils.join(cfg.forcedOfflinePlayers, ", "));
+					UUIDFixer.alwaysOfflinePlayers.size(), StringUtils.join(UUIDFixer.alwaysOfflinePlayers, ", "));
 			}, false);
 		}
 
-		return cfg.forcedOfflinePlayers.size();
+		return UUIDFixer.alwaysOfflinePlayers.size();
 	}
 }
