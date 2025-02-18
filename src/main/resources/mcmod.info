@@ -1,0 +1,12 @@
+[{
+  "modid": "mcwifipnp",
+  "name": "LAN World Plug-n-Play",
+  "description": "Provides a better UI than the vanilla Minecraft \"Open to LAN\" screen, which now also:\n1. Allows for a port customization\n2. Allows a user to disable the online mode, so that unauthenticated players can also join.\n3. UPnP support.",
+  "version": "${version}",
+  "mcversion": "${mcversion}",
+  "logoFile": "mcwifipnp.png",
+  "url": "https://github.com/Satxm/mcwifipnp",
+  "updateUrl": "",
+  "authorList": ["Satxm", "Rikka0w0"],
+  "credits": ""
+}]

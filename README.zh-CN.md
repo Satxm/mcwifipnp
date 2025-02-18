@@ -42,9 +42,9 @@ GitHub : [https://github.com/Satxm/mcwifipnp](https://github.com/Satxm/mcwifipnp
 
 ## 简介
 
-**这个分支仅适用于 Minecraft 版本 [1.20.5, 1.21.4]!**
+**这个分支仅适用于 Minecraft 1.7.10!**
 
-使用Minecraft原生界面样式，使用Mojang官方混淆表。
+使用Minecraft原生界面样式。
 
 * 修改自[TheGlitch76/mcpnp](https://github.com/TheGlitch76/mcpnp)项目
 * UPnP模块来自[adolfintel/WaifUPnP](https://github.com/adolfintel/WaifUPnP)。
@@ -92,10 +92,10 @@ GitHub : [https://github.com/Satxm/mcwifipnp](https://github.com/Satxm/mcwifipnp
 ### 编译
 ```
 git clone git@github.com:Satxm/mcwifipnp.git
+git checkout 1.7.10
 cd mcwifipnp
-.\gradlew.bat :fabric:runClient
+.\gradlew.bat runClient
 ```
-将`fabric`替换为`forge`, `neoforge`, 或者 `quilt`可以构建对应的jar。
 
 ### Eclipse
 在 Eclipse 中将直接将根文件夹作为gradle项目导入就以开始开发。

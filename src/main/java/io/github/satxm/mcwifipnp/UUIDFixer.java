@@ -16,7 +16,7 @@ import com.google.gson.JsonParser;
 import com.google.gson.JsonSyntaxException;
 
 public class UUIDFixer {
-	public static boolean tryOnlineFirst = false;
+	public static boolean tryOnlineFirst = true;
 	public static List<String> alwaysOfflinePlayers = Collections.emptyList();
 
 	/**
@@ -38,7 +38,7 @@ public class UUIDFixer {
 		try {
 			String UUIDJson = IOUtils.toString(URI.create(url), Charset.defaultCharset());
 			if (!UUIDJson.isEmpty()) {
-				JsonObject root = JsonParser.parseString(UUIDJson).getAsJsonObject();
+				JsonObject root = new JsonParser().parse(UUIDJson).getAsJsonObject();
 				String playerName2 = root.getAsJsonPrimitive("name").getAsString();
 				String uuidString = root.getAsJsonPrimitive("id").getAsString();
 				// com.mojang.util.UUIDTypeAdapter.fromString(String)

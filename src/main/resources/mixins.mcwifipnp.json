@@ -1,0 +1,8 @@
+{
+  "package": "io.github.satxm.mcwifipnp.mixin",
+  "refmap": "mixins.mcwifipnp.refmap.json",
+  "mixins": [
+    "MixinUUIDUtil"
+  ],
+  "compatibilityLevel": "JAVA_8"
+}

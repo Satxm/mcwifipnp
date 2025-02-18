@@ -42,9 +42,9 @@ GitHub : [https://github.com/Satxm/mcwifipnp](https://github.com/Satxm/mcwifipnp
 
 ## Introduction
 
-**This Branch is for Minecraft [1.20.5, 1.21.4]!**
+**This Branch is for Minecraft 1.7.10!**
 
-Uses the vanilla Minecraft GUI style, Uses the official mojang mappings.
+Uses the vanilla Minecraft GUI style. **The only supported 1.7.10 mod loader is Forge!**
 
 * Modified from [TheGlitch76/mcpnp](https://github.com/TheGlitch76/mcpnp)
 * UPnP module from [adolfintel/WaifUPnP](https://github.com/adolfintel/WaifUPnP).
@@ -92,10 +92,10 @@ Uses the vanilla Minecraft GUI style, Uses the official mojang mappings.
 ### Compile Fabric Artifacts
 ```
 git clone git@github.com:Satxm/mcwifipnp.git
+git checkout 1.7.10
 cd mcwifipnp
-.\gradlew.bat :fabric:runClient
+.\gradlew.bat runClient
 ```
-Replace `fabric` with `forge`, `neoforge`, or `quilt` to build the corresponding artifacts.
 
 ### Eclipse
 Import the root folder as a gradle project in Eclipse to start the development.
