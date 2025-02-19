@@ -65,10 +65,11 @@ GitHub : [https://github.com/Satxm/mcwifipnp](https://github.com/Satxm/mcwifipnp
  - `禁用`：即不验证登录信息，允许使用离线模式登录的玩家加入；
  - `禁用 + 修复UUID`：尝试使用离线模式登录的玩家名匹配Mojang服务器用户名称以获取唯一UUID，同时为使用微软帐户登录的用户保留UUID，它也可以防止背包和物品栏内容丢失。
 
-2. 添加了一个新命令 `/forceoffline` 以便于控制玩家是否强制玩家为离线模式，不从 Mojang 服务器获取 UUID，与`禁用 + 修复UUID`共同使用。
- - `/forceoffline list` 命令可以查看列表中玩家，
- - `/forceoffline add` 命令可以添加玩家到列表，
- - `/forceoffline remove` 命令可以从列表中移除玩家。
+2. 新命令 `/uuidfixer` 可以控制在`禁用 + 修复UUID`模式下用户名如何映射为UUID。
+ - `/uuidfixer list` 命令可以查看列表中的规则。
+ - `/uuidfixer force` 命令可以添加新规则或替换已有规则。
+ - `/uuidfixer remove` 命令可以从列表中移除一个已有规则。
+ - `/uuidfixer test` 命令可用于检查一个用户名所适用的规则。
 
 3. 允许你修改局域网世界的端口号，并选择是否映射这个端口使用UPnP映射到公网（如果你的路由器支持UPnP）。
 
@@ -87,6 +88,8 @@ GitHub : [https://github.com/Satxm/mcwifipnp](https://github.com/Satxm/mcwifipnp
 10. 服务器启动后，您可以更改上述大部分设置，但某些选项仅适用于新加入的玩家。
 
 11. 您还可以通过单击左下角的按钮返回原版的“对局域网开放”屏幕。
+
+12. 当本模组安装在服务端上时，只有修复UUID功能可用。只有服务端工作目录下存在`uuid_fixer.json`时修复UUID才会启用。`/uuidfixer`命令在服务端上也可用。除此之外，本模组在服务端上什么也不会做。
 
 ## 开发者
 ### 编译

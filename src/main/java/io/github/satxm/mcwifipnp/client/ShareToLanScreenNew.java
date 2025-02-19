@@ -15,7 +15,11 @@ import net.minecraft.client.gui.screens.ShareToLanScreen;
 import net.minecraft.client.server.IntegratedServer;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.commands.PublishCommand;
+import net.minecraft.server.players.PlayerList;
+import net.minecraft.server.players.ServerOpListEntry;
 import net.minecraft.util.HttpUtil;
 import net.minecraft.world.level.GameType;
 
@@ -24,6 +28,7 @@ import javax.annotation.Nullable;
 import io.github.satxm.mcwifipnp.Config;
 import io.github.satxm.mcwifipnp.MCWiFiPnPUnit;
 import io.github.satxm.mcwifipnp.OnlineMode;
+import io.github.satxm.mcwifipnp.commands.IpCommand;
 import io.github.satxm.mcwifipnp.network.UPnPModule;
 
 public class ShareToLanScreenNew extends Screen {
@@ -78,7 +83,22 @@ public class ShareToLanScreenNew extends Screen {
 				UPnPModule.startIfEnabled(server, cfg);
 			}
 		} else {
-			MCWiFiPnPUnit.publishServer(this.cfg);
+			// Publish server
+			MutableComponent component = server.publishServer(this.cfg.gameType, this.cfg.allowHostCheat, this.cfg.port)
+				? PublishCommand.getSuccessMessage(this.cfg.port)
+				: Component.translatable("commands.publish.failed");
+			this.minecraft.gui.getChat().addMessage(component);
+
+			PlayerList playerList = server.getPlayerList();
+			playerList.getOps().add(new ServerOpListEntry(
+				server.getSingleplayerProfile(), 4, playerList.canBypassPlayerLimit(server.getSingleplayerProfile())));
+
+			UPnPModule.startIfEnabled(server, cfg);
+			if (this.cfg.getPublicIP) {
+				new Thread(() -> {
+					this.minecraft.gui.getChat().addMessage(IpCommand.getBrief(server));
+				}, "MCWiFiPnP").start();
+			}
 		}
 		this.cfg.applyTo(server);
 

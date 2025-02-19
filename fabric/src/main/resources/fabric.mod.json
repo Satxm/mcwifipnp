@@ -17,9 +17,9 @@
   "icon": "mcwifipnp.png",
   "environment": "*",
   "entrypoints": {
-  "main": [
-    "io.github.satxm.mcwifipnp.MCWiFiPnP"
-  ]
+    "main": [ "io.github.satxm.mcwifipnp.MCWiFiPnP" ],
+	"client": [ "io.github.satxm.mcwifipnp.MCWiFiPnP" ],
+	"server": [ "io.github.satxm.mcwifipnp.MCWiFiPnP" ]
   },
   "mixins": [
     "mcwifipnp.mixins.json"

@@ -5,6 +5,7 @@ import net.minecraftforge.event.RegisterCommandsEvent;
 import net.minecraftforge.event.server.ServerStoppingEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.loading.FMLEnvironment;
 
 @Mod(MCWiFiPnPUnit.MODID)
 public class MCWiFiPnP {
@@ -14,7 +15,7 @@ public class MCWiFiPnP {
 
 	@SubscribeEvent
 	public void onRegisterCommands(RegisterCommandsEvent event) {
-		MCWiFiPnPUnit.registerCommands(event.getDispatcher());
+		MCWiFiPnPUnit.registerCommands(event.getDispatcher(), FMLEnvironment.dist.isDedicatedServer());
 	}
 
 	@SubscribeEvent

@@ -20,7 +20,9 @@
     },
     "intermediate_mappings": "net.fabricmc:intermediary",
     "entrypoints": {
-      "init": "io.github.satxm.mcwifipnp.MCWiFiPnP"
+      "init": "io.github.satxm.mcwifipnp.MCWiFiPnP",
+	  "client": "io.github.satxm.mcwifipnp.MCWiFiPnP",
+	  "server": "io.github.satxm.mcwifipnp.MCWiFiPnP"
     },
     "depends": [
       {

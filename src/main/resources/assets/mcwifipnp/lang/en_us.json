@@ -34,10 +34,16 @@
   "mcwifipnp.upnp.failed.disabled": "Unable to forward port %s: UPnP is not enabled on your router, You may need to use port mapping software.",
   "mcwifipnp.upnp.failed.unknownerror": "Unable to forward port %s: Unknown error while adding port mapping, Please use a port mapping software.",
   "mcwifipnp.upnp.failed": "Unable to forward port %s!",
-  "mcwifipnp.commands.forceoffline.add.failed": "Player is already in the force offline list",
-  "mcwifipnp.commands.forceoffline.add.success": "Added %s to the force offline list",
-  "mcwifipnp.commands.forceoffline.list": "There are %s players in the force offline list: %s",
-  "mcwifipnp.commands.forceoffline.none": "There are no players in the force offline list",
-  "mcwifipnp.commands.forceoffline.remove.failed": "Player is not in the force offline list",
-  "mcwifipnp.commands.forceoffline.remove.success": "Removed %s from the force offline list"
+  "mcwifipnp.commands.uuidfixer.policy.online": "online",
+  "mcwifipnp.commands.uuidfixer.policy.offline": "offline",
+  "mcwifipnp.commands.uuidfixer.policy.invalid": "invalid",
+  "mcwifipnp.commands.uuidfixer.default.show": "UUID Fixer's default policy is %s.",
+  "mcwifipnp.commands.uuidfixer.default.set": "Set UUID Fixer's default policy to %s.",
+  "mcwifipnp.commands.uuidfixer.set.success": "Set %s's UUID Fixer policy to %s.",
+  "mcwifipnp.commands.uuidfixer.set.override": "Override UUID of %s with to %s.",
+  "mcwifipnp.commands.uuidfixer.set.bad-policy": "Invalid policy: %s, should be online, offline, or a valid UUID.",
+  "mcwifipnp.commands.uuidfixer.list": "There are %s rules in the UUID Fixer's policy list:",
+  "mcwifipnp.commands.uuidfixer.none": "UUID Fixer's policy list is empty.",
+  "mcwifipnp.commands.uuidfixer.policy.not-exist": "%s is not in the UUID Fixer's policy list!",
+  "mcwifipnp.commands.uuidfixer.remove.success": "Removed %s from the UUID Fixer's policy list."
 }

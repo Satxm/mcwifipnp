@@ -5,11 +5,13 @@
   "compatibilityLevel": "JAVA_21",
   "refmap": "mcwifipnp-refmap.json",
   "client": [
-	"MixinMinecraftServer",
     "PlayerListAccessor",
-    "MixinUUIDUtil",
     "AccessorGridLayout",
     "MixinPauseScreen"
+  ],
+  "mixins": [
+    "MixinMinecraftServer",
+    "MixinUUIDUtil"
   ],
   "injectors": {
     "defaultRequire": 1

@@ -5,8 +5,6 @@ import java.lang.reflect.Type;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
-import java.util.Collections;
-import java.util.List;
 
 import org.apache.logging.log4j.Logger;
 
@@ -58,9 +56,6 @@ public class Config {
 
 	@SerializedName(value = "enable-uuid-fixer", alternate = {"EnableUUIDFixer"})
 	public boolean enableUUIDFixer = false;
-
-	@SerializedName(value = "forced-offline-players", alternate = {"ForceOfflinePlayers"})
-	public List<String> forcedOfflinePlayers = Collections.emptyList();
 
 	@SerializedName(value = "pvp", alternate = {"PvP"})
 	public boolean enablePvP = true;
@@ -155,8 +150,7 @@ public class Config {
 		this.enforceWhitelist = server.isEnforceWhitelist();
 
 		this.motd = server.getMotd();
-		this.enableUUIDFixer = UUIDFixer.tryOnlineFirst;
-		this.forcedOfflinePlayers = UUIDFixer.alwaysOfflinePlayers;
+		this.enableUUIDFixer = UUIDFixer.enabled;
 	}
 
 	public void applyTo(MinecraftServer server) {
@@ -171,7 +165,6 @@ public class Config {
 		playerList.setUsingWhiteList(this.enforceWhitelist);
 
 		server.setMotd(this.motd);
-		UUIDFixer.tryOnlineFirst = this.enableUUIDFixer;
-		UUIDFixer.alwaysOfflinePlayers = this.forcedOfflinePlayers;
+		UUIDFixer.enabled = this.enableUUIDFixer;
 	}
 }

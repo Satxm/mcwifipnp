@@ -7,11 +7,8 @@ import com.mojang.brigadier.CommandDispatcher;
 
 import io.github.satxm.mcwifipnp.commands.*;
 import io.github.satxm.mcwifipnp.network.UPnPModule;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.server.IntegratedServer;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.commands.BanIpCommands;
 import net.minecraft.server.commands.BanListCommands;
@@ -20,12 +17,10 @@ import net.minecraft.server.commands.DeOpCommands;
 import net.minecraft.server.commands.OpCommand;
 import net.minecraft.server.commands.PardonCommand;
 import net.minecraft.server.commands.PardonIpCommand;
-import net.minecraft.server.commands.PublishCommand;
 import net.minecraft.server.commands.WhitelistCommand;
 import net.minecraft.server.players.OldUsersConverter;
-import net.minecraft.server.players.PlayerList;
-import net.minecraft.server.players.ServerOpListEntry;
 
+// This is the common entry which should not import any side-specific class
 public class MCWiFiPnPUnit {
 	public static final String MODID = "mcwifipnp";
 	public static final Component MODIFY_LAN_OPTIONS = Component.translatable("mcwifipnp.gui.lanServerOptions");
@@ -39,7 +34,17 @@ public class MCWiFiPnPUnit {
 	 * Register commands.
 	 * Should be called from platform-specific entries.
 	 */
-	public static void registerCommands(CommandDispatcher<CommandSourceStack> cmdDispatcher) {
+	public static void registerCommands(CommandDispatcher<CommandSourceStack> cmdDispatcher, boolean isDedicatedServer) {
+		// Register our new commands on both client and dedicated server
+		UUIDFixerCommand.register(cmdDispatcher);
+		IpCommand.register(cmdDispatcher);
+
+		if (isDedicatedServer) {
+			enableUUIDFixerOnDedicatedServer();
+			return;
+		}
+
+		// Register missing vanilla server commands on the client-side
 		DeOpCommands.register(cmdDispatcher);
 		OpCommand.register(cmdDispatcher);
 		WhitelistCommand.register(cmdDispatcher);
@@ -48,8 +53,6 @@ public class MCWiFiPnPUnit {
 		BanPlayerCommands.register(cmdDispatcher);
 		PardonCommand.register(cmdDispatcher);
 		PardonIpCommand.register(cmdDispatcher);
-		ForceOfflineCommand.register(cmdDispatcher);
-		IpCommand.register(cmdDispatcher);
 	}
 
 	/**
@@ -59,24 +62,10 @@ public class MCWiFiPnPUnit {
 		UPnPModule.stop(server);
 	}
 
-	public static void publishServer(Config cfg) {
-		Minecraft client = Minecraft.getInstance();
-		IntegratedServer server = client.getSingleplayerServer();
-		PlayerList playerList = server.getPlayerList();
-
-		MutableComponent component = server.publishServer(cfg.gameType, cfg.allowHostCheat, cfg.port)
-			? PublishCommand.getSuccessMessage(cfg.port)
-			: Component.translatable("commands.publish.failed");
-		client.gui.getChat().addMessage(component);
-		playerList.getOps().add(new ServerOpListEntry(
-			server.getSingleplayerProfile(), 4, playerList.canBypassPlayerLimit(server.getSingleplayerProfile())));
-
-		UPnPModule.startIfEnabled(server, cfg);
-		if (cfg.getPublicIP) {
-			new Thread(() -> {
-				client.gui.getChat().addMessage(IpCommand.getBrief(server));
-			}, "MCWiFiPnP").start();
-		}
+	public static void enableUUIDFixerOnDedicatedServer() {
+		UUIDFixer.enabled = true;
+		LOGGER.info("UUID Fixer has been enabled on the dedicated server."
+			+ "To disable, delete mod McWifiPnP. Config file is \"uuid_fixer.json\".");
 	}
 
 	/**

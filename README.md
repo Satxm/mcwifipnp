@@ -63,12 +63,13 @@ Uses the vanilla Minecraft GUI style, Uses the official mojang mappings.
 1. The `Online Mode` button has three options: 
  - `Enable`: verify login information against the Mojang server database, only allow players with genuine Microsoft account to join.
  - `Disable`: no verification, allows anyone, including offline players to join.
- - `Disable + UUID Fixer`: Similar to above, but if a player has his name on the Mojang server, the official unique UUID will be used, just like in the "Online Mode". Exceptions can be added using the `/forceoffline add` command. This mode can be useful to preserve backpacks and inventories when switching from "Online Mode" to "Offline Mode".
+ - `Disable + UUID Fixer`: Similar to above, enables the UUID Fixer. The default behavior of UUID Fixer is that, if a player has his name on the Mojang server, the official unique UUID will be used, just like in the "Online Mode". Exceptions can be added using the `/uuidfixer force` command. This mode can be useful to preserve backpacks and inventories when switching from "Online Mode" to "Offline Mode".
 
-2. The command `/forceoffline` controls a list of players who are forced into offline mode. Use in conjunction with `Disable + UUID Fixer` to setup exceptions.
- - command `/forceoffline list` can list players who in the force offline list, 
- - command `/forceoffline add` can add players to the force offline list, 
- - command `/forceoffline remove` can remove players from the force offline list.
+2. The command `/uuidfixer` controls how usernames are mapped to UUIDs in the `Disable + UUID Fixer` mode.
+ - command `/uuidfixer list` lists all mapping rules.
+ - command `/uuidfixer force` adds a new rule or update an existing rule.
+ - command `/uuidfixer remove` removes an existing rule.
+ - command `/uuidfixer test` allows you to check the policy applied to a username.
 
 3. Allows you to change server's port number and you can choose whether to map this port to the public network using UPnP (if your router supports UPnP).
 
@@ -87,6 +88,8 @@ Uses the vanilla Minecraft GUI style, Uses the official mojang mappings.
 10. You can change most of the above settings once the server starts, but some options are only applied to newly joined players.
 
 11. You can also go back to the vanilla `Open to Lan` screen by clicking in the button on the bottom-left corner.
+
+12. When installed to a dedicated server, only the `UUID Fixer` function is available. It can only be enabled if `uuid_fixer.json` exists in the root server folder. The `/uuidfixer` command is available on the dedicated server side. This mod does nothing otherwise.
 
 ## For Developers
 ### Compile Fabric Artifacts
