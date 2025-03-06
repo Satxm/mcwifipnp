@@ -6,10 +6,10 @@
     "version": "${version}",
     "metadata": {
       "name": "LAN World Plug-n-Play",
-      "description": "Provides a better UI than the vanilla Minecraft \"Open to LAN\" screen, which now also:\n1. Allows for a port customization\n2. Allows a user to disable the online mode, so that unauthenticated players can also join.\n3. UPnP support.",
+      "description": "Provides a better UI than the vanilla Minecraft \"Open to LAN\" screen, which now also:\\n1. Allows for a port customization\\n2. Allows a user to disable the online mode, so that unauthenticated players can also join.\\n3. UPnP support.",
       "contributors": {
         "Satxm": "Owner",
-		"Rikka0w0": "Contributor"
+        "Rikka0w0": "Contributor"
       },
       "contact": {
         "homepage": "https://github.com/satxm/mcwifipnp",
@@ -21,8 +21,8 @@
     "intermediate_mappings": "net.fabricmc:intermediary",
     "entrypoints": {
       "init": "io.github.satxm.mcwifipnp.MCWiFiPnP",
-	  "client": "io.github.satxm.mcwifipnp.MCWiFiPnP",
-	  "server": "io.github.satxm.mcwifipnp.MCWiFiPnP"
+      "client": "io.github.satxm.mcwifipnp.MCWiFiPnP",
+      "server": "io.github.satxm.mcwifipnp.MCWiFiPnP"
     },
     "depends": [
       {
