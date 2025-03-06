@@ -21,7 +21,7 @@ jobs:
       uses: gradle/actions/setup-gradle@v4
       with:
           cache-read-only: false
-          gradle-home-cache-cleanup: true
+          cache-cleanup: always
 
     - name: Make Gradle Wrapper Executable
       if: ${{ runner.os != 'Windows' }}
