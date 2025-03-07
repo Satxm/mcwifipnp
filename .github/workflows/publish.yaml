@@ -43,10 +43,10 @@ jobs:
 
       - name: Get Name form files
         run: |
-          fabric_name=$(basename fabric/build/libs/!\(*-@\(dev|sources|javadoc\)\).jar | sed 's/\.jar//' | sed 's/mcwifipnp-//')
-          forge_name=$(basename forge/build/libs/!\(*-@\(dev|sources|javadoc\)\).jar | sed 's/\.jar//' | sed 's/mcwifipnp-//')
-          neoforge_name=$(basename neoforge/build/libs/!\(*-@\(dev|sources|javadoc\)\).jar | sed 's/\.jar//' | sed 's/mcwifipnp-//')
-          quilt_name=$(basename quilt/build/libs/!\(*-@\(dev|sources|javadoc\)\).jar | sed 's/\.jar//' | sed 's/mcwifipnp-//')
+          fabric_name=$(basename fabric/build/libs/!\(*-@\(dev\|sources\|javadoc\)\).jar | sed 's/\.jar//' | sed 's/mcwifipnp-//')
+          forge_name=$(basename forge/build/libs/!\(*-@\(dev\|sources\|javadoc\)\).jar | sed 's/\.jar//' | sed 's/mcwifipnp-//')
+          neoforge_name=$(basename neoforge/build/libs/!\(*-@\(dev\|sources\|javadoc\)\).jar | sed 's/\.jar//' | sed 's/mcwifipnp-//')
+          quilt_name=$(basename quilt/build/libs/!\(*-@\(dev\|sources\|javadoc\)\).jar | sed 's/\.jar//' | sed 's/mcwifipnp-//')
           set_action_env "FABRIC_NAME" "${fabric_name}"
           set_action_env "FORGE_NAME" "${forge_name}"
           set_action_env "NEOFORGE_NAME" "${neoforge_name}"
