@@ -43,69 +43,65 @@ jobs:
 
       - name: Get Name form files
         run: |
-          # Generate dynamic strings based on the build configuration
-          function set_action_env() {
-            echo "$1"="$2" >> $GITHUB_ENV
-          }
-          fabric_file=fabric/build/libs/!(*-@(dev|sources|javadoc)).jar
-          forge_file=forge/build/libs/!(*-@(dev|sources|javadoc)).jar
-          neoforge_file=neoforge/build/libs/!(*-@(dev|sources|javadoc)).jar
-          quilt_file=quilt/build/libs/!(*-@(dev|sources|javadoc)).jar
-          echo $fabric_file
-          echo $forge_file
-          echo $neoforge_file
-          echo $quilt_file
+          fabric_name=$(basename fabric/build/libs/*.jar | sed 's/.jar//' | sed 's/mcwifipnp-//' | sed 's/-sources//' | sed 's/-dev//')
+          forge_name=$(basename forge/build/libs/*.jar | sed 's/\.jar//' | sed 's/mcwifipnp-//' | sed 's/-sources//' | sed 's/-dev//')
+          neoforge_name=$(basename neoforge/build/libs/*.jar | sed 's/\.jar//' | sed 's/mcwifipnp-//' | sed 's/-sources//' | sed 's/-dev//')
+          quilt_name=$(basename quilt/build/libs/*.jar | sed 's/\.jar//' | sed 's/mcwifipnp-//' | sed 's/-sources//' | sed 's/-dev//')
+          echo "FABRIC_NAME"="${fabric_name}"
+          echo "FORGE_NAME"="${forge_name}"
+          echo "NEOFORGE_NAME"="${neoforge_name}"
+          echo "QUILT_NAME"="${quilt_name}"
 
-      # - name: Publish (Fabric)
-      #   uses: Kir-Antipov/mc-publish@v3.3
-      #   with:
-      #     modrinth-id: ${{ env.modrinth-id }}
-      #     modrinth-token: "${{ secrets.MODRINTH_TOKEN }}"
-      #     curseforge-id: ${{ env.curseforge-id }}
-      #     curseforge-token: "${{ secrets.CURSEFORGE_TOKEN }}"
+      - name: Publish (Fabric)
+        uses: Kir-Antipov/mc-publish@v3.3
+        with:
+          modrinth-id: ${{ env.modrinth-id }}
+          modrinth-token: "${{ secrets.MODRINTH_TOKEN }}"
+          curseforge-id: ${{ env.curseforge-id }}
+          curseforge-token: "${{ secrets.CURSEFORGE_TOKEN }}"
 
-      #     name: ${{ env.FABRIC_NAME }}
-      #     version-type: release
-      #     files: fabric/build/libs/!(*-@(dev|sources|javadoc)).jar
-      #     java: Java ${{ env.java-version }}
+          name: ${{ env.FABRIC_NAME }}
+          version-type: release
+          files: fabric/build/libs/!(*-@(dev|sources|javadoc)).jar
+          java: Java ${{ env.java-version }}
 
-      # - name: Publish (Forge)
-      #   uses: Kir-Antipov/mc-publish@v3.3
-      #   with:
-      #     modrinth-id: ${{ env.modrinth-id }}
-      #     modrinth-token: "${{ secrets.MODRINTH_TOKEN }}"
-      #     curseforge-id: ${{ env.curseforge-id }}
-      #     curseforge-token: "${{ secrets.CURSEFORGE_TOKEN }}"
+      - name: Publish (Forge)
+        uses: Kir-Antipov/mc-publish@v3.3
+        with:
+          modrinth-id: ${{ env.modrinth-id }}
+          modrinth-token: "${{ secrets.MODRINTH_TOKEN }}"
+          curseforge-id: ${{ env.curseforge-id }}
+          curseforge-token: "${{ secrets.CURSEFORGE_TOKEN }}"
 
-      #     name: ${{ env.FORGE_NAME }}
-      #     version-type: release
-      #     files: forge/build/libs/!(*-@(dev|sources|javadoc)).jar
-      #     java: Java ${{ env.java-version }}
+          name: ${{ env.FORGE_NAME }}
+          version-type: release
+          files: forge/build/libs/!(*-@(dev|sources|javadoc)).jar
+          java: Java ${{ env.java-version }}
 
-      # - name: Publish (NeoForge)
-      #   uses: Kir-Antipov/mc-publish@v3.3
-      #   with:
-      #     modrinth-id: ${{ env.modrinth-id }}
-      #     modrinth-token: "${{ secrets.MODRINTH_TOKEN }}"
-      #     curseforge-id: ${{ env.curseforge-id }}
-      #     curseforge-token: "${{ secrets.CURSEFORGE_TOKEN }}"
+      - name: Publish (NeoForge)
+        uses: Kir-Antipov/mc-publish@v3.3
+        with:
+          modrinth-id: ${{ env.modrinth-id }}
+          modrinth-token: "${{ secrets.MODRINTH_TOKEN }}"
+          curseforge-id: ${{ env.curseforge-id }}
+          curseforge-token: "${{ secrets.CURSEFORGE_TOKEN }}"
 
-      #     name: ${{ env.NEOFORGE_NAME }}
-      #     loaders: neoforge
-      #     version-type: release
-      #     files: neoforge/build/libs/!(*-@(dev|sources|javadoc)).jar
-      #     java: Java ${{ env.java-version }}
+          name: ${{ env.NEOFORGE_NAME }}
+          loaders: neoforge
+          version-type: release
+          files: neoforge/build/libs/!(*-@(dev|sources|javadoc)).jar
+          java: Java ${{ env.java-version }}
 
-      # - name: Publish (Quilt)
-      #   uses: Kir-Antipov/mc-publish@v3.3
-      #   with:
-      #     modrinth-id: ${{ env.modrinth-id }}
-      #     modrinth-token: "${{ secrets.MODRINTH_TOKEN }}"
-      #     curseforge-id: ${{ env.curseforge-id }}
-      #     curseforge-token: "${{ secrets.CURSEFORGE_TOKEN }}"
+      - name: Publish (Quilt)
+        uses: Kir-Antipov/mc-publish@v3.3
+        with:
+          modrinth-id: ${{ env.modrinth-id }}
+          modrinth-token: "${{ secrets.MODRINTH_TOKEN }}"
+          curseforge-id: ${{ env.curseforge-id }}
+          curseforge-token: "${{ secrets.CURSEFORGE_TOKEN }}"
 
-      #     name: ${{ env.QUILT_NAME }}
-      #     loaders: quilt
-      #     version-type: release
-      #     files: quilt/build/libs/!(*-@(dev|sources|javadoc)).jar
-      #     java: Java ${{ env.java-version }}
+          name: ${{ env.QUILT_NAME }}
+          loaders: quilt
+          version-type: release
+          files: quilt/build/libs/!(*-@(dev|sources|javadoc)).jar
+          java: Java ${{ env.java-version }}
