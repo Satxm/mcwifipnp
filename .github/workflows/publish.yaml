@@ -47,10 +47,10 @@ jobs:
           forge_name=$(basename forge/build/libs/*.jar | sed 's/\.jar//' | sed 's/mcwifipnp-//' | sed 's/-sources//' | sed 's/-dev//')
           neoforge_name=$(basename neoforge/build/libs/*.jar | sed 's/\.jar//' | sed 's/mcwifipnp-//' | sed 's/-sources//' | sed 's/-dev//')
           quilt_name=$(basename quilt/build/libs/*.jar | sed 's/\.jar//' | sed 's/mcwifipnp-//' | sed 's/-sources//' | sed 's/-dev//')
-          echo "FABRIC_NAME"="${fabric_name}"
-          echo "FORGE_NAME"="${forge_name}"
-          echo "NEOFORGE_NAME"="${neoforge_name}"
-          echo "QUILT_NAME"="${quilt_name}"
+          echo "FABRIC_NAME"="${fabric_name}" >> $GITHUB_ENV
+          echo "FORGE_NAME"="${forge_name}" >> $GITHUB_ENV
+          echo "NEOFORGE_NAME"="${neoforge_name}" >> $GITHUB_ENV
+          echo "QUILT_NAME"="${quilt_name}" >> $GITHUB_ENV
 
       - name: Publish (Fabric)
         uses: Kir-Antipov/mc-publish@v3.3
