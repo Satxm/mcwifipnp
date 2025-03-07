@@ -43,6 +43,10 @@ jobs:
 
       - name: Get Name form files
         run: |
+          # Generate dynamic strings based on the build configuration
+          function set_action_env() {
+            echo "$1"="$2" >> $GITHUB_ENV
+          }
           fabric_name=$(basename fabric/build/libs/!\(*-@\(dev\|sources\|javadoc\)\).jar | sed 's/\.jar//' | sed 's/mcwifipnp-//')
           forge_name=$(basename forge/build/libs/!\(*-@\(dev\|sources\|javadoc\)\).jar | sed 's/\.jar//' | sed 's/mcwifipnp-//')
           neoforge_name=$(basename neoforge/build/libs/!\(*-@\(dev\|sources\|javadoc\)\).jar | sed 's/\.jar//' | sed 's/mcwifipnp-//')
@@ -75,7 +79,7 @@ jobs:
 
           name: ${{ env.FORGE_NAME }}
           version-type: release
-          files: forge/build/libs/!(*-@(dev|sources|javadoc|slim)).jar
+          files: forge/build/libs/!(*-@(dev|sources|javadoc)).jar
           java: Java ${{ env.java-version }}
 
       - name: Publish (NeoForge)
@@ -89,7 +93,7 @@ jobs:
           name: ${{ env.NEOFORGE_NAME }}
           loaders: neoforge
           version-type: release
-          files: neoforge/build/libs/!(*-@(dev|sources|javadoc|slim)).jar
+          files: neoforge/build/libs/!(*-@(dev|sources|javadoc)).jar
           java: Java ${{ env.java-version }}
 
       - name: Publish (Quilt)
@@ -103,5 +107,5 @@ jobs:
           name: ${{ env.QUILT_NAME }}
           loaders: quilt
           version-type: release
-          files: quilt/build/libs/!(*-@(dev|sources|javadoc|slim)).jar
+          files: quilt/build/libs/!(*-@(dev|sources|javadoc)).jar
           java: Java ${{ env.java-version }}
