@@ -29,8 +29,8 @@ public class EditBoxEx<T> extends EditBox {
 	protected Function<T, ValidatorResult> validator;
 	protected ValidatorResult validatorFailedState;
 
-	public EditBoxEx(Font font, int width, int height, int x, int y, Component name) {
-		super(font, width, height, x, y, name);
+	public EditBoxEx(Font font, int x, int y, int width, int height, Component name) {
+		super(font, x, y, width, height, name);
 	}
 
 	public void onTextChanged(String newText) {
@@ -55,7 +55,7 @@ public class EditBoxEx<T> extends EditBox {
 					}
 				}
 			} catch (Exception e) {
-				
+
 			}
 		}
 
@@ -81,15 +81,15 @@ public class EditBoxEx<T> extends EditBox {
 	}
 
 	// Builder functions start
-	public static EditBoxEx<Integer> numerical(Font font, int width, int height, int x, int y, Component name) {
-		EditBoxEx<Integer> instance = new EditBoxEx<Integer>(font, width, height, x, y, name);
+	public static EditBoxEx<Integer> numerical(Font font, int x, int y, int width, int height, Component name) {
+		EditBoxEx<Integer> instance = new EditBoxEx<Integer>(font, x, y, width, height, name);
 		instance.valueToStringMap = (i) -> Integer.toString(i);
 		instance.stringToValueMap = Integer::parseInt;
 		return instance;
 	}
 
-	public static EditBoxEx<String> text(Font font, int width, int height, int x, int y, Component name) {
-		EditBoxEx<String> instance = new EditBoxEx<String>(font, width, height, x, y, name);
+	public static EditBoxEx<String> text(Font font, int x, int y, int width, int height, Component name) {
+		EditBoxEx<String> instance = new EditBoxEx<String>(font, x, y, width, height, name);
 		instance.valueToStringMap = Function.identity();
 		instance.stringToValueMap = Function.identity();
 		return instance;

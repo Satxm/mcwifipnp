@@ -151,11 +151,11 @@ public class ShareToLanScreenNew extends Screen {
 			// Port field
 			EditBox portField;
 			if (ShareToLanScreenNew.this.serverPublished) {
-				portField = new EditBox(ShareToLanScreenNew.this.font, 0, 0, 40, 20, Component.translatable("lanServer.port"));
+				portField = new EditBox(ShareToLanScreenNew.this.font, 0, 0, 70, 20, Component.translatable("lanServer.port"));
 				portField.setEditable(false);
 				portField.setValue(Integer.toString(cfg.port));
 			} else {
-				portField = EditBoxEx.numerical(ShareToLanScreenNew.this.font, 0, 0, 40, 20, Component.translatable("lanServer.port"))
+				portField = EditBoxEx.numerical(ShareToLanScreenNew.this.font, 0, 0, 70, 20, Component.translatable("lanServer.port"))
 					.defaults(cfg.port, EditBoxEx.TEXT_COLOR_HINT,
 							Tooltip.create(Component.translatable("mcwifipnp.gui.port.info")))
 					.invalid(EditBoxEx.TEXT_COLOR_ERROR,
@@ -184,7 +184,7 @@ public class ShareToLanScreenNew extends Screen {
 
 			// Number of players field
 			EditBoxEx<Integer> maxPlayersField = EditBoxEx
-				.numerical(ShareToLanScreenNew.this.font, 0, 0, 40, 20, Component.translatable("mcwifipnp.gui.players"))
+				.numerical(ShareToLanScreenNew.this.font, 0, 0, 70, 20, Component.translatable("mcwifipnp.gui.players"))
 				.bistate(cfg.maxPlayers, Tooltip.create(Component.translatable("mcwifipnp.gui.players.info")),
 						(maxPlayers) -> maxPlayers > 0)
 				.responder((newState, maxPlayers) -> {
@@ -200,7 +200,7 @@ public class ShareToLanScreenNew extends Screen {
 			// Row2
 			// Motd field
 			tabContents.addChild(CommonLayouts.labeledElement(ShareToLanScreenNew.this.font, EditBoxEx
-				.text(ShareToLanScreenNew.this.font, 0, 0, 300, 20, Component.translatable("mcwifipnp.gui.motd"))
+				.text(ShareToLanScreenNew.this.font, 0, 0, 308, 20, Component.translatable("mcwifipnp.gui.motd"))
 				.bistate(cfg.motd, Tooltip.create(Component.translatable("mcwifipnp.gui.motd.info")), (newMotd) -> true)
 				.responder((newState, newMotd) -> {
 					confirmButton.active = newState.valid();
