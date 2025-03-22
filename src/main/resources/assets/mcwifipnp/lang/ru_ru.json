@@ -34,6 +34,7 @@
   "mcwifipnp.upnp.failed.disabled": "Не удаётся переадресовать порт %s: UPnP на вашем маршрутизаторе не включен. Возможно, вам потребуется использовать программное обеспечение для сопоставления портов.",
   "mcwifipnp.upnp.failed.unknownerror": "Не удаётся переадресовать порт %s: неизвестная ошибка при добавлении сопоставления портов. Пожалуйста, используйте программное обеспечение для сопоставления портов.",
   "mcwifipnp.upnp.failed": "Не удаётся переадресовать порт %s!",
+  "mcwifipnp.commands.uuidfixer.name": "исправитель UUID",
   "mcwifipnp.commands.uuidfixer.policy.online": "онлайн",
   "mcwifipnp.commands.uuidfixer.policy.offline": "автономная",
   "mcwifipnp.commands.uuidfixer.policy.invalid": "недействительна",

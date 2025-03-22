@@ -11,6 +11,7 @@ import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.builder.RequiredArgumentBuilder;
 import com.mojang.brigadier.exceptions.SimpleCommandExceptionType;
 
+import io.github.satxm.mcwifipnp.Config;
 import io.github.satxm.mcwifipnp.UUIDFixer;
 
 import java.util.LinkedHashSet;
@@ -21,6 +22,7 @@ import java.util.stream.Collectors;
 
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
+import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 
@@ -115,7 +117,34 @@ public class UUIDFixerCommand {
 			}
 		)));
 
+		cmdBuilder = cmdBuilder.then(Commands.literal("enabled").then(
+			Commands.argument("enabled", BoolArgumentType.bool()).executes(commandContext -> {
+				return setEnabled(commandContext.getSource(), BoolArgumentType.getBool(commandContext, "enabled"));
+			})
+		).executes(commandContext -> {
+			return showEnabled(commandContext.getSource());
+		}));
+
 		commandDispatcher.register(cmdBuilder);
+	}
+
+	private static int setEnabled(CommandSourceStack commandSourceStack, boolean enabled) {
+		MinecraftServer server = commandSourceStack.getServer();
+		Config cfg = Config.readFromPublishedServer(server);
+		cfg.enableUUIDFixer = enabled;
+		cfg.saveAndApply(server);
+
+		return showEnabled(commandSourceStack);
+	}
+
+	private static int showEnabled(CommandSourceStack commandSourceStack) {
+		MinecraftServer server = commandSourceStack.getServer();
+		Config cfg = Config.readFromPublishedServer(server);
+
+		Component status = Component.translatable("mcwifipnp.commands.uuidfixer.name")
+			.append(": ").append(cfg.enableUUIDFixer ? CommonComponents.OPTION_ON : CommonComponents.OPTION_OFF);
+		commandSourceStack.sendSuccess(()->status, false);
+		return 1;
 	}
 
 	private static int setPolicy(CommandSourceStack commandSourceStack, String playerName,

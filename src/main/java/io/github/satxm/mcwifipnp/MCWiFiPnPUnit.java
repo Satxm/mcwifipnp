@@ -44,6 +44,10 @@ public class MCWiFiPnPUnit {
 			return;
 		}
 
+		// Register our client-only commands
+		OnlineModeCommand.register(cmdDispatcher);
+		UPnPCommand.register(cmdDispatcher);
+
 		// Register missing vanilla server commands on the client-side
 		DeOpCommands.register(cmdDispatcher);
 		OpCommand.register(cmdDispatcher);

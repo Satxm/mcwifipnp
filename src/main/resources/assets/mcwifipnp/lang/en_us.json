@@ -34,6 +34,7 @@
   "mcwifipnp.upnp.failed.disabled": "Unable to forward port %s: UPnP is not enabled on your router, You may need to use port mapping software.",
   "mcwifipnp.upnp.failed.unknownerror": "Unable to forward port %s: Unknown error while adding port mapping, Please use a port mapping software.",
   "mcwifipnp.upnp.failed": "Unable to forward port %s!",
+  "mcwifipnp.commands.uuidfixer.name": "UUID Fixer",
   "mcwifipnp.commands.uuidfixer.policy.online": "online",
   "mcwifipnp.commands.uuidfixer.policy.offline": "offline",
   "mcwifipnp.commands.uuidfixer.policy.invalid": "invalid",

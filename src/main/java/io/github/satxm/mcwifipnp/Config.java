@@ -94,6 +94,14 @@ public class Config {
 		return read(getConfigPath(server));
 	}
 
+	public static Config readFromPublishedServer(MinecraftServer server) {
+		Config cfg = read(getConfigPath(server));
+		if (server.isPublished())
+			cfg.readFromRunningServer(server);
+
+		return cfg;
+	}
+
 	public static Config read(Path location) {
 		Config cfg;
 
@@ -120,6 +128,12 @@ public class Config {
 		} catch (IOException e) {
 			LOGGER.warn("Unable to write config file!", e);
 		}
+	}
+
+	public void saveAndApply(MinecraftServer server) {
+		if (server.isPublished())
+			this.applyTo(server);
+		this.save();
 	}
 
 	private static class EnumLowerCaseAdapter<T extends Enum<T>> implements JsonSerializer<T>, JsonDeserializer<T> {

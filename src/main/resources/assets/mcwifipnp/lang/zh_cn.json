@@ -34,6 +34,7 @@
   "mcwifipnp.upnp.failed.disabled": "无法转发端口%s：路由器上未启用UPnP，你可能需要端口映射软件。",
   "mcwifipnp.upnp.failed.unknownerror": "无法转发端口%s：添加端口映射时出现未知错误，请使用端口映射软件。",
   "mcwifipnp.upnp.failed": "无法转发端口%s！请使用端口映射软件。",
+  "mcwifipnp.commands.uuidfixer.name": "修复UUID",
   "mcwifipnp.commands.uuidfixer.policy.online": "正版验证",
   "mcwifipnp.commands.uuidfixer.policy.offline": "离线模式",
   "mcwifipnp.commands.uuidfixer.policy.invalid": "无效",

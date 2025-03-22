@@ -64,14 +64,17 @@ GitHub : [https://github.com/Satxm/mcwifipnp](https://github.com/Satxm/mcwifipnp
  - `启用`：启用正版验证，将会比对Mojang服务器数据库验证登录信息，即只允许使用微软帐户登录的玩家加入；
  - `禁用`：即不验证登录信息，允许使用离线模式登录的玩家加入；
  - `禁用 + 修复UUID`：尝试使用离线模式登录的玩家名匹配Mojang服务器用户名称以获取唯一UUID，同时为使用微软帐户登录的用户保留UUID，它也可以防止背包和物品栏内容丢失。
+ - 对应的控制台命令为`/onlinemode`与`/uuidfixer enabled`。
 
 2. 新命令 `/uuidfixer` 可以控制在`禁用 + 修复UUID`模式下用户名如何映射为UUID。
+ - `/uuidfixer enabled`用于开启与关闭本功能。
  - `/uuidfixer list` 命令可以查看列表中的规则。
  - `/uuidfixer force` 命令可以添加新规则或替换已有规则。
  - `/uuidfixer remove` 命令可以从列表中移除一个已有规则。
  - `/uuidfixer test` 命令可用于检查一个用户名所适用的规则。
 
 3. 允许你修改局域网世界的端口号，并选择是否映射这个端口使用UPnP映射到公网（如果你的路由器支持UPnP）。
+使用图形界面或者`/upnp`命令来开启与关闭UPnP支持。
 
 4. 允许你启用或禁用PVP。
 

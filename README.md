@@ -64,14 +64,17 @@ Uses the vanilla Minecraft GUI style, Uses the official mojang mappings.
  - `Enable`: verify login information against the Mojang server database, only allow players with genuine Microsoft account to join.
  - `Disable`: no verification, allows anyone, including offline players to join.
  - `Disable + UUID Fixer`: Similar to above, enables the UUID Fixer. The default behavior of UUID Fixer is that, if a player has his name on the Mojang server, the official unique UUID will be used, just like in the "Online Mode". Exceptions can be added using the `/uuidfixer force` command. This mode can be useful to preserve backpacks and inventories when switching from "Online Mode" to "Offline Mode".
+ - The corresponding commands are `/onlinemode` and `/uuidfixer enabled`.
 
 2. The command `/uuidfixer` controls how usernames are mapped to UUIDs in the `Disable + UUID Fixer` mode.
+ - command `/uuidfixer enabled` toggles the UUID fixer on and off.
  - command `/uuidfixer list` lists all mapping rules.
  - command `/uuidfixer force` adds a new rule or update an existing rule.
  - command `/uuidfixer remove` removes an existing rule.
  - command `/uuidfixer test` allows you to check the policy applied to a username.
 
 3. Allows you to change server's port number and you can choose whether to map this port to the public network using UPnP (if your router supports UPnP).
+Use the GUI button or the `/upnp` command to toggle UPnP support on and off.
 
 4. Allows you to enable or disable pvp.
 

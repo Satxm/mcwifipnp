@@ -34,11 +34,12 @@ public record UPnPModule(int port, String displayName) implements Runnable {
 		if (uPnPModule != null) {
 			uPnPModule.stop();
 		}
+		((IUPnPProvider) server).setUPnPInstance(null);
 	}
 
 	public void stop() {
-        UPnP.closePortTCP(this.port);
-        LOGGER.info("Stopped forwarded port " + this.port + ".");
+		UPnP.closePortTCP(this.port);
+		LOGGER.info("Stopped forwarding port " + this.port + ".");
 	}
 
 	@Override
