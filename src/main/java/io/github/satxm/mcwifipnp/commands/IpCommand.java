@@ -240,7 +240,8 @@ public class IpCommand {
 	public static MutableComponent copyable(MutableComponent base, String content) {
 		return base.withStyle(style -> style.withColor(ChatFormatting.GREEN)
 				.withClickEvent(new ClickEvent.CopyToClipboard(content))
-				.withHoverEvent(new HoverEvent.ShowText(Component.translatable("chat.copy.click").append("\n").append(content)))
+				.withHoverEvent(new HoverEvent.ShowText(
+					Component.translatable("chat.copy.click").append("\n").append(content)))
 				.withInsertion(content)
 		);
 	}
