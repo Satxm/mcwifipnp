@@ -55,6 +55,7 @@ jobs:
       - name: Publish (Fabric)
         uses: Kir-Antipov/mc-publish@v3.3
         with:
+          fail-mode: warn
           modrinth-id: ${{ env.modrinth-id }}
           modrinth-token: "${{ secrets.MODRINTH_TOKEN }}"
           curseforge-id: ${{ env.curseforge-id }}
@@ -68,6 +69,7 @@ jobs:
       - name: Publish (Forge)
         uses: Kir-Antipov/mc-publish@v3.3
         with:
+          fail-mode: warn
           modrinth-id: ${{ env.modrinth-id }}
           modrinth-token: "${{ secrets.MODRINTH_TOKEN }}"
           curseforge-id: ${{ env.curseforge-id }}
@@ -81,6 +83,7 @@ jobs:
       - name: Publish (NeoForge)
         uses: Kir-Antipov/mc-publish@v3.3
         with:
+          fail-mode: warn
           modrinth-id: ${{ env.modrinth-id }}
           modrinth-token: "${{ secrets.MODRINTH_TOKEN }}"
           curseforge-id: ${{ env.curseforge-id }}
@@ -95,6 +98,7 @@ jobs:
       - name: Publish (Quilt)
         uses: Kir-Antipov/mc-publish@v3.3
         with:
+          fail-mode: warn
           modrinth-id: ${{ env.modrinth-id }}
           modrinth-token: "${{ secrets.MODRINTH_TOKEN }}"
           curseforge-id: ${{ env.curseforge-id }}
