@@ -42,7 +42,7 @@ GitHub : [https://github.com/Satxm/mcwifipnp](https://github.com/Satxm/mcwifipnp
 
 ## 简介
 
-**这个分支仅适用于 Minecraft 版本 [1.20.5, 1.21.4]!**
+**这个分支仅适用于 Minecraft 版本 [1.21.5, 1.22)!**
 
 使用Minecraft原生界面样式，使用Mojang官方混淆表。
 

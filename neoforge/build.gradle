@@ -2,7 +2,7 @@ plugins {
   id 'java-library'
   id 'eclipse'
   id 'idea'
-  id 'net.neoforged.gradle.userdev' version '7.0.+'
+  id 'net.neoforged.moddev' version '2.+'
 }
 
 java.toolchain.languageVersion = JavaLanguageVersion.of(21)
@@ -20,25 +20,42 @@ repositories {
   mavenLocal()
 }
 
-minecraft {
+neoForge {
+  version = project.neo_version
+
   runs {
-    configureEach {
-      workingDirectory project.file('run')
-      systemProperty 'forge.logging.markers', 'REGISTRIES'
-      systemProperty 'forge.logging.console.level', 'debug'
-      modSource project.sourceSets.main
-    }
     client {
-      systemProperty 'forge.enabledGameTestNamespaces', project.mod_id
+      client()
+      systemProperty 'neoforge.enabledGameTestNamespaces', project.mod_id
     }
-    data {
+
+    server {
+      server()
+      programArgument '--nogui'
+      systemProperty 'neoforge.enabledGameTestNamespaces', project.mod_id
+    }
+
+    gameTestServer {
+      type = "gameTestServer"
+      systemProperty 'neoforge.enabledGameTestNamespaces', project.mod_id
+    }
+
+    clientData {
+      clientData()
       programArguments.addAll '--mod', project.mod_id, '--all', '--output', file('src/generated/resources/').getAbsolutePath(), '--existing', file('src/main/resources/').getAbsolutePath()
     }
-  }
-}
 
-dependencies {
-  implementation "net.neoforged:neoforge:${project.neo_version}"
+    configureEach {
+      systemProperty 'forge.logging.markers', 'REGISTRIES'
+      logLevel = org.slf4j.event.Level.DEBUG
+    }
+  }
+
+  mods {
+    "${mod_id}" {
+      sourceSet(sourceSets.main)
+    }
+  }
 }
 
 sourceSets {
@@ -69,7 +86,7 @@ tasks.withType(ProcessResources).configureEach {
 }
 
 tasks.withType(JavaCompile).configureEach {
-  it.options.encoding = 'UTF-8'
+  options.encoding = 'UTF-8'
   it.options.release = 21
 }
 
