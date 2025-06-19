@@ -10,10 +10,10 @@ import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.network.chat.Component;
 
 public class EditBoxEx<T> extends EditBox {
-	public final static int TEXT_COLOR_HINT = 0x707070;
-	public final static int TEXT_COLOR_NORMAL = 0xE0E0E0;
-	public final static int TEXT_COLOR_WARN = 0xFFFF55;
-	public final static int TEXT_COLOR_ERROR = 0xFF5555;
+	public final static int TEXT_COLOR_HINT = 0xFF707070;
+	public final static int TEXT_COLOR_NORMAL = 0xFFE0E0E0;
+	public final static int TEXT_COLOR_WARN = 0xFFFF5555;
+	public final static int TEXT_COLOR_ERROR = 0xFFFF5555;
 
 	protected T defaultValue;
 	protected ValidatorResult defaultState;

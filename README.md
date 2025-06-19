@@ -42,7 +42,7 @@ GitHub : [https://github.com/Satxm/mcwifipnp](https://github.com/Satxm/mcwifipnp
 
 ## Introduction
 
-**This Branch is for Minecraft [1.21.5, 1.22)!**
+**This Branch is for Minecraft [1.21.6, 1.22)!**
 
 Uses the vanilla Minecraft GUI style, Uses the official mojang mappings.
 
