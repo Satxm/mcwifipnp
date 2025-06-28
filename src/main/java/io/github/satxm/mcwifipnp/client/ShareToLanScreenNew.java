@@ -45,6 +45,8 @@ public class ShareToLanScreenNew extends Screen {
 
 	protected Button confirmButton;
 
+	protected CycleButton<Boolean> removePlayerReportingButton;
+
 	@Nullable
 	protected Button backToVanillaScreenButton;
 
@@ -137,6 +139,16 @@ public class ShareToLanScreenNew extends Screen {
 			this.backToVanillaScreenButton.setTooltip(Tooltip.create(CommonComponents.GUI_BACK));
 			this.addRenderableWidget(this.backToVanillaScreenButton);
 		}
+
+		this.removePlayerReportingButton = CycleButton.onOffBuilder(cfg.removePlayerReportingButton)
+				.displayOnlyValue()
+				.withTooltip((state) -> Tooltip.create(Component.translatable("mcwifipnp.gui.removePlayerReportingButton")))
+				.create(this.width - 25, footer.getY(), 20, 20,
+						Component.translatable("mcwifipnp.gui.removePlayerReportingButton"),
+						(cycleButton, removePlayerReportingButton) -> {
+							cfg.removePlayerReportingButton = removePlayerReportingButton;
+						});
+		this.addRenderableWidget(this.removePlayerReportingButton);
 
 		this.layout.visitWidgets(widget -> {
 			widget.setTabOrderGroup(1);
@@ -306,5 +318,6 @@ public class ShareToLanScreenNew extends Screen {
 		if (this.backToVanillaScreenButton != null) {
 			this.backToVanillaScreenButton.setPosition(5, this.confirmButton.getY());
 		}
+		this.removePlayerReportingButton.setPosition(this.width - 25, this.confirmButton.getY());
 	}
 }
