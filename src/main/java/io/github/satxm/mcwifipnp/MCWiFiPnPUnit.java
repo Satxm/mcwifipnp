@@ -66,7 +66,11 @@ public class MCWiFiPnPUnit {
     server.setPvpAllowed(cfg.PvP);
     server.setEnforceWhitelist(cfg.Whitelist);
     playerList.setUsingWhiteList(cfg.Whitelist);
-    playerList.getOps().add(new ServerOpListEntry(server.getSingleplayerProfile(), 4, playerList.canBypassPlayerLimit(server.getSingleplayerProfile())));
+    if (cfg.AllowCommands) {
+      playerList.getOps().add(new ServerOpListEntry(server.getSingleplayerProfile(), 4, playerList.canBypassPlayerLimit(server.getSingleplayerProfile())));
+    } else {
+      playerList.getOps().remove(server.getSingleplayerProfile());
+    }
     playerList.setAllowCommandsForAllPlayers(cfg.AllPlayersCheats);
     UUIDFixer.EnableUUIDFixer = cfg.EnableUUIDFixer;
     UUIDFixer.ForceOfflinePlayers = cfg.ForceOfflinePlayers;
