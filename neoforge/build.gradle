@@ -86,7 +86,7 @@ tasks.withType(ProcessResources).configureEach {
 }
 
 tasks.withType(JavaCompile).configureEach {
-  options.encoding = 'UTF-8'
+  it.options.encoding = 'UTF-8'
   it.options.release = 21
 }
 
