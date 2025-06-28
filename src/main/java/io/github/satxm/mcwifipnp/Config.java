@@ -30,38 +30,41 @@ public class Config {
 	// These fields require special handling and consideration
 	public int port = 25565;
 
-	@SerializedName(value = "allow-host-cheat", alternate = {"AllowCommands"})
+	@SerializedName(value = "allow-host-cheat", alternate = { "AllowCommands" })
 	public boolean allowHostCheat = false;
 
 	// These fields are read, synced, and save as normal
-	@SerializedName(value = "max-players", alternate = {"maxPlayers"})
+	@SerializedName(value = "max-players", alternate = { "maxPlayers" })
 	public int maxPlayers = 8;
 
-	@SerializedName(value = "gamemode", alternate = {"GameMode"})
+	@SerializedName(value = "gamemode", alternate = { "GameMode" })
 	public GameType gameType = GameType.SURVIVAL;
 
 	public String motd = Component.translatable("lanServer.title").getString();
 
-	@SerializedName(value = "allow-everyone-cheat", alternate = {"AllPlayersCheats"})
+	@SerializedName(value = "allow-everyone-cheat", alternate = { "AllPlayersCheats" })
 	public boolean allowEveryoneCheat = false;
 
-	@SerializedName(value = "enforce-whitelist", alternate = {"Whitelist"})
+	@SerializedName(value = "enforce-whitelist", alternate = { "Whitelist" })
 	public boolean enforceWhitelist = false;
 
-	@SerializedName(value = "enable-upnp", alternate = {"UseUPnP"})
+	@SerializedName(value = "enable-upnp", alternate = { "UseUPnP" })
 	public boolean useUPnP = true;
 
-	@SerializedName(value = "online-mode", alternate = {"OnlineMode"})
+	@SerializedName(value = "online-mode", alternate = { "OnlineMode" })
 	public boolean onlineMode = true;
 
-	@SerializedName(value = "enable-uuid-fixer", alternate = {"EnableUUIDFixer"})
+	@SerializedName(value = "enable-uuid-fixer", alternate = { "EnableUUIDFixer" })
 	public boolean enableUUIDFixer = false;
 
-	@SerializedName(value = "pvp", alternate = {"PvP"})
+	@SerializedName(value = "pvp", alternate = { "PvP" })
 	public boolean enablePvP = true;
 
-	@SerializedName(value = "get-public-ip", alternate = {"CopyToClipboard"})
+	@SerializedName(value = "get-public-ip", alternate = { "CopyToClipboard" })
 	public boolean getPublicIP = true;
+
+	@SerializedName(value = "remove-player-reporting", alternate = { "removePlayerReportingButton" })
+	public boolean removePlayerReportingButton = false;
 
 	// These fields will not be serialized
 	public transient Path location;
