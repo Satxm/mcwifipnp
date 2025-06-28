@@ -85,13 +85,17 @@ public class ShareToLanScreenNew extends Screen {
 		} else {
 			// Publish server
 			MutableComponent component = server.publishServer(this.cfg.gameType, this.cfg.allowHostCheat, this.cfg.port)
-				? PublishCommand.getSuccessMessage(this.cfg.port)
-				: Component.translatable("commands.publish.failed");
+					? PublishCommand.getSuccessMessage(this.cfg.port)
+					: Component.translatable("commands.publish.failed");
 			this.minecraft.gui.getChat().addMessage(component);
 
 			PlayerList playerList = server.getPlayerList();
-			playerList.getOps().add(new ServerOpListEntry(
-				server.getSingleplayerProfile(), 4, playerList.canBypassPlayerLimit(server.getSingleplayerProfile())));
+			if (this.cfg.allowHostCheat) {
+				playerList.getOps().add(new ServerOpListEntry(server.getSingleplayerProfile(), 4,
+						playerList.canBypassPlayerLimit(server.getSingleplayerProfile())));
+			} else {
+				playerList.getOps().remove(server.getSingleplayerProfile());
+			}
 
 			UPnPModule.startIfEnabled(server, cfg);
 			if (this.cfg.getPublicIP) {
@@ -127,9 +131,9 @@ public class ShareToLanScreenNew extends Screen {
 		} else {
 			this.backToVanillaScreenButton = SpriteIconButton.builder(CommonComponents.GUI_BACK,
 					(button) -> this.minecraft.setScreen(new ShareToLanScreen(this.lastScreen)), true)
-				.width(20)
-				.sprite(ResourceLocation.tryParse("icon/accessibility"), 15, 15)
-				.build();
+					.width(20)
+					.sprite(ResourceLocation.tryParse("icon/accessibility"), 15, 15)
+					.build();
 			this.backToVanillaScreenButton.setTooltip(Tooltip.create(CommonComponents.GUI_BACK));
 			this.addRenderableWidget(this.backToVanillaScreenButton);
 		}
@@ -155,26 +159,27 @@ public class ShareToLanScreenNew extends Screen {
 				portField.setEditable(false);
 				portField.setValue(Integer.toString(cfg.port));
 			} else {
-				portField = EditBoxEx.numerical(ShareToLanScreenNew.this.font, 0, 0, 70, 20, Component.translatable("lanServer.port"))
-					.defaults(cfg.port, EditBoxEx.TEXT_COLOR_HINT,
-							Tooltip.create(Component.translatable("mcwifipnp.gui.port.info")))
-					.invalid(EditBoxEx.TEXT_COLOR_ERROR,
-							Tooltip.create(Component.translatable("mcwifipnp.gui.port.invalid")))
-					.validator((port) -> {
-						if (port < 1024 || port > 65535) {
-							throw new NumberFormatException("Port out of range:" + port);
-						} else if (!HttpUtil.isPortAvailable(port)) {
-							return new EditBoxEx.ValidatorResult(EditBoxEx.TEXT_COLOR_WARN,
-									Tooltip.create(Component.translatable("mcwifipnp.gui.port.unavailable")), false,
-									true);
-						} else {
-							return null;
-						}
-					}).responder((newState, newPort) -> {
-						confirmButton.active = newState.valid();
-						if (newState.updateBackendValue())
-							cfg.port = newPort;
-					});
+				portField = EditBoxEx
+						.numerical(ShareToLanScreenNew.this.font, 0, 0, 70, 20, Component.translatable("lanServer.port"))
+						.defaults(cfg.port, EditBoxEx.TEXT_COLOR_HINT,
+								Tooltip.create(Component.translatable("mcwifipnp.gui.port.info")))
+						.invalid(EditBoxEx.TEXT_COLOR_ERROR,
+								Tooltip.create(Component.translatable("mcwifipnp.gui.port.invalid")))
+						.validator((port) -> {
+							if (port < 1024 || port > 65535) {
+								throw new NumberFormatException("Port out of range:" + port);
+							} else if (!HttpUtil.isPortAvailable(port)) {
+								return new EditBoxEx.ValidatorResult(EditBoxEx.TEXT_COLOR_WARN,
+										Tooltip.create(Component.translatable("mcwifipnp.gui.port.unavailable")), false,
+										true);
+							} else {
+								return null;
+							}
+						}).responder((newState, newPort) -> {
+							confirmButton.active = newState.valid();
+							if (newState.updateBackendValue())
+								cfg.port = newPort;
+						});
 				portField.setMaxLength(5);
 			}
 			tabContents.addChild(new StringWidget(portField.getMessage(), ShareToLanScreenNew.this.font),
@@ -184,14 +189,14 @@ public class ShareToLanScreenNew extends Screen {
 
 			// Number of players field
 			EditBoxEx<Integer> maxPlayersField = EditBoxEx
-				.numerical(ShareToLanScreenNew.this.font, 0, 0, 70, 20, Component.translatable("mcwifipnp.gui.players"))
-				.bistate(cfg.maxPlayers, Tooltip.create(Component.translatable("mcwifipnp.gui.players.info")),
-						(maxPlayers) -> maxPlayers > 0)
-				.responder((newState, maxPlayers) -> {
-					confirmButton.active = newState.valid();
-					if (newState.updateBackendValue())
-						cfg.maxPlayers = maxPlayers;
-				});
+					.numerical(ShareToLanScreenNew.this.font, 0, 0, 70, 20, Component.translatable("mcwifipnp.gui.players"))
+					.bistate(cfg.maxPlayers, Tooltip.create(Component.translatable("mcwifipnp.gui.players.info")),
+							(maxPlayers) -> maxPlayers > 0)
+					.responder((newState, maxPlayers) -> {
+						confirmButton.active = newState.valid();
+						if (newState.updateBackendValue())
+							cfg.maxPlayers = maxPlayers;
+					});
 			tabContents.addChild(new StringWidget(maxPlayersField.getMessage(), ShareToLanScreenNew.this.font),
 					1, this.layout.newCellSettings().alignHorizontallyLeft().paddingTop(6));
 			tabContents.addChild(maxPlayersField,
@@ -200,68 +205,67 @@ public class ShareToLanScreenNew extends Screen {
 			// Row2
 			// Motd field
 			tabContents.addChild(CommonLayouts.labeledElement(ShareToLanScreenNew.this.font, EditBoxEx
-				.text(ShareToLanScreenNew.this.font, 0, 0, 308, 20, Component.translatable("mcwifipnp.gui.motd"))
-				.bistate(cfg.motd, Tooltip.create(Component.translatable("mcwifipnp.gui.motd.info")), (newMotd) -> true)
-				.responder((newState, newMotd) -> {
-					confirmButton.active = newState.valid();
-					if (newState.updateBackendValue())
-						cfg.motd = newMotd;
-				}).maxLength(32), Component.translatable("mcwifipnp.gui.motd")), 4);
-
+					.text(ShareToLanScreenNew.this.font, 0, 0, 308, 20, Component.translatable("mcwifipnp.gui.motd"))
+					.bistate(cfg.motd, Tooltip.create(Component.translatable("mcwifipnp.gui.motd.info")), (newMotd) -> true)
+					.responder((newState, newMotd) -> {
+						confirmButton.active = newState.valid();
+						if (newState.updateBackendValue())
+							cfg.motd = newMotd;
+					}).maxLength(32), Component.translatable("mcwifipnp.gui.motd")), 4);
 
 			// Row3
 			// Allow Cheat button (for other joined players)
 			if (!ShareToLanScreenNew.this.serverPublished) {
 				tabContents.addChild(CycleButton.onOffBuilder(cfg.allowHostCheat)
-					.create(Component.translatable("selectWorld.allowCommands"), (cycleButton, allowHostCheat) -> {
-						cfg.allowHostCheat = allowHostCheat;
-					}), 2);
+						.create(Component.translatable("selectWorld.allowCommands"), (cycleButton, allowHostCheat) -> {
+							cfg.allowHostCheat = allowHostCheat;
+						}), 2);
 			}
 
 			tabContents.addChild(CycleButton.onOffBuilder(cfg.enforceWhitelist)
-				.withTooltip((state) -> Tooltip.create(Component.translatable("mcwifipnp.gui.Whitelist.info")))
-				.create(Component.translatable("mcwifipnp.gui.Whitelist"), (cycleButton, enforceWhitelist) -> {
-					cfg.enforceWhitelist = enforceWhitelist;
-				}), 2);
+					.withTooltip((state) -> Tooltip.create(Component.translatable("mcwifipnp.gui.Whitelist.info")))
+					.create(Component.translatable("mcwifipnp.gui.Whitelist"), (cycleButton, enforceWhitelist) -> {
+						cfg.enforceWhitelist = enforceWhitelist;
+					}), 2);
 
 			// Row 4
 			tabContents.addChild(CycleButton.builder(OnlineMode::getDisplayName)
-				.withValues(OnlineMode.values())
-				.withInitialValue(OnlineMode.of(cfg.onlineMode, cfg.enableUUIDFixer))
-				.withTooltip((OnlineMode) -> Tooltip.create(OnlineMode.gettoolTip()))
-				.create(Component.translatable("mcwifipnp.gui.OnlineMode"), (cycleButton, onlineMode) -> {
-					cfg.onlineMode = onlineMode.onlineMode;
-					cfg.enableUUIDFixer = onlineMode.fixUUID;
-				}), 2);
+					.withValues(OnlineMode.values())
+					.withInitialValue(OnlineMode.of(cfg.onlineMode, cfg.enableUUIDFixer))
+					.withTooltip((OnlineMode) -> Tooltip.create(OnlineMode.gettoolTip()))
+					.create(Component.translatable("mcwifipnp.gui.OnlineMode"), (cycleButton, onlineMode) -> {
+						cfg.onlineMode = onlineMode.onlineMode;
+						cfg.enableUUIDFixer = onlineMode.fixUUID;
+					}), 2);
 
 			tabContents.addChild(CycleButton.onOffBuilder(cfg.enablePvP)
-				.withTooltip((state) -> Tooltip.create(Component.translatable("mcwifipnp.gui.PvP.info")))
-				.create(Component.translatable("mcwifipnp.gui.PvP"), (cycleButton, PvP) -> {
-					cfg.enablePvP = PvP;
-				}), 2);
+					.withTooltip((state) -> Tooltip.create(Component.translatable("mcwifipnp.gui.PvP.info")))
+					.create(Component.translatable("mcwifipnp.gui.PvP"), (cycleButton, PvP) -> {
+						cfg.enablePvP = PvP;
+					}), 2);
 
 			// Row 5
 			tabContents.addChild(CycleButton.onOffBuilder(cfg.useUPnP)
-				.withTooltip((state) -> Tooltip.create(Component.translatable("mcwifipnp.gui.UseUPnP.info")))
-				.create(Component.translatable("mcwifipnp.gui.UseUPnP"), (cycleButton, useUPnP) -> {
-					cfg.useUPnP = useUPnP;
-				}), 2);
+					.withTooltip((state) -> Tooltip.create(Component.translatable("mcwifipnp.gui.UseUPnP.info")))
+					.create(Component.translatable("mcwifipnp.gui.UseUPnP"), (cycleButton, useUPnP) -> {
+						cfg.useUPnP = useUPnP;
+					}), 2);
 
 			if (!ShareToLanScreenNew.this.serverPublished) {
 				tabContents.addChild(CycleButton.onOffBuilder(cfg.getPublicIP)
-					.withTooltip((state) -> Tooltip.create(Component.translatable("mcwifipnp.gui.CopyIP.info")))
-					.create(Component.translatable("mcwifipnp.gui.CopyIP"), (cycleButton, getPublicIP) -> {
-						cfg.getPublicIP = getPublicIP;
-					}), 2);
+						.withTooltip((state) -> Tooltip.create(Component.translatable("mcwifipnp.gui.CopyIP.info")))
+						.create(Component.translatable("mcwifipnp.gui.CopyIP"), (cycleButton, getPublicIP) -> {
+							cfg.getPublicIP = getPublicIP;
+						}), 2);
 			}
-
 
 			/*
 			 * Settings here only affects newly joined players.
 			 * Changing these settings wont affect already joined players.
 			 */
 			// Row 6
-			tabContents.addChild(new StringWidget(Component.translatable("lanServer.otherPlayers"), ShareToLanScreenNew.this.font),
+			tabContents.addChild(
+					new StringWidget(Component.translatable("lanServer.otherPlayers"), ShareToLanScreenNew.this.font),
 					4, this.layout.newCellSettings().alignHorizontallyCenter().paddingTop(8));
 
 			// Row 7
@@ -274,7 +278,7 @@ public class ShareToLanScreenNew extends Screen {
 
 			// Allow Cheat button (for other joined players)
 			tabContents.addChild(CycleButton.onOffBuilder(cfg.allowEveryoneCheat)
-					.withTooltip((state) ->Tooltip.create(Component.translatable("mcwifipnp.gui.AllPlayersCheats.info")))
+					.withTooltip((state) -> Tooltip.create(Component.translatable("mcwifipnp.gui.AllPlayersCheats.info")))
 					.create(Component.translatable("mcwifipnp.gui.AllPlayersCheats"), (cycleButton, allowEveryoneCheat) -> {
 						cfg.allowEveryoneCheat = allowEveryoneCheat;
 					}), 2);
