@@ -8,7 +8,6 @@ import com.mojang.brigadier.CommandDispatcher;
 import io.github.satxm.mcwifipnp.commands.*;
 import io.github.satxm.mcwifipnp.network.UPnPModule;
 import net.minecraft.commands.CommandSourceStack;
-import net.minecraft.network.chat.Component;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.commands.BanIpCommands;
 import net.minecraft.server.commands.BanListCommands;
@@ -23,7 +22,6 @@ import net.minecraft.server.players.OldUsersConverter;
 // This is the common entry which should not import any side-specific class
 public class MCWiFiPnPUnit {
 	public static final String MODID = "mcwifipnp";
-	public static final Component MODIFY_LAN_OPTIONS = Component.translatable("mcwifipnp.gui.lanServerOptions");
 
 	/**
 	 * The logger that should be used throughout this mod and its plugins.

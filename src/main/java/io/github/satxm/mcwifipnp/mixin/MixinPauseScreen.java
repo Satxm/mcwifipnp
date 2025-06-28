@@ -1,8 +1,9 @@
 package io.github.satxm.mcwifipnp.mixin;
 
-import io.github.satxm.mcwifipnp.MCWiFiPnPUnit;
+import io.github.satxm.mcwifipnp.Config;
 import io.github.satxm.mcwifipnp.client.GuiUtils;
 import io.github.satxm.mcwifipnp.client.ShareToLanScreenNew;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.SpriteIconButton;
 import net.minecraft.client.gui.components.Tooltip;
@@ -10,6 +11,7 @@ import net.minecraft.client.gui.layouts.GridLayout;
 import net.minecraft.client.gui.layouts.LayoutElement;
 import net.minecraft.client.gui.screens.PauseScreen;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.server.IntegratedServer;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 
@@ -23,38 +25,53 @@ import java.util.List;
 
 @Mixin(PauseScreen.class)
 public abstract class MixinPauseScreen extends Screen {
+	private Config cfg;
+
 	protected MixinPauseScreen(Component title) {
 		super(title);
 	}
 
 	@Inject(method = "createPauseMenu", at = @At("TAIL"), locals = LocalCapture.CAPTURE_FAILHARD)
 	protected void addOrReplaceButton(CallbackInfo ci, GridLayout gridLayout, GridLayout.RowHelper dummy) {
-		// If there is a published server, add a new button to the pause screen.
-		if (this.minecraft.hasSingleplayerServer() && this.minecraft.getSingleplayerServer().isPublished()) {
+
+		IntegratedServer server = Minecraft.getInstance().getSingleplayerServer();
+		this.cfg = Config.read(server);
+
+		Component MODIFY_LAN_OPTIONS = this.minecraft.getSingleplayerServer().isPublished()
+				? Component.translatable("mcwifipnp.gui.lanServerOptions")
+				: Component.translatable("menu.shareToLan");
+
+		// Add a new button to the pause screen to open Lan Options Screen.
+		if (this.minecraft.hasSingleplayerServer() && this.minecraft.getSingleplayerServer().isPublished()
+				&& !cfg.removePlayerReportingButton) {
 			Button optionButton = GuiUtils.findWidget(this.children(), Button.class, "menu.options");
 
 			if (optionButton != null) {
 				SpriteIconButton lanServerSettings = SpriteIconButton
-						.builder(MCWiFiPnPUnit.MODIFY_LAN_OPTIONS,
+						.builder(MODIFY_LAN_OPTIONS,
 								(button) -> this.minecraft.setScreen(new ShareToLanScreenNew(this, true)), true)
 						.width(20).sprite(ResourceLocation.tryParse("icon/language"), 15, 15).build();
 				lanServerSettings.setPosition(this.width / 2 - 124, optionButton.getY());
-				lanServerSettings.setTooltip(Tooltip.create(MCWiFiPnPUnit.MODIFY_LAN_OPTIONS));
+				lanServerSettings.setTooltip(Tooltip.create(MODIFY_LAN_OPTIONS));
 				this.addRenderableWidget(lanServerSettings);
 			}
-		} else {
-			// Otherwise, replace the vanilla "Open to Lan" button.
-			final List<LayoutElement> elements = ((AccessorGridLayout) gridLayout).getChildren();
-			Button oldButton = GuiUtils.findWidget(elements, Button.class, "menu.shareToLan");
+		}
 
-			if (oldButton != null) {
-				Button newButton = Button.builder(Component.translatable("menu.shareToLan"), btn -> {
-					this.minecraft.setScreen(new ShareToLanScreenNew(this, false));
-				}).bounds(oldButton.getX(), oldButton.getY(), oldButton.getWidth(), oldButton.getHeight()).build();
-				elements.set(elements.indexOf(oldButton), newButton);
-				this.removeWidget(oldButton);
-				this.addRenderableWidget(newButton);
-			}
+		// Replace the vanilla "Open to Lan" or "Player Reporting" button.
+		final List<LayoutElement> elements = ((AccessorGridLayout) gridLayout).getChildren();
+		Button oldButton = GuiUtils.findWidget(elements, Button.class, "menu.shareToLan");
+
+		if (this.minecraft.hasSingleplayerServer() && cfg.removePlayerReportingButton && oldButton == null) {
+			oldButton = GuiUtils.findWidget(elements, Button.class, "menu.playerReporting");
+		}
+		if (oldButton != null) {
+			Button newButton = Button.builder(MODIFY_LAN_OPTIONS, btn -> {
+				this.minecraft.setScreen(new ShareToLanScreenNew(this,
+						(this.minecraft.hasSingleplayerServer() && this.minecraft.getSingleplayerServer().isPublished())));
+			}).bounds(oldButton.getX(), oldButton.getY(), oldButton.getWidth(), oldButton.getHeight()).build();
+			elements.set(elements.indexOf(oldButton), newButton);
+			this.removeWidget(oldButton);
+			this.addRenderableWidget(newButton);
 		}
 	}
 }

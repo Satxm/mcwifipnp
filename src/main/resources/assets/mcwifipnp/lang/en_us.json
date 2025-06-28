@@ -27,6 +27,7 @@
   "mcwifipnp.gui.globalIP": "Global %s",
   "mcwifipnp.gui.CopyIP": "Get Public IP",
   "mcwifipnp.gui.CopyIP.info": "Get the §bPublic IP§f and allow you to copy it to clipboard",
+  "mcwifipnp.gui.removePlayerReportingButton": "Replace Player Reporting Button",
   "mcwifipnp.upnp.success": "Successfully forwarded port %s",
   "mcwifipnp.upnp.clipboard": "Successfully got %s, Due to factors such as NAT, these IPs may still not be able to connect directly.",
   "mcwifipnp.upnp.cantgetip": "Couldn't get public IP! Please check your network settings. Your IPv4 may contain multiple NATs or you do not have IPv6.",
