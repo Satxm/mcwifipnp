@@ -27,4 +27,4 @@ rootProject.name = "mcwifipnp"
 include("fabric")
 include("forge")
 include("neoforge")
-include("quilt")
+// include("quilt")
