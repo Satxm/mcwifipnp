@@ -35,9 +35,11 @@ public abstract class MixinPauseScreen extends Screen {
 	protected void addOrReplaceButton(CallbackInfo ci, GridLayout gridLayout, GridLayout.RowHelper dummy) {
 
 		IntegratedServer server = Minecraft.getInstance().getSingleplayerServer();
-		this.cfg = Config.read(server);
+		if (this.minecraft.hasSingleplayerServer()) {
+			this.cfg = Config.read(server);
+		}
 
-		Component MODIFY_LAN_OPTIONS = this.minecraft.getSingleplayerServer().isPublished()
+		Component MODIFY_LAN_OPTIONS = this.minecraft.hasSingleplayerServer() && this.minecraft.getSingleplayerServer().isPublished()
 				? Component.translatable("mcwifipnp.gui.lanServerOptions")
 				: Component.translatable("menu.shareToLan");
 
