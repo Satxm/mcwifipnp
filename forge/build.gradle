@@ -36,6 +36,20 @@ minecraft {
     client {
       property 'forge.enabledGameTestNamespaces', project.mod_id
     }
+
+    server {
+      property 'forge.enabledGameTestNamespaces', project.mod_id
+      args '--nogui'
+    }
+
+    gameTestServer {
+      property 'forge.enabledGameTestNamespaces', project.mod_id
+    }
+
+    data {
+      workingDirectory project.file('run-data')
+      args '--mod', project.mod_id, '--all', '--output', file('src/generated/resources/'), '--existing', file('src/main/resources/')
+    }
   }
 }
 

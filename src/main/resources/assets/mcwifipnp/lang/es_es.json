@@ -26,6 +26,7 @@
   "mcwifipnp.gui.globalIP": "Global %s",
   "mcwifipnp.gui.CopyIP": "Obtener IP",
   "mcwifipnp.gui.CopyIP.info": "Obtener IP y copiar al portapapeles",
+  "mcwifipnp.gui.removePlayerReportingButton": "Reemplaza Reportes de jugadores Botón",
   "mcwifipnp.upnp.success": "Puerto %s reenviado con éxito",
   "mcwifipnp.upnp.clipboard": "Obtención exitosa de %s. Debido a factores como NAT, es posible que estas IP no puedan conectarse directamente.",
   "mcwifipnp.upnp.cantgetip": "¡No se pudo obtener la IP pública! Verifica la configuración de tu red. Tu IPv4 puede contener múltiples NAT o no tener IPv6.",
