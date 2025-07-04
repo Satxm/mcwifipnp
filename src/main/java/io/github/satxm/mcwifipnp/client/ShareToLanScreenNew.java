@@ -45,7 +45,7 @@ public class ShareToLanScreenNew extends Screen {
 
 	protected Button confirmButton;
 
-	protected CycleButton<Boolean> removePlayerReportingButton;
+	protected Checkbox removePlayerReportingButtonBox;
 
 	@Nullable
 	protected Button backToVanillaScreenButton;
@@ -133,22 +133,19 @@ public class ShareToLanScreenNew extends Screen {
 		} else {
 			this.backToVanillaScreenButton = SpriteIconButton.builder(CommonComponents.GUI_BACK,
 					(button) -> this.minecraft.setScreen(new ShareToLanScreen(this.lastScreen)), true)
-					.width(20)
 					.sprite(ResourceLocation.tryParse("icon/accessibility"), 15, 15)
-					.build();
+					.width(20).build();
 			this.backToVanillaScreenButton.setTooltip(Tooltip.create(CommonComponents.GUI_BACK));
 			this.addRenderableWidget(this.backToVanillaScreenButton);
 		}
 
-		this.removePlayerReportingButton = CycleButton.onOffBuilder(cfg.removePlayerReportingButton)
-				.displayOnlyValue()
-				.withTooltip((state) -> Tooltip.create(Component.translatable("mcwifipnp.gui.removePlayerReportingButton")))
-				.create(this.width - 25, footer.getY(), 20, 20,
-						Component.translatable("mcwifipnp.gui.removePlayerReportingButton"),
-						(cycleButton, removePlayerReportingButton) -> {
-							cfg.removePlayerReportingButton = removePlayerReportingButton;
-						});
-		this.addRenderableWidget(this.removePlayerReportingButton);
+		this.removePlayerReportingButtonBox = Checkbox.builder(Component.empty(), this.font)
+				.tooltip(Tooltip.create(Component.translatable("mcwifipnp.gui.removePlayerReportingButton")))
+				.selected(cfg.removePlayerReportingButton)
+				.onValueChange((checkbox, bl) -> {
+					cfg.removePlayerReportingButton = bl;
+				}).build();
+		this.addRenderableWidget(this.removePlayerReportingButtonBox);
 
 		this.layout.visitWidgets(widget -> {
 			widget.setTabOrderGroup(1);
@@ -318,6 +315,8 @@ public class ShareToLanScreenNew extends Screen {
 		if (this.backToVanillaScreenButton != null) {
 			this.backToVanillaScreenButton.setPosition(5, this.confirmButton.getY());
 		}
-		this.removePlayerReportingButton.setPosition(this.width - 25, this.confirmButton.getY());
+		this.removePlayerReportingButtonBox.setPosition(this.width - 5 - this.removePlayerReportingButtonBox.getWidth(),
+				this.confirmButton.getY() + this.confirmButton.getHeight() / 2
+						- this.removePlayerReportingButtonBox.getHeight() / 2);
 	}
 }
