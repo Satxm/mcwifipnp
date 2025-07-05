@@ -5,6 +5,8 @@
   "mcwifipnp.gui.players": "Max. Players",
   "mcwifipnp.gui.players.info": "The maximum number of players that the server can host.",
   "mcwifipnp.gui.lanServerOptions": "Lan Server Settings",
+  "mcwifipnp.gui.otherOptions": "Other Settings",
+  "mcwifipnp.gui.backToVanillaScreen": "Back to Vanilla Screen",
   "mcwifipnp.gui.motd": "The MOTD (Message of the day)",
   "mcwifipnp.gui.motd.info": "The server information displayed below the name in the multiplayer server list.",
   "mcwifipnp.gui.AllPlayersCheats": "Other Players Cheats",
