@@ -1,0 +1,111 @@
+name: Build and Publish
+
+on:
+  workflow_dispatch:
+
+env:
+  java-version: "17"
+  modrinth-id: RTWpcTBp
+  curseforge-id: 450250
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: write
+      packages: write
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          submodules: true
+
+      - name: Set up JDK ${{ env.java-version }}
+        uses: actions/setup-java@v3
+        with:
+          java-version: ${{ env.java-version }}
+          distribution: "temurin"
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          cache-read-only: false
+          cache-cleanup: always
+
+      - name: Make Gradle Wrapper Executable
+        if: ${{ runner.os != 'Windows' }}
+        run: chmod +x ./gradlew
+
+      - name: Build with Gradle Wrapper
+        run: ./gradlew build
+
+      - name: Get Name form files
+        run: |
+          fabric_name=$(basename fabric/build/libs/*.jar | sed 's/.jar//' | sed 's/mcwifipnp-//' | sed 's/-sources//' | sed 's/-dev//')
+          forge_name=$(basename forge/build/libs/*.jar | sed 's/\.jar//' | sed 's/mcwifipnp-//' | sed 's/-sources//' | sed 's/-dev//')
+          neoforge_name=$(basename neoforge/build/libs/*.jar | sed 's/\.jar//' | sed 's/mcwifipnp-//' | sed 's/-sources//' | sed 's/-dev//')
+          quilt_name=$(basename quilt/build/libs/*.jar | sed 's/\.jar//' | sed 's/mcwifipnp-//' | sed 's/-sources//' | sed 's/-dev//')
+          echo "FABRIC_NAME"="${fabric_name}" >> $GITHUB_ENV
+          echo "FORGE_NAME"="${forge_name}" >> $GITHUB_ENV
+          echo "NEOFORGE_NAME"="${neoforge_name}" >> $GITHUB_ENV
+          echo "QUILT_NAME"="${quilt_name}" >> $GITHUB_ENV
+
+      - name: Publish (Fabric)
+        uses: Kir-Antipov/mc-publish@v3.3
+        with:
+          fail-mode: warn
+          modrinth-id: ${{ env.modrinth-id }}
+          modrinth-token: "${{ secrets.MODRINTH_TOKEN }}"
+          curseforge-id: ${{ env.curseforge-id }}
+          curseforge-token: "${{ secrets.CURSEFORGE_TOKEN }}"
+
+          name: ${{ env.FABRIC_NAME }}
+          version-type: release
+          files: fabric/build/libs/!(*-@(dev|sources|javadoc)).jar
+          java: Java ${{ env.java-version }}
+
+      - name: Publish (Forge)
+        uses: Kir-Antipov/mc-publish@v3.3
+        with:
+          fail-mode: warn
+          modrinth-id: ${{ env.modrinth-id }}
+          modrinth-token: "${{ secrets.MODRINTH_TOKEN }}"
+          curseforge-id: ${{ env.curseforge-id }}
+          curseforge-token: "${{ secrets.CURSEFORGE_TOKEN }}"
+
+          name: ${{ env.FORGE_NAME }}
+          version-type: release
+          files: forge/build/libs/!(*-@(dev|sources|javadoc)).jar
+          java: Java ${{ env.java-version }}
+
+      - name: Publish (NeoForge)
+        uses: Kir-Antipov/mc-publish@v3.3
+        with:
+          fail-mode: warn
+          modrinth-id: ${{ env.modrinth-id }}
+          modrinth-token: "${{ secrets.MODRINTH_TOKEN }}"
+          curseforge-id: ${{ env.curseforge-id }}
+          curseforge-token: "${{ secrets.CURSEFORGE_TOKEN }}"
+
+          name: ${{ env.NEOFORGE_NAME }}
+          loaders: neoforge
+          version-type: release
+          files: neoforge/build/libs/!(*-@(dev|sources|javadoc)).jar
+          java: Java ${{ env.java-version }}
+
+#      - name: Publish (Quilt)
+#        uses: Kir-Antipov/mc-publish@v3.3
+#        with:
+#          fail-mode: warn
+#          modrinth-id: ${{ env.modrinth-id }}
+#          modrinth-token: "${{ secrets.MODRINTH_TOKEN }}"
+#          curseforge-id: ${{ env.curseforge-id }}
+#          curseforge-token: "${{ secrets.CURSEFORGE_TOKEN }}"
+#
+#          name: ${{ env.QUILT_NAME }}
+#          loaders: quilt
+#          version-type: release
+#          files: quilt/build/libs/!(*-@(dev|sources|javadoc)).jar
+#          java: Java ${{ env.java-version }}
