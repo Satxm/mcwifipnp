@@ -1,7 +1,20 @@
 package io.github.satxm.mcwifipnp.client;
 
+import javax.annotation.Nullable;
+
+import io.github.satxm.mcwifipnp.Config;
+import io.github.satxm.mcwifipnp.MCWiFiPnPUnit;
+import io.github.satxm.mcwifipnp.OnlineMode;
+import io.github.satxm.mcwifipnp.commands.IpCommand;
+import io.github.satxm.mcwifipnp.network.UPnPModule;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.components.*;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.components.Button;
+import net.minecraft.client.gui.components.Checkbox;
+import net.minecraft.client.gui.components.CycleButton;
+import net.minecraft.client.gui.components.EditBox;
+import net.minecraft.client.gui.components.StringWidget;
+import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.gui.components.tabs.GridLayoutTab;
 import net.minecraft.client.gui.components.tabs.TabManager;
 import net.minecraft.client.gui.components.tabs.TabNavigationBar;
@@ -12,24 +25,16 @@ import net.minecraft.client.gui.layouts.LinearLayout;
 import net.minecraft.client.gui.navigation.ScreenRectangle;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.ShareToLanScreen;
+import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.server.IntegratedServer;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.commands.PublishCommand;
 import net.minecraft.server.players.PlayerList;
 import net.minecraft.server.players.ServerOpListEntry;
 import net.minecraft.util.HttpUtil;
 import net.minecraft.world.level.GameType;
-
-import javax.annotation.Nullable;
-
-import io.github.satxm.mcwifipnp.Config;
-import io.github.satxm.mcwifipnp.MCWiFiPnPUnit;
-import io.github.satxm.mcwifipnp.OnlineMode;
-import io.github.satxm.mcwifipnp.commands.IpCommand;
-import io.github.satxm.mcwifipnp.network.UPnPModule;
 
 public class ShareToLanScreenNew extends Screen {
 	private final Config cfg;
@@ -51,6 +56,7 @@ public class ShareToLanScreenNew extends Screen {
 	protected Button backToVanillaScreenButton;
 
 	private boolean oldUPnPEnabled;
+	private boolean oldCopyIP;
 	private String oldMotd;
 
 	public ShareToLanScreenNew(Screen screen, boolean serverPublished) {
@@ -72,6 +78,7 @@ public class ShareToLanScreenNew extends Screen {
 
 		this.oldMotd = this.cfg.motd;
 		this.oldUPnPEnabled = this.cfg.useUPnP;
+		this.oldCopyIP = this.cfg.getPublicIP;
 	}
 
 	protected void onConfirmClicked() {
@@ -83,6 +90,11 @@ public class ShareToLanScreenNew extends Screen {
 				// Motd has changed, update UPnP display name
 				UPnPModule.stop(server);
 				UPnPModule.startIfEnabled(server, cfg);
+			}
+			if (this.cfg.getPublicIP && this.cfg.getPublicIP ^ oldCopyIP) {
+				new Thread(() -> {
+					this.minecraft.gui.getChat().addMessage(IpCommand.getBrief(server));
+				}, "MCWiFiPnP").start();
 			}
 		} else {
 			// Publish server
@@ -117,7 +129,7 @@ public class ShareToLanScreenNew extends Screen {
 	@Override
 	protected void init() {
 		this.tabNavigationBar = TabNavigationBar.builder(this.tabManager, this.width)
-				.addTabs(new DefaultTab()).build();
+				.addTabs(new DefaultTab1(), new DefaultTab2(), new DefaultTab3()).build();
 		this.addRenderableWidget(this.tabNavigationBar);
 
 		// Add footer widgets
@@ -126,38 +138,16 @@ public class ShareToLanScreenNew extends Screen {
 				this.serverPublished ? CommonComponents.GUI_DONE : Component.translatable("lanServer.start"),
 				button -> this.onConfirmClicked()).width(150).build();
 		footer.addChild(this.confirmButton);
-		footer.addChild(Button.builder(CommonComponents.GUI_CANCEL, p_232903_ -> this.onClose()).build());
+		footer.addChild(Button.builder(CommonComponents.GUI_CANCEL, button -> this.onClose()).build());
 
-		if (this.serverPublished) {
-			this.backToVanillaScreenButton = null;
-		} else {
-			this.backToVanillaScreenButton = SpriteIconButton.builder(CommonComponents.GUI_BACK,
-					(button) -> this.minecraft.setScreen(new ShareToLanScreen(this.lastScreen)), true)
-					.sprite(ResourceLocation.tryParse("icon/accessibility"), 15, 15)
-					.width(20).build();
-			this.backToVanillaScreenButton.setTooltip(Tooltip.create(CommonComponents.GUI_BACK));
-			this.addRenderableWidget(this.backToVanillaScreenButton);
-		}
-
-		this.removePlayerReportingButtonBox = Checkbox.builder(Component.empty(), this.font)
-				.tooltip(Tooltip.create(Component.translatable("mcwifipnp.gui.removePlayerReportingButton")))
-				.selected(cfg.removePlayerReportingButton)
-				.onValueChange((checkbox, bl) -> {
-					cfg.removePlayerReportingButton = bl;
-				}).maxWidth(17).build();
-		this.addRenderableWidget(this.removePlayerReportingButtonBox);
-
-		this.layout.visitWidgets(widget -> {
-			widget.setTabOrderGroup(1);
-			this.addRenderableWidget(widget);
-		});
+		this.layout.visitWidgets(this::addRenderableWidget);
 		this.tabNavigationBar.selectTab(0, false);
 		this.repositionElements();
 	}
 
-	private class DefaultTab extends GridLayoutTab {
-		public DefaultTab() {
-			super(ShareToLanScreenNew.this.title);
+	private class DefaultTab1 extends GridLayoutTab {
+		public DefaultTab1() {
+			super(Component.translatable("mcwifipnp.gui.lanServerOptions"));
 			GridLayout.RowHelper tabContents = this.layout.columnSpacing(8).rowSpacing(4).createRowHelper(4);
 
 			// Row 1
@@ -252,32 +242,15 @@ public class ShareToLanScreenNew extends Screen {
 					.create(Component.translatable("mcwifipnp.gui.PvP"), (cycleButton, PvP) -> {
 						cfg.enablePvP = PvP;
 					}), 2);
+		}
+	}
 
-			// Row 5
-			tabContents.addChild(CycleButton.onOffBuilder(cfg.useUPnP)
-					.withTooltip((state) -> Tooltip.create(Component.translatable("mcwifipnp.gui.UseUPnP.info")))
-					.create(Component.translatable("mcwifipnp.gui.UseUPnP"), (cycleButton, useUPnP) -> {
-						cfg.useUPnP = useUPnP;
-					}), 2);
+	private class DefaultTab2 extends GridLayoutTab {
+		public DefaultTab2() {
+			super(Component.translatable("lanServer.otherPlayers"));
+			GridLayout.RowHelper tabContents = this.layout.columnSpacing(8).rowSpacing(4).createRowHelper(4);
 
-			if (!ShareToLanScreenNew.this.serverPublished) {
-				tabContents.addChild(CycleButton.onOffBuilder(cfg.getPublicIP)
-						.withTooltip((state) -> Tooltip.create(Component.translatable("mcwifipnp.gui.CopyIP.info")))
-						.create(Component.translatable("mcwifipnp.gui.CopyIP"), (cycleButton, getPublicIP) -> {
-							cfg.getPublicIP = getPublicIP;
-						}), 2);
-			}
-
-			/*
-			 * Settings here only affects newly joined players.
-			 * Changing these settings wont affect already joined players.
-			 */
-			// Row 6
-			tabContents.addChild(
-					new StringWidget(Component.translatable("lanServer.otherPlayers"), ShareToLanScreenNew.this.font),
-					4, this.layout.newCellSettings().alignHorizontallyCenter().paddingTop(8));
-
-			// Row 7
+			// Row 1
 			// GameMode toggle button
 			tabContents.addChild(CycleButton.builder(GameType::getShortDisplayName)
 					.withValues(GameType.values()).withInitialValue(cfg.gameType)
@@ -291,6 +264,41 @@ public class ShareToLanScreenNew extends Screen {
 					.create(Component.translatable("mcwifipnp.gui.AllPlayersCheats"), (cycleButton, allowEveryoneCheat) -> {
 						cfg.allowEveryoneCheat = allowEveryoneCheat;
 					}), 2);
+		}
+	}
+
+	private class DefaultTab3 extends GridLayoutTab {
+		public DefaultTab3() {
+			super(Component.translatable("mcwifipnp.gui.otherOptions"));
+			GridLayout.RowHelper tabContents = this.layout.columnSpacing(8).rowSpacing(4).createRowHelper(4);
+
+			// Row 1
+			tabContents.addChild(CycleButton.onOffBuilder(cfg.useUPnP)
+					.withTooltip((state) -> Tooltip.create(Component.translatable("mcwifipnp.gui.UseUPnP.info")))
+					.create(Component.translatable("mcwifipnp.gui.UseUPnP"), (cycleButton, useUPnP) -> {
+						cfg.useUPnP = useUPnP;
+					}), 2);
+
+			tabContents.addChild(CycleButton.onOffBuilder(cfg.getPublicIP)
+					.withTooltip((state) -> Tooltip.create(Component.translatable("mcwifipnp.gui.CopyIP.info")))
+					.create(Component.translatable("mcwifipnp.gui.CopyIP"), (cycleButton, getPublicIP) -> {
+						cfg.getPublicIP = getPublicIP;
+					}), 2);
+
+			// Row 2
+			tabContents.addChild(CycleButton.onOffBuilder(cfg.removePlayerReportingButton)
+					.create(Component.translatable("mcwifipnp.gui.removePlayerReportingButton"),
+							(cycleButton, removePlayerReportingButton) -> {
+								cfg.removePlayerReportingButton = removePlayerReportingButton;
+							}),
+					2);
+
+			if (!ShareToLanScreenNew.this.serverPublished) {
+				tabContents
+						.addChild(Button.builder(Component.translatable("mcwifipnp.gui.backToVanillaScreen"), button -> {
+							ShareToLanScreenNew.this.minecraft.setScreen(new ShareToLanScreen(ShareToLanScreenNew.this.lastScreen));
+						}).build(), 2);
+			}
 		}
 	}
 
@@ -311,11 +319,12 @@ public class ShareToLanScreenNew extends Screen {
 			this.layout.setHeaderHeight(i);
 			this.layout.arrangeElements();
 		}
+	}
 
-		if (this.backToVanillaScreenButton != null) {
-			this.backToVanillaScreenButton.setPosition(5, this.confirmButton.getY());
-		}
-		this.removePlayerReportingButtonBox.setPosition(this.width - 5 - 17,
-				this.confirmButton.getY() + this.confirmButton.getHeight() / 2 - 17 / 2);
+	@Override
+	public void render(GuiGraphics guiGraphics, int i, int j, float f) {
+		super.render(guiGraphics, i, j, f);
+		guiGraphics.blit(RenderType::guiTextured, Screen.FOOTER_SEPARATOR, 0,
+				this.height - this.layout.getFooterHeight() - 2, 0.0F, 0.0F, this.width, 2, 32, 2);
 	}
 }
