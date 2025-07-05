@@ -79,33 +79,3 @@ jobs:
           version-type: release
           files: forge/build/libs/!(*-@(dev|sources|javadoc)).jar
           java: Java ${{ env.java-version }}
-
-      - name: Publish (NeoForge)
-        uses: Kir-Antipov/mc-publish@v3.3
-        with:
-          fail-mode: warn
-          modrinth-id: ${{ env.modrinth-id }}
-          modrinth-token: "${{ secrets.MODRINTH_TOKEN }}"
-          curseforge-id: ${{ env.curseforge-id }}
-          curseforge-token: "${{ secrets.CURSEFORGE_TOKEN }}"
-
-          name: ${{ env.NEOFORGE_NAME }}
-          loaders: neoforge
-          version-type: release
-          files: neoforge/build/libs/!(*-@(dev|sources|javadoc)).jar
-          java: Java ${{ env.java-version }}
-
-#      - name: Publish (Quilt)
-#        uses: Kir-Antipov/mc-publish@v3.3
-#        with:
-#          fail-mode: warn
-#          modrinth-id: ${{ env.modrinth-id }}
-#          modrinth-token: "${{ secrets.MODRINTH_TOKEN }}"
-#          curseforge-id: ${{ env.curseforge-id }}
-#          curseforge-token: "${{ secrets.CURSEFORGE_TOKEN }}"
-#
-#          name: ${{ env.QUILT_NAME }}
-#          loaders: quilt
-#          version-type: release
-#          files: quilt/build/libs/!(*-@(dev|sources|javadoc)).jar
-#          java: Java ${{ env.java-version }}
