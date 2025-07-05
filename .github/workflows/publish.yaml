@@ -76,6 +76,7 @@ jobs:
           curseforge-token: "${{ secrets.CURSEFORGE_TOKEN }}"
 
           name: ${{ env.FORGE_NAME }}
+          loaders: forge
           version-type: release
           files: forge/build/libs/!(*-@(dev|sources|javadoc)).jar
           java: Java ${{ env.java-version }}

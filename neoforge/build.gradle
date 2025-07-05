@@ -2,7 +2,7 @@ plugins {
   id 'java-library'
   id 'eclipse'
   id 'idea'
-  id 'net.neoforged.gradle.userdev' version '7.0.+'
+  id 'net.neoforged.moddev' version '1.+'
 }
 
 java.toolchain.languageVersion = JavaLanguageVersion.of(21)
@@ -20,25 +20,42 @@ repositories {
   mavenLocal()
 }
 
-minecraft {
+neoForge {
+  version = project.neo_version
+
   runs {
-    configureEach {
-      workingDirectory project.file('run')
-      systemProperty 'forge.logging.markers', 'REGISTRIES'
-      systemProperty 'forge.logging.console.level', 'debug'
-      modSource project.sourceSets.main
-    }
     client {
-      systemProperty 'forge.enabledGameTestNamespaces', project.mod_id
+      client()
+      systemProperty 'neoforge.enabledGameTestNamespaces', project.mod_id
     }
+
+    server {
+      server()
+      programArgument '--nogui'
+      systemProperty 'neoforge.enabledGameTestNamespaces', project.mod_id
+    }
+
+    gameTestServer {
+      type = "gameTestServer"
+      systemProperty 'neoforge.enabledGameTestNamespaces', project.mod_id
+    }
+
     data {
+      data()
       programArguments.addAll '--mod', project.mod_id, '--all', '--output', file('src/generated/resources/').getAbsolutePath(), '--existing', file('src/main/resources/').getAbsolutePath()
     }
-  }
-}
 
-dependencies {
-  implementation "net.neoforged:neoforge:${project.neo_version}"
+    configureEach {
+      systemProperty 'forge.logging.markers', 'REGISTRIES'
+      logLevel = org.slf4j.event.Level.DEBUG
+    }
+  }
+
+  mods {
+    "${mod_id}" {
+      sourceSet(sourceSets.main)
+    }
+  }
 }
 
 sourceSets {
@@ -55,7 +72,8 @@ sourceSets {
 
 tasks.withType(ProcessResources).configureEach {
   var replaceProperties = [
-    minecraft_version_range : project.neo_minecraft_version_range,
+    minecraft_version_min : project.minecraft_version_min,
+    minecraft_version_max : project.minecraft_version_max,
     neo_version_range : project.neo_version_range,
     neo_loader_version_range : project.neo_loader_version_range,
     mod_version: project.mod_version,
