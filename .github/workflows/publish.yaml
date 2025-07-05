@@ -62,6 +62,9 @@ jobs:
           curseforge-token: "${{ secrets.CURSEFORGE_TOKEN }}"
 
           name: ${{ env.FABRIC_NAME }}
+          loaders: fabric
+          game-versions: |
+            [1.20,1.20.2)
           version-type: release
           files: fabric/build/libs/!(*-@(dev|sources|javadoc)).jar
           java: Java ${{ env.java-version }}
@@ -77,8 +80,10 @@ jobs:
 
           name: ${{ env.FORGE_NAME }}
           loaders: |
-            fabric
             forge
+            neoforge
+          game-versions: |
+            [1.20,1.20.2)
           version-type: release
           files: forge/build/libs/!(*-@(dev|sources|javadoc)).jar
           java: Java ${{ env.java-version }}
@@ -94,6 +99,8 @@ jobs:
 
           name: ${{ env.QUILT_NAME }}
           loaders: quilt
+          game-versions: |
+            [1.20,1.20.2)
           version-type: release
           files: quilt/build/libs/!(*-@(dev|sources|javadoc)).jar
           java: Java ${{ env.java-version }}
