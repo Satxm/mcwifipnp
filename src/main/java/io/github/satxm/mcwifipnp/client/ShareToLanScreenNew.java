@@ -144,7 +144,7 @@ public class ShareToLanScreenNew extends Screen {
 				.selected(cfg.removePlayerReportingButton)
 				.onValueChange((checkbox, bl) -> {
 					cfg.removePlayerReportingButton = bl;
-				}).build();
+				}).maxWidth(17).build();
 		this.addRenderableWidget(this.removePlayerReportingButtonBox);
 
 		this.layout.visitWidgets(widget -> {
@@ -315,8 +315,7 @@ public class ShareToLanScreenNew extends Screen {
 		if (this.backToVanillaScreenButton != null) {
 			this.backToVanillaScreenButton.setPosition(5, this.confirmButton.getY());
 		}
-		this.removePlayerReportingButtonBox.setPosition(this.width - 5 - this.removePlayerReportingButtonBox.getWidth(),
-				this.confirmButton.getY() + this.confirmButton.getHeight() / 2
-						- this.removePlayerReportingButtonBox.getHeight() / 2);
+		this.removePlayerReportingButtonBox.setPosition(this.width - 5 - 17,
+				this.confirmButton.getY() + this.confirmButton.getHeight() / 2 - 17 / 2);
 	}
 }
