@@ -5,6 +5,8 @@
   "mcwifipnp.gui.players": "最大玩家數",
   "mcwifipnp.gui.players.info": "可以加入伺服器的最大玩家數量。",
   "mcwifipnp.gui.lanServerOptions": "伺服器設定",
+  "mcwifipnp.gui.otherOptions": "更多設定",
+  "mcwifipnp.gui.backToVanillaScreen": "返回原版伺服器設定",
   "mcwifipnp.gui.motd": "伺服器資訊",
   "mcwifipnp.gui.motd.info": "在多人遊戲伺服器清單中名稱下方顯示的伺服器資訊。",
   "mcwifipnp.gui.AllPlayersCheats": "其他玩家作弊",
