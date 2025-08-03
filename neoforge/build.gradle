@@ -1,6 +1,5 @@
 plugins {
   id 'java-library'
-  id 'eclipse'
   id 'idea'
   id 'net.neoforged.moddev' version '2.+'
 }
@@ -14,10 +13,6 @@ group = project.mod_group_id
 
 base {
   archivesName = project.mod_id
-}
-
-repositories {
-  mavenLocal()
 }
 
 neoForge {
@@ -70,20 +65,36 @@ sourceSets {
   }
 }
 
+var replaceProperties = [
+  minecraft_version_min : project.minecraft_version_min,
+  minecraft_version_max : project.minecraft_version_max,
+  neo_version_range : project.neo_version_range,
+  neo_loader_version_range : project.neo_loader_version_range,
+  mod_version: project.mod_version,
+  pack_format_number: project.pack_format_number,
+]
+
+// This works the release, Eclipse debug session will complain about pack.mcmeta
 tasks.withType(ProcessResources).configureEach {
-  var replaceProperties = [
-    minecraft_version_min : project.minecraft_version_min,
-    minecraft_version_max : project.minecraft_version_max,
-    neo_version_range : project.neo_version_range,
-    neo_loader_version_range : project.neo_loader_version_range,
-    mod_version: project.mod_version,
-    pack_format_number: project.pack_format_number,
-  ]
   inputs.properties replaceProperties
-  filesMatching(['META-INF/neoforge.mods.toml', 'pack.mcmeta']) {
+  filesMatching(['pack.mcmeta']) {
     expand replaceProperties + [project: project]
   }
 }
+
+// This block of code expands all declared replace properties in the specified resource targets.
+// A missing property will result in an error. Properties are expanded using ${} Groovy notation.
+var generateModMetadata = tasks.register("generateModMetadata", ProcessResources) {
+    inputs.properties replaceProperties
+    from "src/main/templates"
+    into "build/generated/sources/modMetadata"
+    expand replaceProperties
+}
+// Include the output of "generateModMetadata" as an input directory for the build
+// this works with both building through Gradle and the IDE.
+sourceSets.main.resources.srcDir generateModMetadata
+// To avoid having to run "generateModMetadata" manually, make it run on every project reload
+neoForge.ideSyncTask generateModMetadata
 
 tasks.withType(JavaCompile).configureEach {
   it.options.encoding = 'UTF-8'
