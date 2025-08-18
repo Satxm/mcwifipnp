@@ -110,7 +110,7 @@ public class OptionsList extends ContainerObjectSelectionList<OptionsList.Entry>
 			int xStart = OptionsList.this.screen.width / 2 - COLUMN_WIDTH - GAP / 2;
 
 			guiGraphics.drawString(OptionsList.this.font, this.labelLeft, xStart,
-					y + (this.left.getHeight() - 9) / 2, 16777215);
+					y + (this.left.getHeight() - 9) / 2, 0xFFFFFFFF);
 
 			if (this.right == null)
 				xStart += COLUMN_WIDTH + GAP;
@@ -123,7 +123,7 @@ public class OptionsList extends ContainerObjectSelectionList<OptionsList.Entry>
 
 			xStart += COLUMN_WIDTH + GAP;
 			guiGraphics.drawString(OptionsList.this.font, this.labelRight, xStart,
-					y + (this.right.getHeight() - 9) / 2, 16777215);
+					y + (this.right.getHeight() - 9) / 2, 0xFFFFFFFF);
 			this.right.setPosition(xStart + (COLUMN_WIDTH - this.right.getWidth()), y);
 			this.right.render(guiGraphics, p_94502_, p_94503_, p_94505_);
 		}
