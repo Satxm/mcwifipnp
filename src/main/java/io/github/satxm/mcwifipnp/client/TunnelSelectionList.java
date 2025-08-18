@@ -63,6 +63,12 @@ public class TunnelSelectionList extends ObjectSelectionList<TunnelSelectionList
 				|| super.keyPressed(keyCode, p_99783_, p_99784_);
 	}
 
+	@Override
+	public void setSelected(@Nullable Entry entry) {
+		super.setSelected(entry);
+		this.owner.onSelectedChange();
+	}
+
 	// Actions
 	protected void swap(int from, int to) {
 		this.owner.tunnels.swap(from, to);
@@ -146,6 +152,13 @@ public class TunnelSelectionList extends ObjectSelectionList<TunnelSelectionList
 			}
 		}
 
+		/**
+		 * @return true if the selection update need specific handing
+		 */
+		protected boolean customUpdateSelection() {
+			return false;
+		}
+
 		protected boolean isVisible() {
 			return true;
 		}
@@ -191,6 +204,11 @@ public class TunnelSelectionList extends ObjectSelectionList<TunnelSelectionList
 					new Rectangle(26, 0, 32, 32),
 					true) {
 				@Override
+				protected boolean customUpdateSelection() {
+					return true;
+				}
+
+				@Override
 				protected boolean isVisible() {
 					int iEntry = TunnelSelectionList.this.children().indexOf(Entry.this);
 					return iEntry > 0;
@@ -214,6 +232,11 @@ public class TunnelSelectionList extends ObjectSelectionList<TunnelSelectionList
 					new Rectangle(26, 16, 16, 16),
 					new Rectangle(26, 0, 32, 32),
 					true) {
+				@Override
+				protected boolean customUpdateSelection() {
+					return true;
+				}
+
 				@Override
 				protected boolean isVisible() {
 					int iEntry = TunnelSelectionList.this.children().indexOf(Entry.this);
@@ -291,12 +314,13 @@ public class TunnelSelectionList extends ObjectSelectionList<TunnelSelectionList
 
 			for (VirtualWidget widget: widgets) {
 				if (widget.handleMouseClick(xMouseRelative, yMouseRelative)) {
-					TunnelSelectionList.this.owner.setSelected(this);
+					if (!widget.customUpdateSelection())
+						TunnelSelectionList.this.setSelected(this);
 					return true;
 				}
 			}
 
-			TunnelSelectionList.this.owner.setSelected(this);
+			TunnelSelectionList.this.setSelected(this);
 			if (Util.getMillis() - this.lastClickTime < 250L) {
 				TunnelSelectionList.this.onEntryDoubleClicked(this);
 				return true;
@@ -322,9 +346,11 @@ public class TunnelSelectionList extends ObjectSelectionList<TunnelSelectionList
 
 			if (32 == keyCode) { // Space
 				TunnelSelectionList.this.onEnableToggled(this);
+				TunnelSelectionList.this.owner.onSelectedChange();
 				return true;
 			} else if (257 == keyCode || 335== keyCode) { // Enter
 				TunnelSelectionList.this.onEdit(this);
+				TunnelSelectionList.this.owner.onSelectedChange();
 				return true;
 			}
 

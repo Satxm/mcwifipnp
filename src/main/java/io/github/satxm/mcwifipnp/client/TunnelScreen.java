@@ -126,12 +126,7 @@ public class TunnelScreen extends Screen {
 		p_281617_.drawCenteredString(this.font, this.title, this.width / 2, 20, -1);
 	}
 
-	public void setSelected(TunnelSelectionList.Entry entry) {
-		this.proxyList.setSelected(entry);
-		this.onSelectedChange();
-	}
-
-	protected void onSelectedChange() {
+	public void onSelectedChange() {
 		TunnelSelectionList.Entry selected = this.proxyList.getSelected();
 		boolean allowAction = selected != null;
 		this.enableButton.active = allowAction;
