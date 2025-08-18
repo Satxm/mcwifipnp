@@ -56,5 +56,11 @@
   "mcwifipnp.tunnelScreen.enabled": "启用",
   "mcwifipnp.tunnelScreen.disabled": "禁用",
   "mcwifipnp.tunnelScreen.copyURL": "复制连接地址",
-  "mcwifipnp.tunnelScreen.add": "添加隧道"
+  "mcwifipnp.tunnelScreen.add": "添加隧道",
+
+  "mcwifipnp.providerScreen.title": "选择服务提供商",
+  "mcwifipnp.providerScreen.openLink": "访问网站",
+  "mcwifipnp.providerScreen.help": "更多服务提供商",
+  
+  "mcwifipnp.nodeScreen.title": "选择节点"
 }

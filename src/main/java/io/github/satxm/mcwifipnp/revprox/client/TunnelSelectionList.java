@@ -1,4 +1,4 @@
-package io.github.satxm.mcwifipnp.client;
+package io.github.satxm.mcwifipnp.revprox.client;
 
 import java.awt.Rectangle;
 import java.util.LinkedList;
@@ -290,8 +290,11 @@ public class TunnelSelectionList extends ObjectSelectionList<TunnelSelectionList
 					yOrigin + 1, -1);
 
 			// Draw tunnel description
-			String line2 = "[" + this.tunnelData.name + "] " + this.tunnelData.desc;
-			guiGraphics.drawString(TunnelSelectionList.this.minecraft.font, Component.literal(line2), xString, yOrigin + 12, 0xFF808080);
+			Component line2 = Component.literal("[")
+					.append(this.tunnelData.tunnelType.getDisplayName())
+					.append("] ")
+					.append(this.tunnelData.desc);
+			guiGraphics.drawString(TunnelSelectionList.this.minecraft.font, line2, xString, yOrigin + 12, 0xFF808080);
 
 			// Draw Hostname
 			String line3 = this.tunnelData.host;
@@ -321,6 +324,7 @@ public class TunnelSelectionList extends ObjectSelectionList<TunnelSelectionList
 			}
 
 			TunnelSelectionList.this.setSelected(this);
+			// Handle double clicking
 			if (Util.getMillis() - this.lastClickTime < 250L) {
 				TunnelSelectionList.this.onEntryDoubleClicked(this);
 				return true;
@@ -348,7 +352,7 @@ public class TunnelSelectionList extends ObjectSelectionList<TunnelSelectionList
 				TunnelSelectionList.this.onEnableToggled(this);
 				TunnelSelectionList.this.owner.onSelectedChange();
 				return true;
-			} else if (257 == keyCode || 335== keyCode) { // Enter
+			} else if (257 == keyCode || 335 == keyCode) { // Enter
 				TunnelSelectionList.this.onEdit(this);
 				TunnelSelectionList.this.owner.onSelectedChange();
 				return true;

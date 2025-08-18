@@ -5,6 +5,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.function.Consumer;
 
 import javax.annotation.Nullable;
 
@@ -13,6 +14,7 @@ import com.mojang.blaze3d.platform.NativeImage;
 import io.github.satxm.mcwifipnp.MCWiFiPnPUnit;
 import net.minecraft.client.renderer.texture.DynamicTexture;
 import net.minecraft.client.renderer.texture.TextureManager;
+import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 
 public class TunnelType {
@@ -21,13 +23,19 @@ public class TunnelType {
 
 	public final String name;
 	private final String iconFileName;
+	public final String url;
 
 	@Nullable
 	private ResourceLocation icon;
 
-	private TunnelType(String name, String iconFileName) {
+	private TunnelType(String name, String iconFileName, String url) {
 		this.name = name;
 		this.iconFileName = iconFileName;
+		this.url = url;
+	}
+
+	public Component getDisplayName() {
+		return Component.literal(this.name);
 	}
 
 	public ResourceLocation getIcon() {
@@ -62,11 +70,11 @@ public class TunnelType {
 		}
 	}
 
-	public static TunnelType register(String name) {
+	public static TunnelType register(String name, String website) {
 		if (TUNNEL_TYPES.containsKey(name))
 			return TUNNEL_TYPES.get(name);
 
-		TunnelType tunnelType = new TunnelType(name, name);
+		TunnelType tunnelType = new TunnelType(name, name, website);
 		TUNNEL_TYPES.put(name, tunnelType);
 		return tunnelType;
 	}
@@ -75,9 +83,13 @@ public class TunnelType {
 		return TUNNEL_TYPES.get(name);
 	}
 
+	public static void foreach(Consumer<TunnelType> tunnelType) {
+		TUNNEL_TYPES.values().forEach(tunnelType);
+	}
+
 	static {
-		register("sakurafrp");
-		register("openfrp");
-		register("cloudflare");
+		register("sakurafrp", "https://www.natfrp.com/tunnel/");
+		register("openfrp", "https://console.openfrp.net/manage-proxies");
+		register("cloudflare", "https://www.cloudflare.com/");
 	}
 }

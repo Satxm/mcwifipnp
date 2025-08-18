@@ -8,9 +8,10 @@ public class TunnelList {
 	private final List<TunnelData> tunnelList = new LinkedList<>();
 
 	public TunnelList() {
-		tunnelList.add(new TunnelData("SakuraFrp", "香港3", "frp-pet.com", "sakurafrp"));
+		tunnelList.add(new TunnelData("SakuraFrp 香港3", "香港3", "frp-pet.com", "sakurafrp"));
 		tunnelList.add(new TunnelData("OpenFrp", "香港-4", "cn-hk-bgp-4.ofalias.net:23836", "openfrp"));
 		tunnelList.add(new TunnelData("Cloudflare Tunnel","" , "cyka-blayt.trycloudflare.com", "cloudflare"));
+		tunnelList.add(new TunnelData("SakuraFrp 苏联1", "苏联1", "frp-pet.su", "sakurafrp"));
 	}
 
 	public void load() {

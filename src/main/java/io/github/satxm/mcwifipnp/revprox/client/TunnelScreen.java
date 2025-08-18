@@ -1,4 +1,4 @@
-package io.github.satxm.mcwifipnp.client;
+package io.github.satxm.mcwifipnp.revprox.client;
 
 import io.github.satxm.mcwifipnp.revprox.TunnelList;
 import io.github.satxm.mcwifipnp.revprox.TunnelType;
@@ -25,7 +25,7 @@ public class TunnelScreen extends Screen {
 	public final TunnelList tunnels = new TunnelList();
 
 	// Instances
-	private TunnelSelectionList proxyList;
+	private TunnelSelectionList tunnelSelectionList;
 	private Button editButton, copyUrlButton;
 	private CycleButton<Boolean> enableButton;
 	private Button deleteButton;
@@ -43,24 +43,24 @@ public class TunnelScreen extends Screen {
 		TunnelType.uploadIcons(this.minecraft.getTextureManager());
 
 		if (this.initedOnce) {
-			this.proxyList.setRectangle(this.width, this.height - 64 - 32, 0, 32);
+			this.tunnelSelectionList.setRectangle(this.width, this.height - 64 - 32, 0, 32);
 		} else {
 			this.initedOnce = true;
-			this.proxyList = new TunnelSelectionList(this, this.minecraft,
+			this.tunnelSelectionList = new TunnelSelectionList(this, this.minecraft,
 				this.width, this.height - 64 - 32, 32, 36);
-			this.proxyList.refreshEntries();
+			this.tunnelSelectionList.refreshEntries();
 		}
 
-		this.addRenderableWidget(this.proxyList);
+		this.addRenderableWidget(this.tunnelSelectionList);
 
 		this.enableButton = this.addRenderableWidget(
 				CycleButton.booleanBuilder(ENABLED, DISABLED)
 				.create(STATUS, (cycleButton, newValue) -> {
-					TunnelSelectionList.Entry selected = this.proxyList.getSelected();
+					TunnelSelectionList.Entry selected = this.tunnelSelectionList.getSelected();
 					if (selected == null)
 						return;
 
-					this.proxyList.onEnableToggled(selected);
+					this.tunnelSelectionList.onEnableToggled(selected);
 					this.onSelectedChange();
 				})
 		);
@@ -70,16 +70,16 @@ public class TunnelScreen extends Screen {
 		}).width(100).build());
 
 		Button addButton = this.addRenderableWidget(Button.builder(ADD, p_293603_ -> {
-			this.minecraft.setScreen(new EditTunnelScreen(this, null));
+			this.minecraft.setScreen(new ProviderSelectionScreen(this));
 		}).width(100).build());
 
 		this.editButton = this
 				.addRenderableWidget(Button.builder(Component.translatable("selectServer.edit"), p_99715_ -> {
-					TunnelSelectionList.Entry selected = this.proxyList.getSelected();
+					TunnelSelectionList.Entry selected = this.tunnelSelectionList.getSelected();
 					if (selected == null)
 						return;
 
-					this.proxyList.onEdit(selected);
+					this.tunnelSelectionList.onEdit(selected);
 				}).width(74).build());
 
 		this.deleteButton = this.addRenderableWidget(
@@ -127,7 +127,7 @@ public class TunnelScreen extends Screen {
 	}
 
 	public void onSelectedChange() {
-		TunnelSelectionList.Entry selected = this.proxyList.getSelected();
+		TunnelSelectionList.Entry selected = this.tunnelSelectionList.getSelected();
 		boolean allowAction = selected != null;
 		this.enableButton.active = allowAction;
 		this.copyUrlButton.active = allowAction;
