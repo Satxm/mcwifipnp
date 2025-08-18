@@ -85,10 +85,18 @@ public class TunnelSelectionList extends ObjectSelectionList<TunnelSelectionList
 		entry.tunnelData.enabled = !entry.tunnelData.enabled;
 	}
 
+	/**
+	 * Represent a virtual widget in each entry
+	 */
 	private static abstract class VirtualWidget {
 		private final Rectangle clickable, iconArea;
 		private final boolean showOnlyIfEntrySelected;
 
+		/**
+		 * @param clickable define the area that responds to mouse clicks
+		 * @param iconArea define the area to draw the sprite. Default to clickable if set to null.
+		 * @param showOnlyIfEntrySelected if true, this widget will only be visible when 1) cursor is hovering 2) in touch screen mode
+		 */
 		protected VirtualWidget(Rectangle clickable, @Nullable Rectangle iconArea, boolean showOnlyIfEntrySelected) {
 			this.clickable = clickable;
 			this.iconArea = iconArea == null ? clickable : iconArea;
@@ -173,7 +181,6 @@ public class TunnelSelectionList extends ObjectSelectionList<TunnelSelectionList
 				@Override
 				protected void onClick() {
 					onEnableToggled(Entry.this);
-					TunnelSelectionList.this.owner.setSelected(Entry.this);
 				}
 			};
 			widgets.add(checkbox);
@@ -239,7 +246,6 @@ public class TunnelSelectionList extends ObjectSelectionList<TunnelSelectionList
 				@Override
 				protected void onClick() {
 					TunnelSelectionList.this.onEdit(Entry.this);
-					TunnelSelectionList.this.owner.setSelected(Entry.this);
 				}
 			};
 			widgets.add(edit);
@@ -251,8 +257,8 @@ public class TunnelSelectionList extends ObjectSelectionList<TunnelSelectionList
 		}
 
 		@Override
-		public void render(GuiGraphics guiGraphics, int p_281506_, int yOrigin, int xOrigin, int p_283596_,
-				int p_281630_, int xMouse, int yMouse, boolean hovered, float p_281423_) {
+		public void render(GuiGraphics guiGraphics, int entryIndex, int yOrigin, int xOrigin, int width,
+				int height, int xMouse, int yMouse, boolean hovered, float p_281423_) {
 			int xIcon = xOrigin + 26;
 			int xString = xOrigin + 26 + 32 + 3;
 
@@ -284,8 +290,10 @@ public class TunnelSelectionList extends ObjectSelectionList<TunnelSelectionList
 			double yMouseRelative = yMouse - TunnelSelectionList.this.getRowTop(TunnelSelectionList.this.children().indexOf(this));
 
 			for (VirtualWidget widget: widgets) {
-				if (widget.handleMouseClick(xMouseRelative, yMouseRelative))
+				if (widget.handleMouseClick(xMouseRelative, yMouseRelative)) {
+					TunnelSelectionList.this.owner.setSelected(this);
 					return true;
+				}
 			}
 
 			TunnelSelectionList.this.owner.setSelected(this);

@@ -65,13 +65,13 @@ public class OptionsList extends ContainerObjectSelectionList<OptionsList.Entry>
 		}
 
 		@Override
-		public void render(GuiGraphics p_281311_, int x, int y, int p_94499_, int p_94500_, int p_94501_, int p_94502_,
-				int p_94503_, boolean p_94504_, float p_94505_) {
+		public void render(GuiGraphics guiGraphics, int entryIndex, int yOrigin, int xOrigin, int width,
+				int height, int xMouse, int yMouse, boolean hovered, float p_281423_) {
 			int xStart = OptionsList.this.screen.width / 2 - COLUMN_WIDTH - GAP / 2;
 
 			for (AbstractWidget abstractwidget : this.children) {
-				abstractwidget.setPosition(xStart, y);
-				abstractwidget.render(p_281311_, p_94502_, p_94503_, p_94505_);
+				abstractwidget.setPosition(xStart, yOrigin);
+				abstractwidget.render(guiGraphics, xMouse, yMouse, p_281423_);
 				xStart += COLUMN_WIDTH + GAP;
 			}
 		}

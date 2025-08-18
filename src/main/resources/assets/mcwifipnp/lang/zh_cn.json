@@ -49,5 +49,12 @@
   "mcwifipnp.commands.uuidfixer.list": "修复UUID的策略列表有%s项:",
   "mcwifipnp.commands.uuidfixer.none": "修复UUID的策略列表为空.",
   "mcwifipnp.commands.uuidfixer.policy.not-exist": "%s不在修复UUID的策略列表里!",
-  "mcwifipnp.commands.uuidfixer.remove.success": "从修复UUID的策略列表中删除%s的规则."
+  "mcwifipnp.commands.uuidfixer.remove.success": "从修复UUID的策略列表中删除%s的规则.",
+  
+  "mcwifipnp.tunnelScreen.title": "反向代理（内网穿透）",
+  "mcwifipnp.tunnelScreen.status": "状态",
+  "mcwifipnp.tunnelScreen.enabled": "启用",
+  "mcwifipnp.tunnelScreen.disabled": "禁用",
+  "mcwifipnp.tunnelScreen.copyURL": "复制连接地址",
+  "mcwifipnp.tunnelScreen.add": "添加隧道"
 }
