@@ -22,7 +22,7 @@ public class ProviderSelectionScreen extends GeneralSelectionScreen {
 		GeneralSelectionList.EntryBase selected = this.getSelectionList().getSelected();
 		if (selected instanceof GeneralSelectionList.Option option) {
 			TunnelType tunnelType = (TunnelType) option.userData;
-			this.openLink(tunnelType.url);
+			this.openLink(tunnelType.homepage);
 		}
 	}
 
@@ -58,13 +58,14 @@ public class ProviderSelectionScreen extends GeneralSelectionScreen {
 	@Override
 	protected void populateOptions(Consumer<GeneralSelectionList.EntryBase> newOption) {
 		TunnelType.foreach((tunnelType) -> {
-			GeneralSelectionList.Option entry = this.getSelectionList().new Option(tunnelType.getIcon());
+			GeneralSelectionList.Option entry = this.getSelectionList().new Option();
+			entry.icon = tunnelType.getIcon();
 			entry.lines.add(new GeneralSelectionList.OptionText(tunnelType.getDisplayName(), 0xFFFFFFFF, null));
 			entry.lines.add(new GeneralSelectionList.OptionText(Component.empty(), 0xFFFFFFFF, null));
 			entry.lines.add(new GeneralSelectionList.OptionText(
-					Component.literal(tunnelType.url),
+					Component.literal(tunnelType.homepage),
 					0xFF0000FF,
-					(dummy) -> this.openLink(tunnelType.url)
+					(dummy) -> this.openLink(tunnelType.homepage)
 				));
 			entry.userData = tunnelType;
 			newOption.accept(entry);
@@ -81,6 +82,10 @@ public class ProviderSelectionScreen extends GeneralSelectionScreen {
 
 	@Override
 	public void onListConfirmed() {
-		this.minecraft.setScreen(new NodeSelectionScreen(this, this.lastScreen));
+		GeneralSelectionList.EntryBase selected = this.getSelectionList().getSelected();
+		if (selected instanceof GeneralSelectionList.Option option) {
+			TunnelType tunnelType = (TunnelType) option.userData;
+			this.minecraft.setScreen(new TunnelSelectionScreen(this, this.lastScreen, tunnelType));
+		}
 	}
 }

@@ -62,5 +62,9 @@
   "mcwifipnp.providerScreen.openLink": "访问网站",
   "mcwifipnp.providerScreen.help": "更多服务提供商",
   
-  "mcwifipnp.nodeScreen.title": "选择节点"
+  "mcwifipnp.tunnelSelection.title": "选择隧道",
+  "mcwifipnp.tunnelSelection.cantFindTunnelHelp": "找不到您的通道？",
+  "mcwifipnp.tunnelSelection.cantFindTunnelSuggestion": "点击下面链接添加然后尝试刷新。",
+  "mcwifipnp.tunnelSelection.authFailed": "授权失败，请返回上一页重新授权！",
+  "mcwifipnp.tunnelSelection.fetchException": "拉取隧道列表时发生错误:"
 }

@@ -4,4 +4,5 @@ public interface FetchedTunnel {
 	public String name();
 	public String description();
 	public String hostname();
+	public int tcpingPort();
 }

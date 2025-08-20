@@ -23,15 +23,17 @@ public class TunnelType {
 
 	public final String name;
 	private final String iconFileName;
-	public final String url;
+	public final String homepage;
+	public final String tunnelManagementUrl;
 
 	@Nullable
 	private ResourceLocation icon;
 
-	private TunnelType(String name, String iconFileName, String url) {
+	private TunnelType(String name, String iconFileName, String homepage, String url) {
 		this.name = name;
 		this.iconFileName = iconFileName;
-		this.url = url;
+		this.homepage = homepage;
+		this.tunnelManagementUrl = url;
 	}
 
 	public Component getDisplayName() {
@@ -70,11 +72,11 @@ public class TunnelType {
 		}
 	}
 
-	public static TunnelType register(String name, String website) {
+	public static TunnelType register(String name, String homepage, String tunnelManageUrl) {
 		if (TUNNEL_TYPES.containsKey(name))
 			return TUNNEL_TYPES.get(name);
 
-		TunnelType tunnelType = new TunnelType(name, name, website);
+		TunnelType tunnelType = new TunnelType(name, name, homepage, tunnelManageUrl);
 		TUNNEL_TYPES.put(name, tunnelType);
 		return tunnelType;
 	}
@@ -88,8 +90,8 @@ public class TunnelType {
 	}
 
 	static {
-		register("sakurafrp", "https://www.natfrp.com/tunnel/");
-		register("openfrp", "https://console.openfrp.net/manage-proxies");
-		register("cloudflare", "https://www.cloudflare.com/");
+		register("sakurafrp", "https://www.natfrp.com/", "https://www.natfrp.com/tunnel/");
+		register("openfrp", "https://www.openfrp.net/", "https://console.openfrp.net/manage-proxies");
+		register("cloudflare", "https://www.cloudflare.com/", null);
 	}
 }

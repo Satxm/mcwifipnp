@@ -1,62 +1,36 @@
-package io.github.satxm.mcwifipnp.revprox;
+package io.github.satxm.mcwifipnp.revprox.sakurafrp;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.UncheckedIOException;
+import java.net.InetSocketAddress;
+import java.net.Socket;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.security.AccessControlException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Consumer;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
+import io.github.satxm.mcwifipnp.revprox.FetchedTunnel;
+import io.github.satxm.mcwifipnp.revprox.InvalidAuthException;
+
 public class SakuraFrpClient {
 	private static final String TOKEN_PATH = "./mcwifipnp/token.txt";
 	private static final String TUNNELS_PATH = "./mcwifipnp/tunnels.txt";
 	private static final HttpClient CLIENT = HttpClient.newHttpClient();
 	private static final Gson GSON = new Gson();
-
-	public static class SakuraFrpTunnel implements FetchedTunnel {
-		private int id;
-		private String name;
-		private int node;
-		private String type;
-		private boolean online;
-
-		private String desc = "";
-		private String hostname = "";
-
-		@Override
-		public String name() {
-			return String.valueOf(this.name);
-		}
-		@Override
-		public String description() {
-			return this.desc;
-		}
-		@Override
-		public String hostname() {
-			return this.hostname;
-		}
-	}
-
-	public static class SakuraFrpNode {
-		private String name;
-		private String host;
-		private int vip;
-		private int flag;
-	}
 
 	public static CompletableFuture<JsonElement> fetchTunnelsFake() {
 		System.out.println("fetchTunnelsFake");
@@ -115,7 +89,7 @@ public class SakuraFrpClient {
 
 					return tunnels;
 				} else if (status == 401 || status == 403) {
-					throw new AccessControlException("Access denied: invalid or expired token.");
+					throw new InvalidAuthException("Access denied: invalid or expired token.");
 				} else {
 					throw new RuntimeException("HTTP request failed with status code: " + status);
 				}
@@ -136,5 +110,18 @@ public class SakuraFrpClient {
 			failed.completeExceptionally(e);
 			return failed;
 		}
+	}
+
+	public static Runnable pingNode(String host, int port, Consumer<Integer> onComplete) {
+		return () -> {
+			try (Socket socket = new Socket()) {
+				long start = System.nanoTime();
+				socket.connect(new InetSocketAddress(host, port), 5000);
+				long elapsedMs = (System.nanoTime() - start) / 1_000_000;
+				onComplete.accept((int) elapsedMs);
+			} catch (IOException e) {
+				onComplete.accept(-1);
+			}
+		};
 	}
 }

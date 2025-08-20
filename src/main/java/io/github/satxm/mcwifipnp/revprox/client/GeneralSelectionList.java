@@ -76,25 +76,29 @@ public class GeneralSelectionList extends ObjectSelectionList<GeneralSelectionLi
 		public static OptionText of(String text) {
 			return new OptionText(Component.literal(text), 0xFFFFFFFF, null);
 		}
+
+		public static OptionText translatable(String text) {
+			return new OptionText(Component.translatable(text), 0xFFFFFFFF, null);
+		}
 	}
 
 	public class Option extends EntryBase {
 		private final int[] Y_LINES = new int[] {1, 12, 12 + 9};
 		public List<OptionText> lines = new LinkedList<>();
 
-		public final ResourceLocation icon;
+		public ResourceLocation icon;
 		public Object userData;
 
 		// Internal State
 		private long lastClickTime;
 
-		public Option(@Nullable ResourceLocation icon) {
-			this.icon = icon == null ? GeneralSelectionList.this.iconDefault : icon;
-		}
-
 		@Override
 		public Component getNarration() {
 			return Component.literal("114514");
+		}
+
+		protected final Minecraft getMinecraft() {
+			return GeneralSelectionList.this.minecraft;
 		}
 
 		@Override
@@ -102,7 +106,7 @@ public class GeneralSelectionList extends ObjectSelectionList<GeneralSelectionLi
 				int height, int xMouse, int yMouse, boolean hovered, float p_281423_) {
 			int xString = xOrigin + 32 + 3;
 
-			Minecraft minecraft = GeneralSelectionList.this.minecraft;
+			Minecraft minecraft = this.getMinecraft();
 
 			// Draw lines
 			int i = 0;
@@ -112,11 +116,10 @@ public class GeneralSelectionList extends ObjectSelectionList<GeneralSelectionLi
 				Component text = line.text();
 
 				if (isHyperLink) {
-					int xMouseRelative = xMouse - xOrigin;
-					int yMouseRelative = yMouse - yOrigin;
+					int yString = yOrigin + yLine;
 					int textWidth = minecraft.font.width(text);
-					if (xMouseRelative >= xString && xMouseRelative < xString + textWidth &&
-							yMouseRelative >= yLine && yMouseRelative < yLine + minecraft.font.lineHeight) {
+					if (xMouse >= xString && xMouse < xString + textWidth &&
+							yMouse >= yString && yMouse < yString + minecraft.font.lineHeight) {
 						text = text.copy().withStyle(style -> style.withUnderlined(true));
 					}
 				}
@@ -126,7 +129,8 @@ public class GeneralSelectionList extends ObjectSelectionList<GeneralSelectionLi
 			}
 
 			// Draw icon
-			guiGraphics.blit(RenderPipelines.GUI_TEXTURED, this.icon, xOrigin, yOrigin, 0.0F, 0.0F, 32, 32, 32, 32);
+			ResourceLocation icon = this.icon == null ? GeneralSelectionList.this.iconDefault : this.icon;
+			guiGraphics.blit(RenderPipelines.GUI_TEXTURED, icon, xOrigin, yOrigin, 0.0F, 0.0F, 32, 32, 32, 32);
 		}
 
 		@Override
@@ -144,11 +148,10 @@ public class GeneralSelectionList extends ObjectSelectionList<GeneralSelectionLi
 				Component text = line.text();
 
 				if (isHyperLink) {
-					double xMouseRelative = xMouse - xOrigin;
-					double yMouseRelative = yMouse - yOrigin;
+					int yString = yOrigin + yLine;
 					int textWidth = minecraft.font.width(text);
-					if (xMouseRelative >= xString && xMouseRelative < xString + textWidth &&
-							yMouseRelative >= yLine && yMouseRelative < yLine + minecraft.font.lineHeight) {
+					if (xMouse >= xString && xMouse < xString + textWidth &&
+							yMouse >= yString && yMouse < yString + minecraft.font.lineHeight) {
 						line.onClicked().accept(this);
 						return true;
 					}
