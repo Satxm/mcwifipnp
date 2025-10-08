@@ -31,6 +31,7 @@ import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.server.commands.PublishCommand;
+import net.minecraft.server.players.NameAndId;
 import net.minecraft.server.players.PlayerList;
 import net.minecraft.server.players.ServerOpListEntry;
 import net.minecraft.util.HttpUtil;
@@ -104,11 +105,11 @@ public class ShareToLanScreenNew extends Screen {
 			this.minecraft.gui.getChat().addMessage(component);
 
 			PlayerList playerList = server.getPlayerList();
+			NameAndId nameAndId = new NameAndId(server.getSingleplayerProfile());
 			if (this.cfg.allowHostCheat) {
-				playerList.getOps().add(new ServerOpListEntry(server.getSingleplayerProfile(), 4,
-						playerList.canBypassPlayerLimit(server.getSingleplayerProfile())));
+				playerList.getOps().add(new ServerOpListEntry(nameAndId, 4, playerList.canBypassPlayerLimit(nameAndId)));
 			} else {
-				playerList.getOps().remove(server.getSingleplayerProfile());
+				playerList.getOps().remove(nameAndId);
 			}
 
 			UPnPModule.startIfEnabled(server, cfg);
@@ -122,8 +123,9 @@ public class ShareToLanScreenNew extends Screen {
 
 		this.minecraft.updateTitle();
 		this.minecraft.setScreen((Screen) null);
+		NameAndId nameAndId = new NameAndId(server.getSingleplayerProfile());
 		if (MCWiFiPnPUnit.convertOldUsers(this.minecraft.getSingleplayerServer()))
-			this.minecraft.getSingleplayerServer().getProfileCache().save();
+			this.minecraft.getSingleplayerServer().services().nameToIdCache().add(nameAndId);
 	}
 
 	@Override

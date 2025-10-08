@@ -65,13 +65,12 @@ public class OptionsList extends ContainerObjectSelectionList<OptionsList.Entry>
 		}
 
 		@Override
-		public void render(GuiGraphics p_281311_, int x, int y, int p_94499_, int p_94500_, int p_94501_, int p_94502_,
-				int p_94503_, boolean p_94504_, float p_94505_) {
+		public void renderContent(GuiGraphics guiGraphics, int i, int j, boolean bl, float f) {
 			int xStart = OptionsList.this.screen.width / 2 - COLUMN_WIDTH - GAP / 2;
 
 			for (AbstractWidget abstractwidget : this.children) {
-				abstractwidget.setPosition(xStart, y);
-				abstractwidget.render(p_281311_, p_94502_, p_94503_, p_94505_);
+				abstractwidget.setPosition(xStart, this.getContentY());
+				abstractwidget.render(guiGraphics, i, j, f);
 				xStart += COLUMN_WIDTH + GAP;
 			}
 		}
@@ -105,27 +104,26 @@ public class OptionsList extends ContainerObjectSelectionList<OptionsList.Entry>
 		}
 
 		@Override
-		public void render(GuiGraphics guiGraphics, int x, int y, int p_94499_, int p_94500_, int p_94501_,
-				int p_94502_, int p_94503_, boolean p_94504_, float p_94505_) {
+		public void renderContent(GuiGraphics guiGraphics, int i, int j, boolean bl, float f) {
 			int xStart = OptionsList.this.screen.width / 2 - COLUMN_WIDTH - GAP / 2;
 
 			guiGraphics.drawString(OptionsList.this.font, this.labelLeft, xStart,
-					y + (this.left.getHeight() - 9) / 2, 16777215);
+					this.getContentY() + (this.left.getHeight() - 9) / 2, 16777215);
 
 			if (this.right == null)
 				xStart += COLUMN_WIDTH + GAP;
 
-			this.left.setPosition(xStart + (COLUMN_WIDTH - this.left.getWidth()), y);
-			this.left.render(guiGraphics, p_94502_, p_94503_, p_94505_);
+			this.left.setPosition(xStart + (COLUMN_WIDTH - this.left.getWidth()), this.getContentY());
+			this.left.render(guiGraphics, i, j, f);
 
 			if (this.right == null)
 				return;
 
 			xStart += COLUMN_WIDTH + GAP;
 			guiGraphics.drawString(OptionsList.this.font, this.labelRight, xStart,
-					y + (this.right.getHeight() - 9) / 2, 16777215);
-			this.right.setPosition(xStart + (COLUMN_WIDTH - this.right.getWidth()), y);
-			this.right.render(guiGraphics, p_94502_, p_94503_, p_94505_);
+					this.getContentY() + (this.right.getHeight() - 9) / 2, 16777215);
+			this.right.setPosition(xStart + (COLUMN_WIDTH - this.right.getWidth()), this.getContentY());
+			this.right.render(guiGraphics, i, j, f);
 		}
 	}
 }

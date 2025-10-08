@@ -40,7 +40,7 @@ neoForge {
       systemProperty 'neoforge.enabledGameTestNamespaces', project.mod_id
     }
 
-    clientData {
+        data {
       clientData()
       programArguments.addAll '--mod', project.mod_id, '--all', '--output', file('src/generated/resources/').getAbsolutePath(), '--existing', file('src/main/resources/').getAbsolutePath()
     }
@@ -68,6 +68,10 @@ sourceSets {
       srcDir "src/generated/resources"
     }
   }
+}
+
+configurations {
+    runtimeClasspath.extendsFrom localRuntime
 }
 
 tasks.withType(ProcessResources).configureEach {

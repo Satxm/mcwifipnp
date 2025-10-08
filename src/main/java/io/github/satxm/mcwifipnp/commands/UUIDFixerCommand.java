@@ -57,7 +57,7 @@ public class UUIDFixerCommand {
 			.suggests((commandContext, suggestionsBuilder) -> {
 				MinecraftServer server = ((CommandSourceStack) commandContext.getSource()).getServer();
 				Set<String> players = server.getPlayerList().getPlayers().stream()
-					.map(player -> player.getGameProfile().getName()).collect(Collectors.toSet());
+					.map(player -> player.getGameProfile().name()).collect(Collectors.toSet());
 
 				Set<String> hints = new LinkedHashSet<>();
 
@@ -189,7 +189,7 @@ public class UUIDFixerCommand {
 			}, true);
 
 			policyHolder.save();
-			commandSourceStack.getServer().kickUnlistedPlayers(commandSourceStack);
+			commandSourceStack.getServer().kickUnlistedPlayers();
 			return 1;
 		}
 	}

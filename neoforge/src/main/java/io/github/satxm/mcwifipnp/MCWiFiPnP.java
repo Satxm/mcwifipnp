@@ -16,7 +16,7 @@ public class MCWiFiPnP {
 
 	@SubscribeEvent
 	public void onRegisterCommands(RegisterCommandsEvent event) {
-		MCWiFiPnPUnit.registerCommands(event.getDispatcher(), FMLEnvironment.dist.isDedicatedServer());
+		MCWiFiPnPUnit.registerCommands(event.getDispatcher(), FMLEnvironment.getDist().isDedicatedServer());
 	}
 
 	@SubscribeEvent
