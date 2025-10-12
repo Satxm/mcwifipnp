@@ -2,6 +2,14 @@ name: Build and Publish
 
 on:
   workflow_dispatch:
+    inputs:
+      channel:
+        type: choice
+        description: Release Channel
+        options:
+          - alpha
+          - beta
+          - release
 
 env:
   java-version: "21"
@@ -41,7 +49,7 @@ jobs:
       - name: Build with Gradle Wrapper
         run: ./gradlew build
 
-      - name: Get Name form files
+      - name: Check Files & Get Name form Files
         run: |
           fabric_name=$(basename fabric/build/libs/*.jar | sed 's/.jar//' | sed 's/mcwifipnp-//' | sed 's/-sources//' | sed 's/-dev//')
           forge_name=$(basename forge/build/libs/*.jar | sed 's/\.jar//' | sed 's/mcwifipnp-//' | sed 's/-sources//' | sed 's/-dev//')
@@ -53,7 +61,8 @@ jobs:
           echo "QUILT_NAME"="${quilt_name}" >> $GITHUB_ENV
 
       - name: Publish (Fabric)
-        uses: Kir-Antipov/mc-publish@v3.3
+        if: ${{ env.FABRIC_NAME }} != "*"
+        uses: Kir-Antipov/mc-publish@v3.3a
         with:
           fail-mode: warn
           modrinth-id: ${{ env.modrinth-id }}
@@ -62,11 +71,12 @@ jobs:
           curseforge-token: "${{ secrets.CURSEFORGE_TOKEN }}"
 
           name: ${{ env.FABRIC_NAME }}
-          version-type: release
+          version-type: ${{ inputs.channel }}
           files: fabric/build/libs/!(*-@(dev|sources|javadoc)).jar
           java: Java ${{ env.java-version }}
 
       - name: Publish (Forge)
+        if: ${{ env.FORGE_NAME }} != "*"
         uses: Kir-Antipov/mc-publish@v3.3
         with:
           fail-mode: warn
@@ -76,11 +86,12 @@ jobs:
           curseforge-token: "${{ secrets.CURSEFORGE_TOKEN }}"
 
           name: ${{ env.FORGE_NAME }}
-          version-type: release
+          version-type: ${{ inputs.channel }}
           files: forge/build/libs/!(*-@(dev|sources|javadoc)).jar
           java: Java ${{ env.java-version }}
 
       - name: Publish (NeoForge)
+        if: ${{ env.NEOFORGE_NAME }} != "*"
         uses: Kir-Antipov/mc-publish@v3.3
         with:
           fail-mode: warn
@@ -91,21 +102,22 @@ jobs:
 
           name: ${{ env.NEOFORGE_NAME }}
           loaders: neoforge
-          version-type: release
+          version-type: ${{ inputs.channel }}
           files: neoforge/build/libs/!(*-@(dev|sources|javadoc)).jar
           java: Java ${{ env.java-version }}
 
-#      - name: Publish (Quilt)
-#        uses: Kir-Antipov/mc-publish@v3.3
-#        with:
-#          fail-mode: warn
-#          modrinth-id: ${{ env.modrinth-id }}
-#          modrinth-token: "${{ secrets.MODRINTH_TOKEN }}"
-#          curseforge-id: ${{ env.curseforge-id }}
-#          curseforge-token: "${{ secrets.CURSEFORGE_TOKEN }}"
-#
-#          name: ${{ env.QUILT_NAME }}
-#          loaders: quilt
-#          version-type: release
-#          files: quilt/build/libs/!(*-@(dev|sources|javadoc)).jar
-#          java: Java ${{ env.java-version }}
+      - name: Publish (Quilt)
+        if: ${{ env.QUILT_NAME }} != "*"
+        uses: Kir-Antipov/mc-publish@v3.3
+        with:
+          fail-mode: warn
+          modrinth-id: ${{ env.modrinth-id }}
+          modrinth-token: "${{ secrets.MODRINTH_TOKEN }}"
+          curseforge-id: ${{ env.curseforge-id }}
+          curseforge-token: "${{ secrets.CURSEFORGE_TOKEN }}"
+
+          name: ${{ env.QUILT_NAME }}
+          loaders: quilt
+          version-type: ${{ inputs.channel }}
+          files: quilt/build/libs/!(*-@(dev|sources|javadoc)).jar
+          java: Java ${{ env.java-version }}
