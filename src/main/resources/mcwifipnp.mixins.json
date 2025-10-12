@@ -5,8 +5,8 @@
   "compatibilityLevel": "JAVA_21",
   "refmap": "mcwifipnp-refmap.json",
   "client": [
-    "PlayerListAccessor",
     "AccessorGridLayout",
+    "MixinIntegratedServer",
     "MixinPauseScreen"
   ],
   "mixins": [

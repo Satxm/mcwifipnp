@@ -6,6 +6,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
 
+import io.github.satxm.mcwifipnp.client.MaxPlayers;
 import org.apache.logging.log4j.Logger;
 
 import com.google.gson.Gson;
@@ -176,7 +177,7 @@ public class Config {
 		server.setDefaultGameType(this.gameType);
 		playerList.setAllowCommandsForAllPlayers(this.allowEveryoneCheat);
 
-		// ((PlayerListAccessor) playerList).setMaxPlayers(this.maxPlayers);
+		((MaxPlayers) server).setMaxPlayers(this.maxPlayers);
 		server.setUsesAuthentication(this.onlineMode);
 		server.getGameRules().getRule(GameRules.RULE_PVP).set(this.enablePvP,server);
 		server.setEnforceWhitelist(this.enforceWhitelist);
