@@ -61,8 +61,8 @@ jobs:
           echo "QUILT_NAME"="${quilt_name}" >> $GITHUB_ENV
 
       - name: Publish (Fabric)
-        if: ${{ env.FABRIC_NAME }} != null
-        uses: Kir-Antipov/mc-publish@v3.3
+        if: ${{ env.FABRIC_NAME }} != "*"
+        uses: Kir-Antipov/mc-publish@v3.3a
         with:
           fail-mode: warn
           modrinth-id: ${{ env.modrinth-id }}
@@ -76,7 +76,7 @@ jobs:
           java: Java ${{ env.java-version }}
 
       - name: Publish (Forge)
-        if: ${{ env.FORGE_NAME }} != null
+        if: ${{ env.FORGE_NAME }} != "*"
         uses: Kir-Antipov/mc-publish@v3.3
         with:
           fail-mode: warn
@@ -91,7 +91,7 @@ jobs:
           java: Java ${{ env.java-version }}
 
       - name: Publish (NeoForge)
-        if: ${{ env.NEOFORGE_NAME }} != null
+        if: ${{ env.NEOFORGE_NAME }} != "*"
         uses: Kir-Antipov/mc-publish@v3.3
         with:
           fail-mode: warn
@@ -107,7 +107,7 @@ jobs:
           java: Java ${{ env.java-version }}
 
       - name: Publish (Quilt)
-        if: ${{ env.QUILT_NAME }} != null
+        if: ${{ env.QUILT_NAME }} != "*"
         uses: Kir-Antipov/mc-publish@v3.3
         with:
           fail-mode: warn
