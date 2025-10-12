@@ -109,12 +109,12 @@ public class ShareToLanScreenNew extends Screen {
 			if (this.cfg.allowHostCheat) {
 				playerList.getOps().add(new ServerOpListEntry(nameAndId, 4, playerList.canBypassPlayerLimit(nameAndId)));
 			} else {
-				playerList.getOps().remove(nameAndId);
+				playerList.getOps().add(new ServerOpListEntry(nameAndId, 2, playerList.canBypassPlayerLimit(nameAndId)));
 			}
 
 			UPnPModule.startIfEnabled(server, cfg);
 			if (this.cfg.getPublicIP) {
-				new Thread(() -> {
+				new Thread(Thread.currentThread().getThreadGroup(), () -> {
 					this.minecraft.gui.getChat().addMessage(IpCommand.getBrief(server));
 				}, "MCWiFiPnP").start();
 			}
