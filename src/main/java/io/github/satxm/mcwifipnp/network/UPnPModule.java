@@ -1,15 +1,13 @@
 package io.github.satxm.mcwifipnp.network;
 
-import org.apache.logging.log4j.Logger;
-
 import com.dosse.upnp.UPnP;
-
 import io.github.satxm.mcwifipnp.Config;
 import io.github.satxm.mcwifipnp.MCWiFiPnPUnit;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.components.ChatComponent;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.level.ServerPlayer;
+import org.apache.logging.log4j.Logger;
 
 public record UPnPModule(int port, String displayName) implements Runnable {
 	private static final Logger LOGGER = MCWiFiPnPUnit.LOGGER;
@@ -44,19 +42,20 @@ public record UPnPModule(int port, String displayName) implements Runnable {
 
 	@Override
 	public void run() {
-		ChatComponent chat = Minecraft.getInstance().gui.getChat();
+        MinecraftServer server = Minecraft.getInstance().getSingleplayerServer();
+        ServerPlayer player = server.getPlayerList().getPlayer(server.getSingleplayerProfile().id());
 
 		if (UPnP.isUPnPAvailable()) {
 			if (UPnP.isMappedTCP(this.port)) {
-				chat.addMessage(Component.translatable("mcwifipnp.upnp.failed.mapped", this.port));
+                player.sendSystemMessage(Component.translatable("mcwifipnp.upnp.failed.mapped", this.port));
 			} else if (UPnP.openPortTCP(this.port, this.displayName)) {
-				chat.addMessage(Component.translatable("mcwifipnp.upnp.success", this.port));
+                player.sendSystemMessage(Component.translatable("mcwifipnp.upnp.success", this.port));
 				LOGGER.info("Started forwarded port " + this.port + ".");
 			} else {
-				chat.addMessage(Component.translatable("mcwifipnp.upnp.failed", this.port));
+                player.sendSystemMessage(Component.translatable("mcwifipnp.upnp.failed", this.port));
 			}
 		} else {
-			chat.addMessage(Component.translatable("mcwifipnp.upnp.failed.disabled", this.port));
+            player.sendSystemMessage(Component.translatable("mcwifipnp.upnp.failed.disabled", this.port));
 		}
 	}
 }

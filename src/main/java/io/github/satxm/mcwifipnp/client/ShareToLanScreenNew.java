@@ -114,8 +114,8 @@ public class ShareToLanScreenNew extends Screen {
 
 			UPnPModule.startIfEnabled(server, cfg);
 			if (this.cfg.getPublicIP) {
-				new Thread(Thread.currentThread().getThreadGroup(), () -> {
-					this.minecraft.gui.getChat().addMessage(IpCommand.getBrief(server));
+				new Thread(() -> {
+                    server.getPlayerList().getPlayer(nameAndId.id()).sendSystemMessage(IpCommand.getBrief(server));
 				}, "MCWiFiPnP").start();
 			}
 		}
