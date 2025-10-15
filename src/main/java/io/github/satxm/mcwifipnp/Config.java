@@ -6,7 +6,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
 
-import io.github.satxm.mcwifipnp.client.MaxPlayers;
 import org.apache.logging.log4j.Logger;
 
 import com.google.gson.Gson;
@@ -20,7 +19,6 @@ import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
 import com.google.gson.annotations.SerializedName;
 
-// import io.github.satxm.mcwifipnp.mixin.PlayerListAccessor;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.players.PlayerList;
@@ -37,7 +35,7 @@ public class Config {
 
 	// These fields are read, synced, and save as normal
 	@SerializedName(value = "max-players", alternate = { "maxPlayers" })
-	public int maxPlayers = 8;
+	public static int maxPlayers = 8;
 
 	@SerializedName(value = "gamemode", alternate = { "GameMode" })
 	public GameType gameType = GameType.SURVIVAL;
@@ -177,7 +175,6 @@ public class Config {
 		server.setDefaultGameType(this.gameType);
 		playerList.setAllowCommandsForAllPlayers(this.allowEveryoneCheat);
 
-		((MaxPlayers) server).setMaxPlayers(this.maxPlayers);
 		server.setUsesAuthentication(this.onlineMode);
 		server.getGameRules().getRule(GameRules.RULE_PVP).set(this.enablePvP,server);
 		server.setEnforceWhitelist(this.enforceWhitelist);
@@ -186,4 +183,8 @@ public class Config {
 		server.setMotd(this.motd);
 		UUIDFixer.enabled = this.enableUUIDFixer;
 	}
+
+    public static int setMaxPlayers() {
+        return maxPlayers;
+    }
 }

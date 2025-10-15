@@ -1,25 +1,19 @@
 package io.github.satxm.mcwifipnp.mixin;
 
-import io.github.satxm.mcwifipnp.client.MaxPlayers;
+import io.github.satxm.mcwifipnp.Config;
 import net.minecraft.client.server.IntegratedServer;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Unique;
-
-import javax.annotation.Nullable;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(IntegratedServer.class)
-abstract class MixinIntegratedServer implements MaxPlayers {
-	@Unique
-	@Nullable
-	private int maxPlayers = 8;
+public abstract class MixinIntegratedServer {
 
-	@Override
-    public int getMaxPlayers() {
-		return this.maxPlayers;
-	}
-
-	@Override
-    public void setMaxPlayers(int i) {
-		this.maxPlayers = i;
-	}
+    @Inject(method = "getMaxPlayers", at = @At("HEAD"), cancellable = true, require = 1, allow = 1)
+    private void setMaxPlayers(CallbackInfoReturnable<Integer> ci) {
+        int i = Config.setMaxPlayers();
+        ci.setReturnValue(i);
+        ci.cancel();
+    }
 }
