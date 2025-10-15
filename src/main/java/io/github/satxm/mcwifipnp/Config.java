@@ -35,7 +35,7 @@ public class Config {
 
 	// These fields are read, synced, and save as normal
 	@SerializedName(value = "max-players", alternate = { "maxPlayers" })
-	public static int maxPlayers = 8;
+	public int maxPlayers = 8;
 
 	@SerializedName(value = "gamemode", alternate = { "GameMode" })
 	public GameType gameType = GameType.SURVIVAL;
@@ -184,7 +184,4 @@ public class Config {
 		UUIDFixer.enabled = this.enableUUIDFixer;
 	}
 
-    public static int setMaxPlayers() {
-        return maxPlayers;
-    }
 }
