@@ -19,7 +19,7 @@ import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
 import com.google.gson.annotations.SerializedName;
 
-import io.github.satxm.mcwifipnp.mixin.PlayerListAccessor;
+import io.github.satxm.mcwifipnp.mixin.AccessorPlayerList;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.players.PlayerList;
@@ -175,7 +175,7 @@ public class Config {
 		server.setDefaultGameType(this.gameType);
 		playerList.setAllowCommandsForAllPlayers(this.allowEveryoneCheat);
 
-		((PlayerListAccessor) playerList).setMaxPlayers(this.maxPlayers);
+		((AccessorPlayerList) playerList).setMaxPlayers(this.maxPlayers);
 		server.setUsesAuthentication(this.onlineMode);
 		server.setPvpAllowed(this.enablePvP);
 		server.setEnforceWhitelist(this.enforceWhitelist);
@@ -184,4 +184,5 @@ public class Config {
 		server.setMotd(this.motd);
 		UUIDFixer.enabled = this.enableUUIDFixer;
 	}
+
 }

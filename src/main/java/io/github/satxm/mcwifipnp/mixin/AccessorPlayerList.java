@@ -7,7 +7,7 @@ import org.spongepowered.asm.mixin.gen.Accessor;
 import net.minecraft.server.players.PlayerList;
 
 @Mixin(PlayerList.class)
-public interface PlayerListAccessor {
+public interface AccessorPlayerList {
 	@Accessor
 	@Mutable
 	public void setMaxPlayers(int maxPlayers);

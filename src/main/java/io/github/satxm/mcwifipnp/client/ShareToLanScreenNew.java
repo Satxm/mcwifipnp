@@ -2,6 +2,8 @@ package io.github.satxm.mcwifipnp.client;
 
 import javax.annotation.Nullable;
 
+import com.mojang.authlib.GameProfile;
+
 import io.github.satxm.mcwifipnp.Config;
 import io.github.satxm.mcwifipnp.MCWiFiPnPUnit;
 import io.github.satxm.mcwifipnp.OnlineMode;
@@ -104,11 +106,11 @@ public class ShareToLanScreenNew extends Screen {
 			this.minecraft.gui.getChat().addMessage(component);
 
 			PlayerList playerList = server.getPlayerList();
+			GameProfile gameProfile = server.getSingleplayerProfile();
 			if (this.cfg.allowHostCheat) {
-				playerList.getOps().add(new ServerOpListEntry(server.getSingleplayerProfile(), 4,
-						playerList.canBypassPlayerLimit(server.getSingleplayerProfile())));
+				playerList.getOps().add(new ServerOpListEntry(gameProfile, 4, playerList.canBypassPlayerLimit(gameProfile)));
 			} else {
-				playerList.getOps().remove(server.getSingleplayerProfile());
+				playerList.getOps().add(new ServerOpListEntry(gameProfile, 2, playerList.canBypassPlayerLimit(gameProfile)));
 			}
 
 			UPnPModule.startIfEnabled(server, cfg);

@@ -1,15 +1,13 @@
 package io.github.satxm.mcwifipnp.network;
 
-import org.apache.logging.log4j.Logger;
-
 import com.dosse.upnp.UPnP;
-
 import io.github.satxm.mcwifipnp.Config;
 import io.github.satxm.mcwifipnp.MCWiFiPnPUnit;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.ChatComponent;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.MinecraftServer;
+import org.apache.logging.log4j.Logger;
 
 public record UPnPModule(int port, String displayName) implements Runnable {
 	private static final Logger LOGGER = MCWiFiPnPUnit.LOGGER;

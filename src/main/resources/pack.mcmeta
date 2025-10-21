@@ -1,6 +1,9 @@
 {
   "pack": {
     "description": "LAN World Plug-n-Play Mod Resources",
-    "pack_format": ${pack_format_number}
+    "pack_format": ${pack_format_number},
+    "min_format": 1,
+    "max_format": 999,
+    "supported_formats": [1, 999]
   }
 }

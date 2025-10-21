@@ -1,9 +1,16 @@
 package io.github.satxm.mcwifipnp.mixin;
 
+import java.util.List;
+
+import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
+
 import io.github.satxm.mcwifipnp.Config;
 import io.github.satxm.mcwifipnp.client.GuiUtils;
 import io.github.satxm.mcwifipnp.client.ShareToLanScreenNew;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.SpriteIconButton;
 import net.minecraft.client.gui.components.Tooltip;
@@ -14,14 +21,6 @@ import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.server.IntegratedServer;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
-
-import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
-
-import java.util.List;
 
 @Mixin(PauseScreen.class)
 public abstract class MixinPauseScreen extends Screen {
@@ -34,14 +33,15 @@ public abstract class MixinPauseScreen extends Screen {
 	@Inject(method = "createPauseMenu", at = @At("TAIL"), locals = LocalCapture.CAPTURE_FAILHARD)
 	protected void addOrReplaceButton(CallbackInfo ci, GridLayout gridLayout, GridLayout.RowHelper dummy) {
 
-		IntegratedServer server = Minecraft.getInstance().getSingleplayerServer();
+		IntegratedServer server = this.minecraft.getSingleplayerServer();
 		if (this.minecraft.hasSingleplayerServer()) {
 			this.cfg = Config.read(server);
 		}
 
-		Component MODIFY_LAN_OPTIONS = this.minecraft.hasSingleplayerServer() && this.minecraft.getSingleplayerServer().isPublished()
-				? Component.translatable("mcwifipnp.gui.lanServerOptions")
-				: Component.translatable("menu.shareToLan");
+		Component MODIFY_LAN_OPTIONS = this.minecraft.hasSingleplayerServer()
+				&& this.minecraft.getSingleplayerServer().isPublished()
+						? Component.translatable("mcwifipnp.gui.lanServerOptions")
+						: Component.translatable("menu.shareToLan");
 
 		// Add a new button to the pause screen to open Lan Options Screen.
 		if (this.minecraft.hasSingleplayerServer() && this.minecraft.getSingleplayerServer().isPublished()

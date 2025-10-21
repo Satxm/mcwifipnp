@@ -1,11 +1,13 @@
 package io.github.satxm.mcwifipnp.mixin;
 
 import java.util.UUID;
-import io.github.satxm.mcwifipnp.UUIDFixer;
+
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
+
+import io.github.satxm.mcwifipnp.UUIDFixer;
 import net.minecraft.core.UUIDUtil;
 
 @Mixin(UUIDUtil.class)

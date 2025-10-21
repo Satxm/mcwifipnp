@@ -35,16 +35,15 @@ public class IpCommand {
 
 	public static void register(CommandDispatcher<CommandSourceStack> commandDispatcher) {
 		LiteralArgumentBuilder<CommandSourceStack> cmdBuilder = Commands.literal("ip")
-			.requires((cmdStack) -> cmdStack.hasPermission(4));
+				.requires((cmdStack) -> cmdStack.hasPermission(4));
 
 		cmdBuilder = cmdBuilder.then(Commands.literal("get")
-			.then(EnumArgument.IP_FAMILY.appendTo(Commands.literal("local").executes(IpCommand::showLocalIPsAll),
-				(enumOption) -> enumOption.executes(IpCommand::showLocalIPs)))
-			.then(EnumArgument.IP_FAMILY.appendTo(Commands.literal("global").executes(IpCommand::showGlobalIPAll),
-				(enumOption) -> enumOption.executes(IpCommand::showGlobalIP)))
-			.then(Commands.literal("upnp").executes(IpCommand::showUPnPIP))
-			.executes(IpCommand::showDetail)
-		);
+				.then(EnumArgument.IP_FAMILY.appendTo(Commands.literal("local").executes(IpCommand::showLocalIPsAll),
+						(enumOption) -> enumOption.executes(IpCommand::showLocalIPs)))
+				.then(EnumArgument.IP_FAMILY.appendTo(Commands.literal("global").executes(IpCommand::showGlobalIPAll),
+						(enumOption) -> enumOption.executes(IpCommand::showGlobalIP)))
+				.then(Commands.literal("upnp").executes(IpCommand::showUPnPIP))
+				.executes(IpCommand::showDetail));
 
 		// The default action
 		cmdBuilder = cmdBuilder.executes(IpCommand::showBrief);
@@ -64,15 +63,12 @@ public class IpCommand {
 		int count = getIPComponentLocal(results, InternetProtocolFamily.IPv4);
 		count += getIPComponentLocal(results, InternetProtocolFamily.IPv6);
 		if (count > 0) {
-			results.add(labelIndex, Component.translatable(LOCAL_IP_KEY, "IP").append(":"));
+			results.add(labelIndex, Component.translatable(LOCAL_IP_KEY, "IP:"));
 		}
 	}
 
 	private static int showLocalIPsAll(CommandContext<CommandSourceStack> context) {
-		return getAndReply(context, (components) -> {
-			getIPComponentLocal(components, InternetProtocolFamily.IPv4);
-			getIPComponentLocal(components, InternetProtocolFamily.IPv6);
-		});
+		return getAndReply(context, IpCommand::showLocalIPsAllImpl);
 	}
 
 	private static int showGlobalIP(CommandContext<CommandSourceStack> context) {
@@ -89,7 +85,7 @@ public class IpCommand {
 		int count = getIPComponentGlobal(results, InternetProtocolFamily.IPv4);
 		count += getIPComponentGlobal(results, InternetProtocolFamily.IPv6);
 		if (count > 0) {
-			results.add(labelIndex, Component.translatable(GLOBAL_IP_KEY, "IP").append(":"));
+			results.add(labelIndex, Component.translatable(GLOBAL_IP_KEY, "IP:"));
 		}
 	}
 
@@ -98,19 +94,24 @@ public class IpCommand {
 	}
 
 	private static int showUPnPIP(CommandContext<CommandSourceStack> context) {
-		return getAndReply(context, (components) -> getIPComponentUPnP(components, context));
+		return getAndReply(context, (components) -> {
+			showUPnPIPAllImpl(components, context);
+		});
+	}
+
+	private static void showUPnPIPAllImpl(List<MutableComponent> results, CommandContext<CommandSourceStack> context) {
+		int labelIndex = results.size();
+
+		if (getIPComponentUPnP(results, context) > 0) {
+			results.add(labelIndex, Component.literal("UPnP IPv4:"));
+		}
 	}
 
 	private static int showDetail(CommandContext<CommandSourceStack> context) {
 		return getAndReply(context, (components) -> {
 			showGlobalIPAllImpl(components);
 			showLocalIPsAllImpl(components);
-
-			int labelIndex = components.size();
-
-			if (getIPComponentUPnP(components, context) > 0) {
-				components.add(labelIndex, Component.literal("UPnP IPv4:"));
-			}
+			showUPnPIPAllImpl(components, context);
 		});
 	}
 
@@ -143,7 +144,7 @@ public class IpCommand {
 			return 0;
 		}
 
-		for (InetAddress addr: localIPs) {
+		for (InetAddress addr : localIPs) {
 			if (family == InternetProtocolFamily.of(addr)) {
 				String addrString = addr.getHostAddress();
 				addrString = formatIPString(addrString, family);
@@ -153,7 +154,7 @@ public class IpCommand {
 		return results.size();
 	}
 
- 	private static int getIPComponentGlobal(List<MutableComponent> results, InternetProtocolFamily family) {
+	private static int getIPComponentGlobal(List<MutableComponent> results, InternetProtocolFamily family) {
 		String ip = GlobalIPs.fetchGlobalIP(family);
 		if (ip == null) {
 			return 0;
@@ -164,7 +165,7 @@ public class IpCommand {
 		return 1;
 	}
 
- 	private static int getIPComponentUPnP(List<MutableComponent> results, CommandContext<CommandSourceStack> context) {
+	private static int getIPComponentUPnP(List<MutableComponent> results, CommandContext<CommandSourceStack> context) {
 		String upnpIP = UPnP.getExternalIP();
 		if (!UPnPModule.has(context.getSource().getServer()) || upnpIP == null) {
 			return 0;
@@ -173,7 +174,7 @@ public class IpCommand {
 		final MutableComponent component = copyable(upnpIP);
 		results.add(component);
 		return 1;
- 	}
+	}
 
 	public static Component getBrief(MinecraftServer server) {
 		int port = server.getPort();
@@ -183,7 +184,7 @@ public class IpCommand {
 		ArrayList<String> IPList = new ArrayList<String>();
 
 		List<InetAddress> localIPs = getLocalIPs();
-		for (InetAddress addr: localIPs) {
+		for (InetAddress addr : localIPs) {
 			String addrString = addr.getHostAddress();
 			InternetProtocolFamily family = InternetProtocolFamily.of(addr);
 			IPComponentList.add(copyable(LOCAL_IP_KEY, addrString, family, port));
@@ -204,7 +205,8 @@ public class IpCommand {
 
 		String upnpIP = UPnP.getExternalIP();
 		if (useUPnP && upnpIP != null && !IPList.contains(upnpIP)) {
-			IPComponentList.add(ComponentUtils.wrapInSquareBrackets(copyable(Component.literal("UPnP IPv4"), upnpIP)));
+			IPComponentList
+					.add(ComponentUtils.wrapInSquareBrackets(copyable(Component.literal("UPnP IPv4"), upnpIP + ":" + port)));
 			IPList.add(upnpIP);
 		}
 
@@ -241,9 +243,8 @@ public class IpCommand {
 		return base.withStyle(style -> style.withColor(ChatFormatting.GREEN)
 				.withClickEvent(new ClickEvent.CopyToClipboard(content))
 				.withHoverEvent(new HoverEvent.ShowText(
-					Component.translatable("chat.copy.click").append("\n").append(content)))
-				.withInsertion(content)
-		);
+						Component.translatable("chat.copy.click").append("\n").append(content)))
+				.withInsertion(content));
 	}
 
 	public static List<InetAddress> getLocalIPs() {
@@ -265,8 +266,8 @@ public class IpCommand {
 			} catch (SocketException e) {
 			}
 			if (iface.getDisplayName().contains("Virtual") || iface.getDisplayName().contains("VMware")
-				|| iface.getDisplayName().contains("VirtualBox") || iface.getDisplayName().contains("Bluetooth")
-				|| iface.getDisplayName().contains("Hyper-V")) {
+					|| iface.getDisplayName().contains("VirtualBox") || iface.getDisplayName().contains("Bluetooth")
+					|| iface.getDisplayName().contains("Hyper-V")) {
 				continue;
 			}
 			Enumeration<InetAddress> addrs = iface.getInetAddresses();
