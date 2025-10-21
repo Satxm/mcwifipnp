@@ -47,7 +47,7 @@ GitHub : [https://github.com/Satxm/mcwifipnp](https://github.com/Satxm/mcwifipnp
 Uses the vanilla Minecraft GUI style, Uses the official mojang mappings.
 
 * Modified from [TheGlitch76/mcpnp](https://github.com/TheGlitch76/mcpnp)
-* UPnP module from [adolfintel/WaifUPnP](https://github.com/adolfintel/WaifUPnP).
+* UPnP module from [adolfintel/WaifUPnP](https://github.com/adolfintel/WaifUPnP) & [RetGal/WaifUPnP](https://github.com/RetGal/WaifUPnP).
 * `Online Mode` and `UUID Fix` from[Rikka0w0/LanServerProperties](https://github.com/rikka0w0/LanServerProperties).
 
 ## Screenshots

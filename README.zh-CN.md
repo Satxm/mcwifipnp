@@ -47,7 +47,7 @@ GitHub : [https://github.com/Satxm/mcwifipnp](https://github.com/Satxm/mcwifipnp
 使用Minecraft原生界面样式，使用Mojang官方混淆表。
 
 * 修改自[TheGlitch76/mcpnp](https://github.com/TheGlitch76/mcpnp)项目
-* UPnP模块来自[adolfintel/WaifUPnP](https://github.com/adolfintel/WaifUPnP)。
+* UPnP模块来自[adolfintel/WaifUPnP](https://github.com/adolfintel/WaifUPnP) & [RetGal/WaifUPnP](https://github.com/RetGal/WaifUPnP)。
 *`正版验证`以及`UUID修复`等功能来自[Rikka0w0/LanServerProperties](https://github.com/rikka0w0/LanServerProperties).
 
 ## 界面截图

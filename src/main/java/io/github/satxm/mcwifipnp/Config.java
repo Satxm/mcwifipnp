@@ -176,7 +176,7 @@ public class Config {
 		playerList.setAllowCommandsForAllPlayers(this.allowEveryoneCheat);
 
 		server.setUsesAuthentication(this.onlineMode);
-		server.getGameRules().getRule(GameRules.RULE_PVP).set(this.enablePvP,server);
+		server.getGameRules().getRule(GameRules.RULE_PVP).set(this.enablePvP, server);
 		server.setEnforceWhitelist(this.enforceWhitelist);
 		server.setUsingWhitelist(this.enforceWhitelist);
 

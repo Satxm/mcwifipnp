@@ -26,7 +26,8 @@ public enum GlobalIPs {
 	}
 
 	/**
-	 * Fetch the global IP address from the given API provider then validate the result.
+	 * Fetch the global IP address from the given API provider then validate the
+	 * result.
 	 *
 	 * @return the IP, or null if failed or the IP is invalid
 	 */
@@ -36,10 +37,11 @@ public enum GlobalIPs {
 	}
 
 	/**
-	 * Fetch the global IP address from a given API provider then validate the result.
+	 * Fetch the global IP address from a given API provider then validate the
+	 * result.
 	 *
 	 * @param apiProvider the API provider's URL
-	 * @param family IP family to be verify against, can be IPv4 or IPv6
+	 * @param family      IP family to be verify against, can be IPv4 or IPv6
 	 * @return the IP, or null if failed or the IP is invalid
 	 */
 	@Nullable
@@ -64,19 +66,19 @@ public enum GlobalIPs {
 			return null;
 
 		switch (family) {
-		case IPv4:
-			if (!NetUtil.isValidIpV4Address(ip))
-				ip = null;
-			break;
+			case IPv4:
+				if (!NetUtil.isValidIpV4Address(ip))
+					ip = null;
+				break;
 
-		case IPv6:
-			if (!NetUtil.isValidIpV6Address(ip))
-				ip = null;
-			break;
+			case IPv6:
+				if (!NetUtil.isValidIpV6Address(ip))
+					ip = null;
+				break;
 
-		default:
-			ip = null;
-			break;
+			default:
+				ip = null;
+				break;
 		}
 
 		return ip;
@@ -93,7 +95,7 @@ public enum GlobalIPs {
 	 */
 	@Nullable
 	public static String fetchGlobalIP(InternetProtocolFamily family) {
-		for (GlobalIPs api: GlobalIPs.values()) {
+		for (GlobalIPs api : GlobalIPs.values()) {
 			if (api.family != family)
 				continue;
 

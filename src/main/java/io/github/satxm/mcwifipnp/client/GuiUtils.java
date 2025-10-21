@@ -8,6 +8,7 @@ import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.network.chat.contents.TranslatableContents;
 
 public class GuiUtils {
+	@SuppressWarnings("unchecked")
 	public static <T extends AbstractWidget> T findWidget(List<?> list, Class<T> cls, String vanillaLangKey) {
 		for (Object child : list) {
 			if (!(child instanceof AbstractWidget widget))

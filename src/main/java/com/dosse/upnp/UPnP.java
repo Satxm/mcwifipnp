@@ -26,139 +26,232 @@ package com.dosse.upnp;
  */
 public class UPnP {
 
-  private static Gateway defaultGW = null;
-  private static final GatewayFinder finder = new GatewayFinder() {
-    @Override
-    public void gatewayFound(Gateway g) {
-      synchronized (finder) {
-        if (defaultGW == null) {
-          defaultGW = g;
-        }
-      }
-    }
-  };
+	private static Gateway defaultGW = null;
+	private static final String DEFAULT_APP_NAME = "WaifUPnP";
+	private static final GatewayFinder finder = new GatewayFinder() {
+		@Override
+		public void gatewayFound(Gateway g) {
+			synchronized (finder) {
+				if (defaultGW == null) {
+					defaultGW = g;
+				}
+			}
+		}
+	};
 
-  /**
-   * Waits for UPnP to be initialized (takes ~3 seconds).<br>
-   * It is not necessary to call this method manually before using UPnP functions
-   */
-  public static void waitInit() {
-    while (finder.isSearching()) {
-      try {
-        Thread.sleep(1);
-      } catch (InterruptedException ex) {
-      }
-    }
-  }
-  
-  /**
-   * Is there an UPnP gateway?<br>
-   * This method is blocking if UPnP is still initializing<br>
-   * All UPnP commands will fail if UPnP is not available
-   * 
-   * @return true if available, false if not
-   */
-  public static boolean isUPnPAvailable(){
-    waitInit();
-    return defaultGW!=null;
-  }
+	/**
+	 * Waits for UPnP to be initialized (takes ~3 seconds).<br>
+	 * It is not necessary to call this method manually before using UPnP functions
+	 */
+	public static void waitInit() {
+		while (finder.isSearching()) {
+			try {
+				Thread.sleep(1);
+			} catch (InterruptedException ex) {
+			}
+		}
+	}
+	
+	/**
+	 * Is there an UPnP gateway?<br>
+	 * This method is blocking if UPnP is still initializing<br>
+	 * All UPnP commands will fail if UPnP is not available
+	 * 
+	 * @return true if available, false if not
+	 */
+	public static boolean isUPnPAvailable(){
+		waitInit();
+		return defaultGW!=null;
+	}
 
-  /**
-   * Opens a TCP port on the gateway
-   * 
-   * @param port TCP port (0-65535)
-   * @return true if the operation was successful, false otherwise
-   */
-  public static boolean openPortTCP(int port, String display) {
-    if(!isUPnPAvailable()) return false;
-    return defaultGW.openPort(port, false, display);
-  }
-  
-  /**
-   * Opens a UDP port on the gateway
-   * 
-   * @param port UDP port (0-65535)
-   * @return true if the operation was successful, false otherwise
-   */
-  public static boolean openPortUDP(int port, String display) {
-    if(!isUPnPAvailable()) return false;
-    return defaultGW.openPort(port, true, display);
-  }
-  
-  /**
-   * Closes a TCP port on the gateway<br>
-   * Most gateways seem to refuse to do this
-   * 
-   * @param port TCP port (0-65535)
-   * @return true if the operation was successful, false otherwise
-   */
-  public static boolean closePortTCP(int port) {
-    if(!isUPnPAvailable()) return false;
-    return defaultGW.closePort(port, false);
-  }
-  
-  /**
-   * Closes a UDP port on the gateway<br>
-   * Most gateways seem to refuse to do this
-   * 
-   * @param port UDP port (0-65535)
-   * @return true if the operation was successful, false otherwise
-   */
-  public static boolean closePortUDP(int port) {
-    if(!isUPnPAvailable()) return false;
-    return defaultGW.closePort(port, true);
-  }
-  
-  /**
-   * Checks if a TCP port is mapped<br>
-   * 
-   * @param port TCP port (0-65535)
-   * @return true if the port is mapped, false otherwise
-   */
-  public static boolean isMappedTCP(int port) {
-    if(!isUPnPAvailable()) return false;
-    return defaultGW.isMapped(port, false);
-  }
-  
-  /**
-   * Checks if a UDP port is mapped<br>
-   * 
-   * @param port UDP port (0-65535)
-   * @return true if the port is mapped, false otherwise
-   */
-  public static boolean isMappedUDP(int port) {
-    if(!isUPnPAvailable()) return false;
-    return defaultGW.isMapped(port, true);
-  }
-  
-  /**
-   * Gets the external IP address of the default gateway
-   * 
-   * @return external IP address as string, or null if not available
-   */
-  public static String getExternalIP(){
-    if(!isUPnPAvailable()) return null;
-    return defaultGW.getExternalIP();
-  }
-  
-  /**
-   * Gets the internal IP address of this machine
-   * 
-   * @return internal IP address as string, or null if not available
-   */
-  public static String getLocalIP(){
-    if(!isUPnPAvailable()) return null;
-    return defaultGW.getLocalIP();
-  }
+	/**
+	 * Opens a TCP port on the gateway
+	 * 
+	 * @param port TCP port (0-65535)
+	 * @return true if the operation was successful, false otherwise
+	 */
+	public static boolean openPortTCP(int port) {
+		return openPortTCP(port, DEFAULT_APP_NAME);
+	}
 
-  /**
-   * Gets the  IP address of the router
-   *
-   * @return internal IP address as string, or null if not available
-   */
-  public static String getDefaultGatewayIP(){
-    if(!isUPnPAvailable()) return null;
-    return defaultGW.getGatewayIP();
-  }
+	/**
+	 * Opens a TCP port on the gateway
+	 *
+	 * @param port TCP port (0-65535)
+	 * @param appName custom app name to be used for the rule
+	 * @return true if the operation was successful, false otherwise
+	 */
+	public static boolean openPortTCP(int port, String appName) {
+		return openPortTCP(port, null, appName);
+	}
+
+	/**
+	 * Opens a TCP port on the gateway
+	 *
+	 * @param port TCP port (0-65535)
+	 * @param remoteHost IP address of remote host
+	 * @param appName custom app name to be used for the rule
+	 * @return true if the operation was successful, false otherwise
+	 */
+	public static boolean openPortTCP(int port, String remoteHost, String appName) {
+		if(!isUPnPAvailable()) return false;
+		return defaultGW.openPort(port, remoteHost, false, appName);
+	}
+
+	/**
+	 * Opens a UDP port on the gateway
+	 *
+	 * @param port UDP port (0-65535)
+	 * @return true if the operation was successful, false otherwise
+	 */
+	public static boolean openPortUDP(int port) {
+		return openPortUDP(port, null, DEFAULT_APP_NAME);
+	}
+	
+	/**
+	 * Opens a UDP port on the gateway
+	 * 
+	 * @param port UDP port (0-65535)
+	 * @param appName custom app name to be used for the rule
+	 * @return true if the operation was successful, false otherwise
+	 */
+	public static boolean openPortUDP(int port, String appName) {
+		return openPortUDP(port, null, appName);
+	}
+
+	/**
+	 * Opens a UDP port on the gateway
+	 *
+	 * @param port UDP port (0-65535)
+	 * @param remoteHost IP address of remote host
+	 * @param appName custom app name to be used for the rule
+	 * @return true if the operation was successful, false otherwise
+	 */
+	public static boolean openPortUDP(int port, String remoteHost, String appName) {
+		if(!isUPnPAvailable()) return false;
+		return defaultGW.openPort(port, remoteHost, true, appName);
+	}
+
+	/**
+	 * Closes a TCP port on the gateway<br>
+	 * Most gateways seem to refuse to do this
+	 *
+	 * @param port TCP port (0-65535)
+	 * @return true if the operation was successful, false otherwise
+	 */
+	public static boolean closePortTCP(int port) {
+		return closePortTCP(port, null);
+	}
+	
+	/**
+	 * Closes a TCP port on the gateway<br>
+	 * Most gateways seem to refuse to do this
+	 * 
+	 * @param port TCP port (0-65535)
+	 * @param remoteHost IP address of remote host
+	 * @return true if the operation was successful, false otherwise
+	 */
+	public static boolean closePortTCP(int port, String remoteHost) {
+		if(!isUPnPAvailable()) return false;
+		return defaultGW.closePort(port, remoteHost, false);
+	}
+	
+	/**
+	 * Closes a UDP port on the gateway<br>
+	 * Most gateways seem to refuse to do this
+	 * 
+	 * @param port UDP port (0-65535)
+	 * @return true if the operation was successful, false otherwise
+	 */
+	public static boolean closePortUDP(int port) {
+		return closePortUDP(port, null);
+	}
+
+	/**
+	 * Closes a UDP port on the gateway<br>
+	 * Most gateways seem to refuse to do this
+	 *
+	 * @param port UDP port (0-65535)
+	 * @param remoteHost IP address of remote host
+	 * @return true if the operation was successful, false otherwise
+	 */
+	public static boolean closePortUDP(int port, String remoteHost) {
+		if(!isUPnPAvailable()) return false;
+		return defaultGW.closePort(port, remoteHost, true);
+	}
+	
+	/**
+	 * Checks if a TCP port is mapped<br>
+	 * 
+	 * @param port TCP port (0-65535)
+	 * @return true if the port is mapped, false otherwise
+	 */
+	public static boolean isMappedTCP(int port) {
+		return isMappedTCP(port, null);
+	}
+
+	/**
+	 * Checks if a TCP port is mapped<br>
+	 *
+	 * @param port TCP port (0-65535)
+	 * @param remoteHost IP address of remote host
+	 * @return true if the port is mapped, false otherwise
+	 */
+	public static boolean isMappedTCP(int port, String remoteHost) {
+		if(!isUPnPAvailable()) return false;
+		return defaultGW.isMapped(port, remoteHost, false);
+	}
+
+	/**
+	 * Checks if a UDP port is mapped<br>
+	 *
+	 * @param port UDP port (0-65535)
+	 * @return true if the port is mapped, false otherwise
+	 */
+	public static boolean isMappedUDP(int port) {
+		return isMappedUDP(port, null);
+	}
+	
+	/**
+	 * Checks if a UDP port is mapped<br>
+	 * 
+	 * @param port UDP port (0-65535)
+	 * @param remoteHost IP address of remote host
+	 * @return true if the port is mapped, false otherwise
+	 */
+	public static boolean isMappedUDP(int port, String remoteHost) {
+		if(!isUPnPAvailable()) return false;
+		return defaultGW.isMapped(port, remoteHost, true);
+	}
+	
+	/**
+	 * Gets the external IP address of the default gateway
+	 * 
+	 * @return external IP address as string, or null if not available
+	 */
+	public static String getExternalIP(){
+		if(!isUPnPAvailable()) return null;
+		return defaultGW.getExternalIP();
+	}
+	
+	/**
+	 * Gets the internal IP address of this machine
+	 * 
+	 * @return internal IP address as string, or null if not available
+	 */
+	public static String getLocalIP(){
+		if(!isUPnPAvailable()) return null;
+		return defaultGW.getLocalIP();
+	}
+
+	/**
+	 * Gets the IP address of the router
+	 *
+	 * @return internal IP address as string, or null if not available
+	 */
+	public static String getDefaultGatewayIP(){
+		if(!isUPnPAvailable()) return null;
+		return defaultGW.getGatewayIP();
+	}
 
 }
