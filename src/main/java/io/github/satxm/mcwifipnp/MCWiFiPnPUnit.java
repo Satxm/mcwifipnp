@@ -35,7 +35,6 @@ public class MCWiFiPnPUnit {
 	public static void registerCommands(CommandDispatcher<CommandSourceStack> cmdDispatcher, boolean isDedicatedServer) {
 		// Register our new commands on both client and dedicated server
 		UUIDFixerCommand.register(cmdDispatcher);
-		IpCommand.register(cmdDispatcher);
 
 		if (isDedicatedServer) {
 			enableUUIDFixerOnDedicatedServer();
@@ -43,6 +42,7 @@ public class MCWiFiPnPUnit {
 		}
 
 		// Register our client-only commands
+		IpCommand.register(cmdDispatcher);
 		OnlineModeCommand.register(cmdDispatcher);
 		UPnPCommand.register(cmdDispatcher);
 
@@ -59,9 +59,12 @@ public class MCWiFiPnPUnit {
 
 	/**
 	 * Called by platform-specific hooks just before the server stops.
+	 * Only runs on client-side
 	 */
 	public static void onServerStops(MinecraftServer server) {
-		UPnPModule.stop(server);
+		if (!server.isDedicatedServer()) {
+			UPnPModule.stop(server);
+		}
 	}
 
 	public static void enableUUIDFixerOnDedicatedServer() {
