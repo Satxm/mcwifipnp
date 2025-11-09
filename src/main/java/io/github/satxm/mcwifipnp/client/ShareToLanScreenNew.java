@@ -99,7 +99,7 @@ public class ShareToLanScreenNew extends Screen {
 			}
 		} else {
 			// Publish server
-			MutableComponent component = server.publishServer(this.cfg.gameType, this.cfg.allowHostCheat, this.cfg.port)
+			MutableComponent component = server.publishServer(this.cfg.gameType, this.cfg.allowEveryoneCheat, this.cfg.port)
 					? PublishCommand.getSuccessMessage(this.cfg.port)
 					: Component.translatable("commands.publish.failed");
 			this.minecraft.gui.getChat().addMessage(component);
@@ -109,7 +109,7 @@ public class ShareToLanScreenNew extends Screen {
 			if (this.cfg.allowHostCheat) {
 				playerList.getOps().add(new ServerOpListEntry(nameAndId, 4, playerList.canBypassPlayerLimit(nameAndId)));
 			} else {
-				playerList.getOps().add(new ServerOpListEntry(nameAndId, 2, playerList.canBypassPlayerLimit(nameAndId)));
+				playerList.getOps().add(new ServerOpListEntry(nameAndId, 0, playerList.canBypassPlayerLimit(nameAndId)));
 			}
 
 			UPnPModule.startIfEnabled(server, cfg);
