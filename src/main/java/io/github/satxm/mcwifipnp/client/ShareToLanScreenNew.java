@@ -31,9 +31,11 @@ import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.server.commands.PublishCommand;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.players.NameAndId;
 import net.minecraft.server.players.PlayerList;
 import net.minecraft.server.players.ServerOpListEntry;
+import net.minecraft.server.players.UserWhiteListEntry;
 import net.minecraft.util.HttpUtil;
 import net.minecraft.world.level.GameType;
 
@@ -84,6 +86,8 @@ public class ShareToLanScreenNew extends Screen {
 
 	protected void onConfirmClicked() {
 		IntegratedServer server = Minecraft.getInstance().getSingleplayerServer();
+		PlayerList playerList = server.getPlayerList();
+		NameAndId hostPlayer = new NameAndId(server.getSingleplayerProfile());
 		this.cfg.save();
 
 		if (this.serverPublished) {
@@ -94,7 +98,7 @@ public class ShareToLanScreenNew extends Screen {
 			}
 			if (this.cfg.getPublicIP && this.cfg.getPublicIP ^ oldCopyIP) {
 				new Thread(() -> {
-					this.minecraft.gui.getChat().addMessage(IpCommand.getBrief(server));
+					server.getPlayerList().getPlayer(hostPlayer.id()).sendSystemMessage(IpCommand.getBrief(server));
 				}, "MCWiFiPnP").start();
 			}
 		} else {
@@ -104,28 +108,34 @@ public class ShareToLanScreenNew extends Screen {
 					: Component.translatable("commands.publish.failed");
 			this.minecraft.gui.getChat().addMessage(component);
 
-			PlayerList playerList = server.getPlayerList();
-			NameAndId nameAndId = new NameAndId(server.getSingleplayerProfile());
-			if (this.cfg.allowHostCheat) {
-				playerList.getOps().add(new ServerOpListEntry(nameAndId, 4, playerList.canBypassPlayerLimit(nameAndId)));
-			} else {
-				playerList.getOps().add(new ServerOpListEntry(nameAndId, 0, playerList.canBypassPlayerLimit(nameAndId)));
-			}
-
 			UPnPModule.startIfEnabled(server, cfg);
 			if (this.cfg.getPublicIP) {
 				new Thread(() -> {
-                    server.getPlayerList().getPlayer(nameAndId.id()).sendSystemMessage(IpCommand.getBrief(server));
+					server.getPlayerList().getPlayer(hostPlayer.id()).sendSystemMessage(IpCommand.getBrief(server));
 				}, "MCWiFiPnP").start();
 			}
 		}
 		this.cfg.applyTo(server);
 
+		if (!this.cfg.allowEveryoneCheat) {
+			playerList.getOps().clear();
+		}
+		if (this.cfg.allowHostCheat) {
+			playerList.getOps().add(new ServerOpListEntry(hostPlayer, 4, playerList.canBypassPlayerLimit(hostPlayer)));
+		}
+		for (ServerPlayer serverPlayer : server.getPlayerList().getPlayers()) {
+			playerList.sendPlayerPermissionLevel(serverPlayer);
+		}
+
+		if (playerList.isUsingWhitelist()) {
+			playerList.getWhiteList().add(new UserWhiteListEntry(hostPlayer));
+			playerList.reloadWhiteList();
+		}
+		if (MCWiFiPnPUnit.convertOldUsers(this.minecraft.getSingleplayerServer()))
+			this.minecraft.getSingleplayerServer().services().nameToIdCache().add(hostPlayer);
+
 		this.minecraft.updateTitle();
 		this.minecraft.setScreen((Screen) null);
-		NameAndId nameAndId = new NameAndId(server.getSingleplayerProfile());
-		if (MCWiFiPnPUnit.convertOldUsers(this.minecraft.getSingleplayerServer()))
-			this.minecraft.getSingleplayerServer().services().nameToIdCache().add(nameAndId);
 	}
 
 	@Override

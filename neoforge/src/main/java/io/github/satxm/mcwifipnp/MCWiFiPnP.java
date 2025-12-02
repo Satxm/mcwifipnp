@@ -6,6 +6,7 @@ import net.neoforged.fml.common.Mod;
 import net.neoforged.fml.loading.FMLEnvironment;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.event.RegisterCommandsEvent;
+import net.neoforged.neoforge.event.server.ServerStartingEvent;
 import net.neoforged.neoforge.event.server.ServerStoppingEvent;
 
 @Mod(MCWiFiPnPUnit.MODID)
@@ -20,7 +21,12 @@ public class MCWiFiPnP {
 	}
 
 	@SubscribeEvent
+	public void onServerStarting(ServerStartingEvent event) {
+		MCWiFiPnPUnit.onServerStarting(event.getServer());
+	}
+
+	@SubscribeEvent
 	public void onServerStopping(ServerStoppingEvent event) {
-		MCWiFiPnPUnit.onServerStops(event.getServer());
+		MCWiFiPnPUnit.onServerStopping(event.getServer());
 	}
 }

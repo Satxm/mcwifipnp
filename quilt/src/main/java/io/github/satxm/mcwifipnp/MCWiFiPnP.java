@@ -11,7 +11,8 @@ import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 public class MCWiFiPnP implements ModInitializer, ClientModInitializer, DedicatedServerModInitializer {
 	@Override
 	public void onInitialize(ModContainer mod) {
-		ServerLifecycleEvents.SERVER_STOPPING.register(MCWiFiPnPUnit::onServerStops);
+		ServerLifecycleEvents.SERVER_STOPPING.register(MCWiFiPnPUnit::onServerStopping);
+		ServerLifecycleEvents.SERVER_STARTING.register(MCWiFiPnPUnit::onServerStarting);
 	}
 
 	@Override

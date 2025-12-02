@@ -58,23 +58,31 @@ public class MCWiFiPnPUnit {
 	}
 
 	/**
-	 * Called by platform-specific hooks just before the server stops.
+	 * Called by platform-specific hooks just before the server stopping.
 	 * Only runs on client-side
 	 */
-	public static void onServerStops(MinecraftServer server) {
+	public static void onServerStopping(MinecraftServer server) {
 		if (!server.isDedicatedServer()) {
 			UPnPModule.stop(server);
 		}
 	}
 
+	/**
+	 * Called by platform-specific hooks just before the server starting.
+	 * Only runs on client-side
+	 */
+	public static void onServerStarting(MinecraftServer server) {
+	}
+
 	public static void enableUUIDFixerOnDedicatedServer() {
 		UUIDFixer.enabled = true;
 		LOGGER.info("UUID Fixer has been enabled on the dedicated server."
-			+ "To disable, delete mod McWifiPnP. Config file is \"uuid_fixer.json\".");
+				+ "To disable, delete mod McWifiPnP. Config file is \"uuid_fixer.json\".");
 	}
 
 	/**
 	 * Copied from vanilla DedicatedServer
+	 * 
 	 * @param server
 	 * @return
 	 */

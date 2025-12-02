@@ -2,6 +2,7 @@ package io.github.satxm.mcwifipnp;
 
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.RegisterCommandsEvent;
+import net.minecraftforge.event.server.ServerStartingEvent;
 import net.minecraftforge.event.server.ServerStoppingEvent;
 import net.minecraftforge.eventbus.api.listener.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
@@ -19,7 +20,12 @@ public class MCWiFiPnP {
 	}
 
 	@SubscribeEvent
+	public void onServerStarting(ServerStartingEvent event) {
+		MCWiFiPnPUnit.onServerStarting(event.getServer());
+	}
+
+	@SubscribeEvent
 	public void onServerStopping(ServerStoppingEvent event) {
-		MCWiFiPnPUnit.onServerStops(event.getServer());
+		MCWiFiPnPUnit.onServerStopping(event.getServer());
 	}
 }

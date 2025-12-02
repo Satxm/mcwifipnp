@@ -2,6 +2,7 @@ package io.github.satxm.mcwifipnp;
 
 import java.io.IOException;
 import java.lang.reflect.Type;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
@@ -109,7 +110,7 @@ public class Config {
 		Config cfg;
 
 		try {
-			cfg = GSON.fromJson(new String(Files.readAllBytes(location), "utf-8"), Config.class);
+			cfg = GSON.fromJson(new String(Files.readAllBytes(location), StandardCharsets.UTF_8), Config.class);
 			cfg.location = location;
 		} catch (IOException | JsonParseException e) {
 			try {
@@ -126,7 +127,7 @@ public class Config {
 
 	public void save() {
 		try {
-			Files.write(this.location, GSON.toJson(this).getBytes("utf-8"), StandardOpenOption.TRUNCATE_EXISTING,
+			Files.write(this.location, GSON.toJson(this).getBytes(StandardCharsets.UTF_8), StandardOpenOption.TRUNCATE_EXISTING,
 					StandardOpenOption.CREATE);
 		} catch (IOException e) {
 			LOGGER.warn("Unable to write config file!", e);
@@ -182,6 +183,7 @@ public class Config {
 
 		server.setMotd(this.motd);
 		UUIDFixer.enabled = this.enableUUIDFixer;
+		ReadListFile.ReadListFile(server);
 	}
 
 }
