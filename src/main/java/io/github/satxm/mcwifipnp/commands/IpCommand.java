@@ -35,7 +35,7 @@ public class IpCommand {
 
 	public static void register(CommandDispatcher<CommandSourceStack> commandDispatcher) {
 		LiteralArgumentBuilder<CommandSourceStack> cmdBuilder = Commands.literal("ip")
-				.requires((cmdStack) -> cmdStack.hasPermission(4));
+				.requires(Commands.hasPermission(Commands.LEVEL_OWNERS));
 
 		cmdBuilder = cmdBuilder.then(Commands.literal("get")
 				.then(EnumArgument.IP_FAMILY.appendTo(Commands.literal("local").executes(IpCommand::showLocalIPsAll),

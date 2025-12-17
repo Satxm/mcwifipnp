@@ -15,7 +15,7 @@ import net.minecraft.server.MinecraftServer;
 public class UPnPCommand {
 	public static void register(CommandDispatcher<CommandSourceStack> commandDispatcher) {
 		LiteralArgumentBuilder<CommandSourceStack> cmdBuilder = Commands.literal("upnp")
-			.requires((cmdStack) -> cmdStack.hasPermission(3));
+			.requires(Commands.hasPermission(Commands.LEVEL_OWNERS));
 
 		cmdBuilder = cmdBuilder.then(
 			Commands.argument("enabled", BoolArgumentType.bool()).executes(commandContext -> {

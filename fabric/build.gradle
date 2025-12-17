@@ -1,8 +1,6 @@
 plugins {
-  id 'fabric-loom' version '1.11+'
+  id 'net.fabricmc.fabric-loom-remap' version '1.14+'
 }
-
-sourceCompatibility = targetCompatibility = JavaVersion.VERSION_21
 
 println "Java: ${System.getProperty 'java.version'}, JVM: ${System.getProperty 'java.vm.version'} (${System.getProperty 'java.vendor'}), Arch: ${System.getProperty 'os.arch'}"
 
@@ -53,7 +51,10 @@ tasks.withType(JavaCompile).configureEach {
   it.options.release = 21
 }
 
-java.withSourcesJar()
+java {
+  withSourcesJar()
+  sourceCompatibility = targetCompatibility = JavaVersion.VERSION_21
+}
 
 jar {
   from("../LICENSE") {

@@ -32,6 +32,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.server.commands.PublishCommand;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.server.permissions.LevelBasedPermissionSet;
 import net.minecraft.server.players.NameAndId;
 import net.minecraft.server.players.PlayerList;
 import net.minecraft.server.players.ServerOpListEntry;
@@ -121,7 +122,7 @@ public class ShareToLanScreenNew extends Screen {
 			playerList.getOps().clear();
 		}
 		if (this.cfg.allowHostCheat) {
-			playerList.getOps().add(new ServerOpListEntry(hostPlayer, 4, playerList.canBypassPlayerLimit(hostPlayer)));
+			playerList.getOps().add(new ServerOpListEntry(hostPlayer, LevelBasedPermissionSet.OWNER, playerList.canBypassPlayerLimit(hostPlayer)));
 		}
 		for (ServerPlayer serverPlayer : server.getPlayerList().getPlayers()) {
 			playerList.sendPlayerPermissionLevel(serverPlayer);
@@ -240,9 +241,8 @@ public class ShareToLanScreenNew extends Screen {
 					}), 2);
 
 			// Row 4
-			tabContents.addChild(CycleButton.builder(OnlineMode::getDisplayName)
+			tabContents.addChild(CycleButton.builder(OnlineMode::getDisplayName, OnlineMode.of(cfg.onlineMode, cfg.enableUUIDFixer))
 					.withValues(OnlineMode.values())
-					.withInitialValue(OnlineMode.of(cfg.onlineMode, cfg.enableUUIDFixer))
 					.withTooltip((OnlineMode) -> Tooltip.create(OnlineMode.gettoolTip()))
 					.create(Component.translatable("mcwifipnp.gui.OnlineMode"), (cycleButton, onlineMode) -> {
 						cfg.onlineMode = onlineMode.onlineMode;
@@ -264,8 +264,8 @@ public class ShareToLanScreenNew extends Screen {
 
 			// Row 1
 			// GameMode toggle button
-			tabContents.addChild(CycleButton.builder(GameType::getShortDisplayName)
-					.withValues(GameType.values()).withInitialValue(cfg.gameType)
+			tabContents.addChild(CycleButton.builder(GameType::getShortDisplayName, cfg.gameType)
+					.withValues(GameType.values())
 					.create(Component.translatable("selectWorld.gameMode"), (cycleButton, gameType) -> {
 						cfg.gameType = gameType;
 					}), 2);

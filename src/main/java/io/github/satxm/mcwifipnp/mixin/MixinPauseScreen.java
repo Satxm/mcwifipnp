@@ -20,7 +20,7 @@ import net.minecraft.client.gui.screens.PauseScreen;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.server.IntegratedServer;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 @Mixin(PauseScreen.class)
 public abstract class MixinPauseScreen extends Screen {
@@ -52,7 +52,7 @@ public abstract class MixinPauseScreen extends Screen {
 				SpriteIconButton lanServerSettings = SpriteIconButton
 						.builder(MODIFY_LAN_OPTIONS,
 								(button) -> this.minecraft.setScreen(new ShareToLanScreenNew(this, true)), true)
-						.width(20).sprite(ResourceLocation.tryParse("icon/language"), 15, 15).build();
+						.width(20).sprite(Identifier.tryParse("icon/language"), 15, 15).build();
 				lanServerSettings.setPosition(this.width / 2 - 124, optionButton.getY());
 				lanServerSettings.setTooltip(Tooltip.create(MODIFY_LAN_OPTIONS));
 				this.addRenderableWidget(lanServerSettings);

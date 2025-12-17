@@ -23,7 +23,7 @@ import com.google.gson.annotations.SerializedName;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.players.PlayerList;
-import net.minecraft.world.level.GameRules;
+import net.minecraft.world.level.gamerules.GameRules;
 import net.minecraft.world.level.GameType;
 import net.minecraft.world.level.storage.LevelResource;
 
@@ -164,7 +164,7 @@ public class Config {
 
 		this.maxPlayers = playerList.getMaxPlayers();
 		this.onlineMode = server.usesAuthentication();
-		this.enablePvP = server.isPvpAllowed();
+		this.enablePvP = server.getWorldData().getGameRules().get(GameRules.PVP);
 		this.enforceWhitelist = server.isEnforceWhitelist();
 
 		this.motd = server.getMotd();
@@ -177,7 +177,7 @@ public class Config {
 		playerList.setAllowCommandsForAllPlayers(this.allowEveryoneCheat);
 
 		server.setUsesAuthentication(this.onlineMode);
-		server.getGameRules().getRule(GameRules.RULE_PVP).set(this.enablePvP, server);
+		server.getWorldData().getGameRules().set(GameRules.PVP, this.enablePvP, server);
 		server.setEnforceWhitelist(this.enforceWhitelist);
 		server.setUsingWhitelist(this.enforceWhitelist);
 

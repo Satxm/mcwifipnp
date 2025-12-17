@@ -46,7 +46,7 @@ public class UUIDFixerCommand {
 	public static void register(CommandDispatcher<CommandSourceStack> commandDispatcher) {
 
 		LiteralArgumentBuilder<CommandSourceStack> cmdBuilder = Commands.literal("uuidfixer")
-			.requires((cmdStack) -> cmdStack.hasPermission(3));
+			.requires(Commands.hasPermission(Commands.LEVEL_OWNERS));
 
 		cmdBuilder = cmdBuilder.then(Commands.literal("list").executes((commandContext) -> {
 			return showList((CommandSourceStack) commandContext.getSource());
