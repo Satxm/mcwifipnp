@@ -1,5 +1,5 @@
 plugins {
-  id 'net.fabricmc.fabric-loom-remap' version '1.14+'
+  id 'net.fabricmc.fabric-loom' version "${fabric_loom_version}"
 }
 
 println "Java: ${System.getProperty 'java.version'}, JVM: ${System.getProperty 'java.vm.version'} (${System.getProperty 'java.vendor'}), Arch: ${System.getProperty 'os.arch'}"
@@ -13,10 +13,8 @@ base {
 
 dependencies {
   minecraft "com.mojang:minecraft:${project.minecraft_version}"
-  mappings loom.officialMojangMappings()
-  modImplementation "net.fabricmc:fabric-loader:${project.fabric_loader_version}"
-  modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
-  modImplementation "com.google.code.findbugs:jsr305:3.0.2"
+  implementation "net.fabricmc:fabric-loader:${project.fabric_loader_version}"
+  implementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_api_version}"
 }
 
 sourceSets {
@@ -48,12 +46,12 @@ tasks.withType(ProcessResources).configureEach {
 
 tasks.withType(JavaCompile).configureEach {
   it.options.encoding = "UTF-8"
-  it.options.release = 21
+  it.options.release = 25
 }
 
 java {
   withSourcesJar()
-  sourceCompatibility = targetCompatibility = JavaVersion.VERSION_21
+  sourceCompatibility = targetCompatibility = JavaVersion.VERSION_25
 }
 
 jar {

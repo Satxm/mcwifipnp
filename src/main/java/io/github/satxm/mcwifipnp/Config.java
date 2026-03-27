@@ -164,7 +164,7 @@ public class Config {
 
 		this.maxPlayers = playerList.getMaxPlayers();
 		this.onlineMode = server.usesAuthentication();
-		this.enablePvP = server.getWorldData().getGameRules().get(GameRules.PVP);
+		this.enablePvP = server.getGameRules().get(GameRules.PVP);
 		this.enforceWhitelist = server.isEnforceWhitelist();
 
 		this.motd = server.getMotd();
@@ -177,7 +177,7 @@ public class Config {
 		playerList.setAllowCommandsForAllPlayers(this.allowEveryoneCheat);
 
 		server.setUsesAuthentication(this.onlineMode);
-		server.getWorldData().getGameRules().set(GameRules.PVP, this.enablePvP, server);
+		server.getGameRules().set(GameRules.PVP, this.enablePvP, server);
 		server.setEnforceWhitelist(this.enforceWhitelist);
 		server.setUsingWhitelist(this.enforceWhitelist);
 

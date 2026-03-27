@@ -1,11 +1,11 @@
 plugins {
+  id 'java'
   id 'eclipse'
   id 'idea'
-  id 'net.minecraftforge.gradle' version '[6.0.46,6.2)'
-  id 'org.spongepowered.mixin' version '0.7.+'
+  id 'net.minecraftforge.gradle' version '[7.0.17,8)'
 }
 
-java.toolchain.languageVersion = JavaLanguageVersion.of(21)
+java.toolchain.languageVersion = JavaLanguageVersion.of(25)
 
 println "Java: ${System.getProperty 'java.version'}, JVM: ${System.getProperty 'java.vm.version'} (${System.getProperty 'java.vendor'}), Arch: ${System.getProperty 'os.arch'}"
 
@@ -17,47 +17,40 @@ base {
 }
 
 minecraft {
-  mappings channel: 'official', version: project.minecraft_version
-  reobf = false
-  copyIdeResources = true
-
   runs {
     configureEach {
-      workingDirectory project.file('run')
-      property 'forge.logging.markers', 'REGISTRIES'
-      property 'forge.logging.console.level', 'debug'
-      arg "-mixin.config=${mod_id}.mixins.json"
-      mods {
-        "${mod_id}" {
-          source sourceSets.main
-        }
-      }
-    }
-    client {
-      property 'forge.enabledGameTestNamespaces', project.mod_id
-    }
-    
-    server {
-      property 'forge.enabledGameTestNamespaces', project.mod_id
-      args '--nogui'
+      workingDir = layout.projectDirectory.dir('run')
+      args "--mixin.config=${mod_id}.mixins.json"
+      systemProperty 'eventbus.api.strictRuntimeChecks', 'true'
+      systemProperty 'forge.enabledGameTestNamespaces', 'examplemod'
     }
 
-    gameTestServer {
-      property 'forge.enabledGameTestNamespaces', project.mod_id
+    register('client')
+
+    register('server') {
+        args '--nogui'
     }
 
-    data {
-      workingDirectory project.file('run-data')
-      args '--mod', project.mod_id, '--all', '--output', file('src/generated/resources/'), '--existing', file('src/main/resources/')
+    register('gameTestServer')
+
+    register('data') {
+        workingDir = layout.projectDirectory.dir('run-data')
+        args '--mod', project.mod_id, '--all', '--output', layout.projectDirectory.dir('src/generated/resources'), '--existing', layout.projectDirectory.dir('src/main/resources')
     }
   }
 }
 
+repositories {
+    minecraft.mavenizer(it) // In Kotlin, it = this
+    maven fg.forgeMaven
+    maven fg.minecraftLibsMaven
+    mavenCentral()
+}
+
 dependencies {
-  minecraft "net.minecraftforge:forge:${project.minecraft_version}-${project.forge_version}"
-  annotationProcessor "org.spongepowered:mixin:0.8.5:processor"
-  annotationProcessor 'net.minecraftforge:eventbus-validator:7.0-beta.12'
-  implementation('net.sf.jopt-simple:jopt-simple:5.0.4') { version { strictly '5.0.4' } }
+  implementation minecraft.dependency("net.minecraftforge:forge:${project.minecraft_version}-${project.forge_version}")
+  annotationProcessor 'org.spongepowered:mixin:0.8.7:processor'
+  annotationProcessor 'net.minecraftforge:eventbus-validator:7.0.1'
 }
 
 sourceSets {
@@ -70,15 +63,6 @@ sourceSets {
       srcDir "src/generated/resources"
     }
   }
-}
-
-mixin {
-  // MixinGradle Settings
-  add sourceSets.main, 'mcwifipnp-refmap.json'
-  config 'mcwifipnp.mixins.json'
-
-  debug.verbose = true
-  debug.export = true
 }
 
 tasks.named('jar', Jar).configure {
@@ -113,7 +97,6 @@ tasks.named('processResources', ProcessResources).configure {
 
 tasks.withType(JavaCompile).configureEach {
   it.options.encoding = 'UTF-8'
-  it.options.release = 21
 }
 
 idea {

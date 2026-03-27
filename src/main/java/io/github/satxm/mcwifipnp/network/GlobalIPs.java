@@ -6,7 +6,7 @@ import java.net.URI;
 import java.net.URL;
 import java.net.URLConnection;
 
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import io.netty.channel.socket.InternetProtocolFamily;
 import io.netty.util.NetUtil;

@@ -2,13 +2,13 @@ package io.github.satxm.mcwifipnp.client;
 
 import java.util.List;
 
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import com.google.common.collect.ImmutableList;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.ContainerObjectSelectionList;
 import net.minecraft.client.gui.components.events.GuiEventListener;
@@ -65,12 +65,12 @@ public class OptionsList extends ContainerObjectSelectionList<OptionsList.Entry>
 		}
 
 		@Override
-		public void renderContent(GuiGraphics guiGraphics, int i, int j, boolean bl, float f) {
+		public void extractContent(final GuiGraphicsExtractor graphics, final int mouseX, final int mouseY, final boolean hovered, final float a) {
 			int xStart = OptionsList.this.screen.width / 2 - COLUMN_WIDTH - GAP / 2;
 
 			for (AbstractWidget abstractwidget : this.children) {
 				abstractwidget.setPosition(xStart, this.getContentY());
-				abstractwidget.render(guiGraphics, i, j, f);
+				abstractwidget.extractRenderState(graphics, mouseX, mouseY, a);
 				xStart += COLUMN_WIDTH + GAP;
 			}
 		}
@@ -104,26 +104,26 @@ public class OptionsList extends ContainerObjectSelectionList<OptionsList.Entry>
 		}
 
 		@Override
-		public void renderContent(GuiGraphics guiGraphics, int i, int j, boolean bl, float f) {
+		public void extractContent(final GuiGraphicsExtractor graphics, final int mouseX, final int mouseY, final boolean hovered, final float a) {
 			int xStart = OptionsList.this.screen.width / 2 - COLUMN_WIDTH - GAP / 2;
 
-			guiGraphics.drawString(OptionsList.this.font, this.labelLeft, xStart,
+			graphics.text(OptionsList.this.font, this.labelLeft, xStart,
 					this.getContentY() + (this.left.getHeight() - 9) / 2, 16777215);
 
 			if (this.right == null)
 				xStart += COLUMN_WIDTH + GAP;
 
 			this.left.setPosition(xStart + (COLUMN_WIDTH - this.left.getWidth()), this.getContentY());
-			this.left.render(guiGraphics, i, j, f);
+			this.left.extractRenderState(graphics, mouseX, mouseY, a);
 
 			if (this.right == null)
 				return;
 
 			xStart += COLUMN_WIDTH + GAP;
-			guiGraphics.drawString(OptionsList.this.font, this.labelRight, xStart,
+			graphics.text(OptionsList.this.font, this.labelRight, xStart,
 					this.getContentY() + (this.right.getHeight() - 9) / 2, 16777215);
 			this.right.setPosition(xStart + (COLUMN_WIDTH - this.right.getWidth()), this.getContentY());
-			this.right.render(guiGraphics, i, j, f);
+			this.left.extractRenderState(graphics, mouseX, mouseY, a);
 		}
 	}
 }

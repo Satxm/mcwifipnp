@@ -1,6 +1,6 @@
 package io.github.satxm.mcwifipnp.client;
 
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import io.github.satxm.mcwifipnp.Config;
 import io.github.satxm.mcwifipnp.MCWiFiPnPUnit;
@@ -8,7 +8,7 @@ import io.github.satxm.mcwifipnp.OnlineMode;
 import io.github.satxm.mcwifipnp.commands.IpCommand;
 import io.github.satxm.mcwifipnp.network.UPnPModule;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.Checkbox;
 import net.minecraft.client.gui.components.CycleButton;
@@ -104,10 +104,10 @@ public class ShareToLanScreenNew extends Screen {
 			}
 		} else {
 			// Publish server
-			MutableComponent component = server.publishServer(this.cfg.gameType, this.cfg.allowEveryoneCheat, this.cfg.port)
+			MutableComponent message = server.publishServer(this.cfg.gameType, this.cfg.allowEveryoneCheat, this.cfg.port)
 					? PublishCommand.getSuccessMessage(this.cfg.port)
 					: Component.translatable("commands.publish.failed");
-			this.minecraft.gui.getChat().addMessage(component);
+			this.minecraft.gui.getChat().addClientSystemMessage(message);
 
 			UPnPModule.startIfEnabled(server, cfg);
 			if (this.cfg.getPublicIP) {
@@ -322,7 +322,7 @@ public class ShareToLanScreenNew extends Screen {
 	@Override
 	protected void repositionElements() {
 		if (this.tabNavigationBar != null) {
-			this.tabNavigationBar.setWidth(this.width);
+			this.tabNavigationBar.updateWidth(this.width);
 			this.tabNavigationBar.arrangeElements();
 			int i = this.tabNavigationBar.getRectangle().bottom();
 			ScreenRectangle screenrectangle = new ScreenRectangle(0, i, this.width,
@@ -334,9 +334,9 @@ public class ShareToLanScreenNew extends Screen {
 	}
 
 	@Override
-	public void render(GuiGraphics guiGraphics, int i, int j, float f) {
-		super.render(guiGraphics, i, j, f);
-		guiGraphics.blit(RenderPipelines.GUI_TEXTURED, Screen.FOOTER_SEPARATOR, 0,
+	public void extractRenderState(final GuiGraphicsExtractor graphics, final int mouseX, final int mouseY, final float a) {
+		super.extractRenderState(graphics, mouseX, mouseY, a);
+		graphics.blit(RenderPipelines.GUI_TEXTURED, Screen.FOOTER_SEPARATOR, 0,
 				this.height - this.layout.getFooterHeight() - 2, 0.0F, 0.0F, this.width, 2, 32, 2);
 	}
 }

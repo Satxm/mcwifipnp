@@ -1,6 +1,6 @@
 package io.github.satxm.mcwifipnp.network;
 
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 
 public interface IUPnPProvider {
 	@Nullable

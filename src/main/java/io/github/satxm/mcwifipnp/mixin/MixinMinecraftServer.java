@@ -1,6 +1,6 @@
 package io.github.satxm.mcwifipnp.mixin;
 
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
