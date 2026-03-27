@@ -12,7 +12,7 @@ on:
           - release
 
 env:
-  java-version: "21"
+  java-version: "25"
   modrinth-id: RTWpcTBp
   curseforge-id: 450250
 
