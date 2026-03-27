@@ -1,7 +1,5 @@
 package io.github.satxm.mcwifipnp.mixin;
 
-import java.util.List;
-
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -60,19 +58,17 @@ public abstract class MixinPauseScreen extends Screen {
 		}
 
 		// Replace the vanilla "Open to Lan" or "Player Reporting" button.
-		final List<LayoutElement> elements = ((AccessorGridLayout) gridLayout).getChildren();
-		Button oldButton = GuiUtils.findWidget(elements, Button.class, "menu.shareToLan");
+		Button oldButton = GuiUtils.findWidget(this.children(), Button.class, "menu.shareToLan");
 
 		if (this.minecraft.hasSingleplayerServer() && cfg.removePlayerReportingButton && oldButton == null) {
-			oldButton = GuiUtils.findWidget(elements, Button.class, "menu.playerReporting");
+			oldButton = GuiUtils.findWidget(this.children(), Button.class, "menu.playerReporting");
 		}
 		if (oldButton != null) {
 			Button newButton = Button.builder(MODIFY_LAN_OPTIONS, btn -> {
 				this.minecraft.setScreen(new ShareToLanScreenNew(this,
 						(this.minecraft.hasSingleplayerServer() && this.minecraft.getSingleplayerServer().isPublished())));
 			}).bounds(oldButton.getX(), oldButton.getY(), oldButton.getWidth(), oldButton.getHeight()).build();
-			elements.set(elements.indexOf(oldButton), newButton);
-			this.removeWidget(oldButton);
+			this.children().remove(oldButton);
 			this.addRenderableWidget(newButton);
 		}
 	}
