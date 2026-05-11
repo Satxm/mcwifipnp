@@ -42,7 +42,7 @@ GitHub : [https://github.com/Satxm/mcwifipnp](https://github.com/Satxm/mcwifipnp
 
 ## Introduction
 
-**This Branch is for Minecraft [1.21.9, 1.22)!**
+**This Branch is for Minecraft 26.x!**
 
 Uses the vanilla Minecraft GUI style, Uses the official mojang mappings.
 
@@ -97,8 +97,9 @@ Use the GUI button or the `/upnp` command to toggle UPnP support on and off.
 ## For Developers
 ### Compile Fabric Artifacts
 ```
-git clone git@github.com:Satxm/mcwifipnp.git
+git clone https://github.com/Satxm/mcwifipnp.git
 cd mcwifipnp
+.\gradlew.bat build
 .\gradlew.bat :fabric:runClient
 ```
 Replace `fabric` with `forge`, `neoforge`, or `quilt` to build the corresponding artifacts.
