@@ -97,8 +97,9 @@ GitHub : [https://github.com/Satxm/mcwifipnp](https://github.com/Satxm/mcwifipnp
 ## 开发者
 ### 编译
 ```
-git clone git@github.com:Satxm/mcwifipnp.git
+git clone https://github.com/Satxm/mcwifipnp.git
 cd mcwifipnp
+.\gradlew.bat build
 .\gradlew.bat :fabric:runClient
 ```
 将`fabric`替换为`forge`, `neoforge`, 或者 `quilt`可以构建对应的jar。
