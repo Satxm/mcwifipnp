@@ -29,7 +29,6 @@
   "mcwifipnp.gui.globalIP": "公網%s",
   "mcwifipnp.gui.CopyIP": "獲取 IP",
   "mcwifipnp.gui.CopyIP.info": "取得內網 IP 地址及公網 IP 地址，以便於你直接複製。",
-  "mcwifipnp.gui.removePlayerReportingButton": "替換 舉報玩家 按鈕",
   "mcwifipnp.upnp.success": "成功轉發端口 %s",
   "mcwifipnp.upnp.clipboard": "成功獲取到 %s，由於NAT等因素，這些 IP 可能仍舊無法直接聯機。",
   "mcwifipnp.upnp.cantgetip": "無法獲取 IP！請檢查你嘅網路設置。你嘅 IPv4 可能包含多級 NAT 或者你無 IPv6。",

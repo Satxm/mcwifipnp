@@ -1,5 +1,10 @@
 package io.github.satxm.mcwifipnp.client;
 
+import java.lang.System.Logger;
+import java.lang.System.Logger.Level;
+import java.util.Arrays;
+import java.util.logging.LogManager;
+
 import org.jspecify.annotations.Nullable;
 
 import io.github.satxm.mcwifipnp.Config;
@@ -16,6 +21,7 @@ import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.components.StringWidget;
 import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.gui.components.tabs.GridLayoutTab;
+import net.minecraft.client.gui.components.tabs.MenuTabBar;
 import net.minecraft.client.gui.components.tabs.TabManager;
 import net.minecraft.client.gui.components.tabs.TabNavigationBar;
 import net.minecraft.client.gui.layouts.CommonLayouts;
@@ -24,11 +30,13 @@ import net.minecraft.client.gui.layouts.HeaderAndFooterLayout;
 import net.minecraft.client.gui.layouts.LinearLayout;
 import net.minecraft.client.gui.navigation.ScreenRectangle;
 import net.minecraft.client.gui.screens.Screen;
-import net.minecraft.client.gui.screens.ShareToLanScreen;
+import net.minecraft.client.gui.screens.MultiplayerOptionsScreen;
 import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.client.server.IntegratedServer;
+import net.minecraft.client.server.IntegratedServer.MultiplayerScope;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.ComponentUtils;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.server.commands.PublishCommand;
 import net.minecraft.server.level.ServerPlayer;
@@ -39,6 +47,7 @@ import net.minecraft.server.players.ServerOpListEntry;
 import net.minecraft.server.players.UserWhiteListEntry;
 import net.minecraft.util.HttpUtil;
 import net.minecraft.world.level.GameType;
+import net.minecraft.resources.Identifier;
 
 public class ShareToLanScreenNew extends Screen {
 	private final Config cfg;
@@ -54,8 +63,6 @@ public class ShareToLanScreenNew extends Screen {
 
 	protected Button confirmButton;
 
-	protected Checkbox removePlayerReportingButtonBox;
-
 	@Nullable
 	protected Button backToVanillaScreenButton;
 
@@ -63,10 +70,14 @@ public class ShareToLanScreenNew extends Screen {
 	private boolean oldCopyIP;
 	private String oldMotd;
 
-	public ShareToLanScreenNew(Screen screen, boolean serverPublished) {
+	@Nullable
+	private MultiplayerScope oldScope;
+
+	public ShareToLanScreenNew(Screen screen) {
 		super(Component.translatable("lanServer.title"));
 		this.lastScreen = screen;
-		this.serverPublished = serverPublished;
+		this.serverPublished = this.minecraft.hasSingleplayerServer()
+				&& this.minecraft.getSingleplayerServer().isPublished();
 
 		IntegratedServer server = Minecraft.getInstance().getSingleplayerServer();
 
@@ -83,6 +94,7 @@ public class ShareToLanScreenNew extends Screen {
 		this.oldMotd = this.cfg.motd;
 		this.oldUPnPEnabled = this.cfg.useUPnP;
 		this.oldCopyIP = this.cfg.getPublicIP;
+		this.oldScope = server.getMultiplayerScope();
 	}
 
 	protected void onConfirmClicked() {
@@ -90,6 +102,10 @@ public class ShareToLanScreenNew extends Screen {
 		PlayerList playerList = server.getPlayerList();
 		NameAndId hostPlayer = new NameAndId(server.getSingleplayerProfile());
 		this.cfg.save();
+
+		if (cfg.multiplayerScope != oldScope) {
+			this.changeMultiplayerScope(server);
+		}
 
 		if (this.serverPublished) {
 			if (!this.oldMotd.equals(this.cfg.motd) || this.cfg.useUPnP ^ oldUPnPEnabled) {
@@ -102,13 +118,7 @@ public class ShareToLanScreenNew extends Screen {
 					server.getPlayerList().getPlayer(hostPlayer.id()).sendSystemMessage(IpCommand.getBrief(server));
 				}, "MCWiFiPnP").start();
 			}
-		} else {
-			// Publish server
-			MutableComponent message = server.publishServer(this.cfg.gameType, this.cfg.allowEveryoneCheat, this.cfg.port)
-					? PublishCommand.getSuccessMessage(this.cfg.port)
-					: Component.translatable("commands.publish.failed");
-			this.minecraft.gui.getChat().addClientSystemMessage(message);
-
+		} else if (cfg.multiplayerScope != IntegratedServer.MultiplayerScope.OFF) {
 			UPnPModule.startIfEnabled(server, cfg);
 			if (this.cfg.getPublicIP) {
 				new Thread(() -> {
@@ -136,20 +146,18 @@ public class ShareToLanScreenNew extends Screen {
 			this.minecraft.getSingleplayerServer().services().nameToIdCache().add(hostPlayer);
 
 		this.minecraft.updateTitle();
-		this.minecraft.setScreen((Screen) null);
+		this.minecraft.gui.setScreen((Screen) null);
 	}
 
 	@Override
 	protected void init() {
-		this.tabNavigationBar = TabNavigationBar.builder(this.tabManager, this.width)
+		this.tabNavigationBar = MenuTabBar.builder(this.tabManager, this.width)
 				.addTabs(new DefaultTab1(), new DefaultTab2(), new DefaultTab3()).build();
 		this.addRenderableWidget(this.tabNavigationBar);
 
 		// Add footer widgets
 		LinearLayout footer = this.layout.addToFooter(LinearLayout.horizontal().spacing(8));
-		this.confirmButton = Button.builder(
-				this.serverPublished ? CommonComponents.GUI_DONE : Component.translatable("lanServer.start"),
-				button -> this.onConfirmClicked()).width(150).build();
+		this.confirmButton = Button.builder(Component.translatable("menu.multiplayerOptions.applyChanges"), button -> this.onConfirmClicked()).width(150).build();
 		footer.addChild(this.confirmButton);
 		footer.addChild(Button.builder(CommonComponents.GUI_CANCEL, button -> this.onClose()).build());
 
@@ -227,6 +235,16 @@ public class ShareToLanScreenNew extends Screen {
 
 			// Row3
 			// Allow Cheat button (for other joined players)
+			tabContents.addChild(
+					CycleButton
+							.builder(IntegratedServer.MultiplayerScope::getDisplayName, cfg.multiplayerScope)
+							.withValues(GetScopeValues())
+							.withTooltip(IntegratedServer.MultiplayerScope::getTooltip)
+							.create(Component.translatable("menu.multiplayerOptions.network"), (cycleButton, value) -> {
+								cfg.multiplayerScope = value;
+							}),
+					2);
+
 			if (!ShareToLanScreenNew.this.serverPublished) {
 				tabContents.addChild(CycleButton.onOffBuilder(cfg.allowHostCheat)
 						.create(Component.translatable("selectWorld.allowCommands"), (cycleButton, allowHostCheat) -> {
@@ -241,13 +259,14 @@ public class ShareToLanScreenNew extends Screen {
 					}), 2);
 
 			// Row 4
-			tabContents.addChild(CycleButton.builder(OnlineMode::getDisplayName, OnlineMode.of(cfg.onlineMode, cfg.enableUUIDFixer))
-					.withValues(OnlineMode.values())
-					.withTooltip((OnlineMode) -> Tooltip.create(OnlineMode.gettoolTip()))
-					.create(Component.translatable("mcwifipnp.gui.OnlineMode"), (cycleButton, onlineMode) -> {
-						cfg.onlineMode = onlineMode.onlineMode;
-						cfg.enableUUIDFixer = onlineMode.fixUUID;
-					}), 2);
+			tabContents
+					.addChild(CycleButton.builder(OnlineMode::getDisplayName, OnlineMode.of(cfg.onlineMode, cfg.enableUUIDFixer))
+							.withValues(OnlineMode.values())
+							.withTooltip((OnlineMode) -> Tooltip.create(OnlineMode.gettoolTip()))
+							.create(Component.translatable("mcwifipnp.gui.OnlineMode"), (cycleButton, onlineMode) -> {
+								cfg.onlineMode = onlineMode.onlineMode;
+								cfg.enableUUIDFixer = onlineMode.fixUUID;
+							}), 2);
 
 			tabContents.addChild(CycleButton.onOffBuilder(cfg.enablePvP)
 					.withTooltip((state) -> Tooltip.create(Component.translatable("mcwifipnp.gui.PvP.info")))
@@ -298,17 +317,11 @@ public class ShareToLanScreenNew extends Screen {
 					}), 2);
 
 			// Row 2
-			tabContents.addChild(CycleButton.onOffBuilder(cfg.removePlayerReportingButton)
-					.create(Component.translatable("mcwifipnp.gui.removePlayerReportingButton"),
-							(cycleButton, removePlayerReportingButton) -> {
-								cfg.removePlayerReportingButton = removePlayerReportingButton;
-							}),
-					2);
-
 			if (!ShareToLanScreenNew.this.serverPublished) {
 				tabContents
 						.addChild(Button.builder(Component.translatable("mcwifipnp.gui.backToVanillaScreen"), button -> {
-							ShareToLanScreenNew.this.minecraft.setScreen(new ShareToLanScreen(ShareToLanScreenNew.this.lastScreen));
+							ShareToLanScreenNew.this.minecraft.gui
+									.setScreen(new MultiplayerOptionsScreen(ShareToLanScreenNew.this.lastScreen));
 						}).build(), 2);
 			}
 		}
@@ -316,14 +329,13 @@ public class ShareToLanScreenNew extends Screen {
 
 	@Override
 	public void onClose() {
-		this.minecraft.setScreen(this.lastScreen);
+		this.minecraft.gui.setScreen(this.lastScreen);
 	}
 
 	@Override
 	protected void repositionElements() {
 		if (this.tabNavigationBar != null) {
-			this.tabNavigationBar.updateWidth(this.width);
-			this.tabNavigationBar.arrangeElements();
+			this.tabNavigationBar.arrangeElements(this.width);
 			int i = this.tabNavigationBar.getRectangle().bottom();
 			ScreenRectangle screenrectangle = new ScreenRectangle(0, i, this.width,
 					this.height - this.layout.getFooterHeight() - i);
@@ -334,9 +346,75 @@ public class ShareToLanScreenNew extends Screen {
 	}
 
 	@Override
-	public void extractRenderState(final GuiGraphicsExtractor graphics, final int mouseX, final int mouseY, final float a) {
+	public void extractRenderState(final GuiGraphicsExtractor graphics, final int mouseX, final int mouseY,
+			final float a) {
 		super.extractRenderState(graphics, mouseX, mouseY, a);
 		graphics.blit(RenderPipelines.GUI_TEXTURED, Screen.FOOTER_SEPARATOR, 0,
 				this.height - this.layout.getFooterHeight() - 2, 0.0F, 0.0F, this.width, 2, 32, 2);
 	}
+
+	private MultiplayerScope[] GetScopeValues() {
+		return this.minecraft.getPlayerSocialManager().isFriendListEnabled()
+				? IntegratedServer.MultiplayerScope.values()
+				: (IntegratedServer.MultiplayerScope[]) Arrays.stream(IntegratedServer.MultiplayerScope.values())
+						.filter(scope -> scope != IntegratedServer.MultiplayerScope.ONLINE)
+						.toArray(IntegratedServer.MultiplayerScope[]::new);
+	}
+
+	private void changeMultiplayerScope(final IntegratedServer server) {
+		switch (cfg.multiplayerScope) {
+			case OFF:
+				if (server.unpublishServer()) {
+					this.sendPublishMessage(Component.translatable("menu.multiplayerOptions.publish.stopped"));
+					this.minecraft.getPlayerSocialManager().getPresenceHandler().clearInvites();
+					UPnPModule.stop(server);
+				}
+				break;
+			case LAN:
+				if (server.unpublishServer()) {
+					this.sendPublishMessage(Component.translatable("menu.multiplayerOptions.publish.stopped"));
+					this.minecraft.getPlayerSocialManager().getPresenceHandler().clearInvites();
+				}
+
+				this.publish(server, IntegratedServer.MultiplayerScope.LAN);
+				break;
+			case ONLINE:
+				if (server.unpublishServer()) {
+					this.sendPublishMessage(Component.translatable("menu.multiplayerOptions.publish.stopped"));
+					this.minecraft.getPlayerSocialManager().getPresenceHandler().clearInvites();
+				}
+
+				this.publish(server, IntegratedServer.MultiplayerScope.ONLINE);
+		}
+
+		this.minecraft.getPlayerSocialManager().getPresenceHandler().tryUpdatePresence();
+	}
+
+	private void publish(final IntegratedServer server, final IntegratedServer.MultiplayerScope scope) {
+		String key = scope == IntegratedServer.MultiplayerScope.LAN
+				? "menu.multiplayerOptions.publish.started.lan"
+				: "menu.multiplayerOptions.publish.started.online";
+		if (server.isPublished()) {
+			server.setMultiplayerScope(scope);
+			this.sendPublishMessage(
+					Component.translatable(key, ComponentUtils.copyOnClickText(String.valueOf(server.getPort()))));
+		} else {
+			boolean published = server.publishServer(cfg.gameType, cfg.allowEveryoneCheat, cfg.port);
+			Component message = published
+					? Component.translatable(key, ComponentUtils.copyOnClickText(String.valueOf(cfg.port)))
+					: Component.translatable("commands.publish.failed");
+			if (published) {
+				server.setMultiplayerScope(scope);
+			}
+
+			this.sendPublishMessage(message);
+		}
+	}
+
+	private void sendPublishMessage(final Component message) {
+		this.minecraft.gui.hud.getChat().addClientSystemMessage(message);
+		this.minecraft.getNarrator().saySystemQueued(message);
+		this.minecraft.updateTitle();
+	}
+
 }

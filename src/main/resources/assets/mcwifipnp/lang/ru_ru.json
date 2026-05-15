@@ -1,6 +1,6 @@
 {
   "mcwifipnp.gui.port.info": "Порт для локального мира.",
-  "mcwifipnp.gui.port.invalid": "Неверный порт.\nОставьте это поле пустым или введите число от §41024 до 65535§.",
+  "mcwifipnp.gui.port.invalid": "Неверный порт.\nОставьте это поле пустым или введите число от §41024 до 65535§f.",
   "mcwifipnp.gui.port.unavailable": "§4Порт недоступен.",
   "mcwifipnp.gui.players": "Лимит игроков",
   "mcwifipnp.gui.players.info": "Максимальное количество игроков, которые могут присоединиться к серверу.",
@@ -27,7 +27,6 @@
   "mcwifipnp.gui.globalIP": "Глобалный %s",
   "mcwifipnp.gui.CopyIP": "Получить IP",
   "mcwifipnp.gui.CopyIP.info": "Получить IP для копирования в буфер обмена",
-  "mcwifipnp.gui.removePlayerReportingButton": "Заменить Жалобы Кнопка",
   "mcwifipnp.upnp.success": "Порт %s успешно переадресован",
   "mcwifipnp.upnp.clipboard": "Успешно получен %s, из-за таких факторов, как NAT, эти IP-адреса, возможно, по-прежнему не смогут подключиться напрямую.",
   "mcwifipnp.upnp.cantgetip": "Не удалось получить публичный IP! Пожалуйста, проверьте настройки вашей сети. Возможно, ваш IPv4 содержит несколько NAT-адресов или у вас нет IPv6.",

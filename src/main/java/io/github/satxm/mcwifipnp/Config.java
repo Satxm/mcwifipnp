@@ -20,6 +20,7 @@ import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
 import com.google.gson.annotations.SerializedName;
 
+import net.minecraft.client.server.IntegratedServer;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.players.PlayerList;
@@ -66,6 +67,9 @@ public class Config {
 
 	@SerializedName(value = "remove-player-reporting", alternate = { "removePlayerReportingButton" })
 	public boolean removePlayerReportingButton = false;
+
+	@SerializedName(value = "multiplayer-scope", alternate = { "multiplayerScope" })
+	public IntegratedServer.MultiplayerScope multiplayerScope = IntegratedServer.MultiplayerScope.OFF;
 
 	// These fields will not be serialized
 	public transient Path location;

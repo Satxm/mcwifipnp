@@ -1,6 +1,6 @@
 {
-  "mcwifipnp.gui.port.info": "监听端口号。",
-  "mcwifipnp.gui.port.invalid": "端口无效。\n请输入一个介于§41024至65535§之间的数字。",
+  "mcwifipnp.gui.port.info": "多人游戏端口号。",
+  "mcwifipnp.gui.port.invalid": "端口无效。\n请输入一个介于§41024至65535§f之间的数字。",
   "mcwifipnp.gui.port.unavailable": "§4端口不可用。",
   "mcwifipnp.gui.players": "最大允许玩家数",
   "mcwifipnp.gui.players.info": "服务器同时能容纳的最大玩家数量。",
@@ -29,7 +29,6 @@
   "mcwifipnp.gui.globalIP": "公网%s",
   "mcwifipnp.gui.CopyIP": "获取IP",
   "mcwifipnp.gui.CopyIP.info": "是否获取你当前设备的IP地址，以便于你直接复制。",
-  "mcwifipnp.gui.removePlayerReportingButton": "替换 举报玩家 按钮",
   "mcwifipnp.upnp.success": "成功转发端口%s",
   "mcwifipnp.upnp.clipboard": "成功获取到%s，由于NAT等因素，这些IP可能仍旧无法直接联机。",
   "mcwifipnp.upnp.cantgetip": "无法获取IP！请检查你的网络设置。你的IPv4可能包含多级NAT或者你无IPv6。",
