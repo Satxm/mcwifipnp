@@ -40,7 +40,7 @@ public class Config {
 	public int maxPlayers = 8;
 
 	@SerializedName(value = "gamemode", alternate = { "GameMode" })
-	public GameType gameType = GameType.SURVIVAL;
+	public GameType gameMode = GameType.SURVIVAL;
 
 	public String motd = Component.translatable("lanServer.title").getString();
 
@@ -65,11 +65,8 @@ public class Config {
 	@SerializedName(value = "get-public-ip", alternate = { "CopyToClipboard" })
 	public boolean getPublicIP = true;
 
-	@SerializedName(value = "remove-player-reporting", alternate = { "removePlayerReportingButton" })
-	public boolean removePlayerReportingButton = false;
-
 	@SerializedName(value = "multiplayer-scope", alternate = { "multiplayerScope" })
-	public IntegratedServer.MultiplayerScope multiplayerScope = IntegratedServer.MultiplayerScope.OFF;
+	public MinecraftServer.MultiplayerScope multiplayerScope = MinecraftServer.MultiplayerScope.OFF;
 
 	// These fields will not be serialized
 	public transient Path location;
@@ -164,7 +161,7 @@ public class Config {
 		this.port = server.getPort();
 
 		this.allowEveryoneCheat = playerList.isAllowCommandsForAllPlayers();
-		this.gameType = server.getDefaultGameType();
+		this.gameMode = server.getDefaultGameType();
 
 		this.maxPlayers = playerList.getMaxPlayers();
 		this.onlineMode = server.usesAuthentication();
@@ -177,7 +174,7 @@ public class Config {
 
 	public void applyTo(MinecraftServer server) {
 		PlayerList playerList = server.getPlayerList();
-		server.setDefaultGameType(this.gameType);
+		server.setDefaultGameType(this.gameMode);
 		playerList.setAllowCommandsForAllPlayers(this.allowEveryoneCheat);
 
 		server.setUsesAuthentication(this.onlineMode);

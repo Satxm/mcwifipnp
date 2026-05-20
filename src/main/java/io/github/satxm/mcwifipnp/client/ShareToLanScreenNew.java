@@ -1,25 +1,14 @@
 package io.github.satxm.mcwifipnp.client;
 
-import java.lang.System.Logger;
-import java.lang.System.Logger.Level;
-import java.util.Arrays;
-import java.util.logging.LogManager;
-
-import org.jspecify.annotations.Nullable;
-
 import io.github.satxm.mcwifipnp.Config;
 import io.github.satxm.mcwifipnp.MCWiFiPnPUnit;
 import io.github.satxm.mcwifipnp.OnlineMode;
 import io.github.satxm.mcwifipnp.commands.IpCommand;
 import io.github.satxm.mcwifipnp.network.UPnPModule;
+import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
-import net.minecraft.client.gui.components.Button;
-import net.minecraft.client.gui.components.Checkbox;
-import net.minecraft.client.gui.components.CycleButton;
-import net.minecraft.client.gui.components.EditBox;
-import net.minecraft.client.gui.components.StringWidget;
-import net.minecraft.client.gui.components.Tooltip;
+import net.minecraft.client.gui.components.*;
 import net.minecraft.client.gui.components.tabs.GridLayoutTab;
 import net.minecraft.client.gui.components.tabs.MenuTabBar;
 import net.minecraft.client.gui.components.tabs.TabManager;
@@ -29,16 +18,14 @@ import net.minecraft.client.gui.layouts.GridLayout;
 import net.minecraft.client.gui.layouts.HeaderAndFooterLayout;
 import net.minecraft.client.gui.layouts.LinearLayout;
 import net.minecraft.client.gui.navigation.ScreenRectangle;
-import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.MultiplayerOptionsScreen;
+import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.client.server.IntegratedServer;
-import net.minecraft.client.server.IntegratedServer.MultiplayerScope;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.ComponentUtils;
-import net.minecraft.network.chat.MutableComponent;
-import net.minecraft.server.commands.PublishCommand;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.permissions.LevelBasedPermissionSet;
 import net.minecraft.server.players.NameAndId;
@@ -47,7 +34,9 @@ import net.minecraft.server.players.ServerOpListEntry;
 import net.minecraft.server.players.UserWhiteListEntry;
 import net.minecraft.util.HttpUtil;
 import net.minecraft.world.level.GameType;
-import net.minecraft.resources.Identifier;
+import org.jspecify.annotations.Nullable;
+
+import java.util.Arrays;
 
 public class ShareToLanScreenNew extends Screen {
 	private final Config cfg;
@@ -61,25 +50,24 @@ public class ShareToLanScreenNew extends Screen {
 
 	public final HeaderAndFooterLayout layout = new HeaderAndFooterLayout(this);
 
-	protected Button confirmButton;
+	protected Button applyChanges;
 
-	@Nullable
-	protected Button backToVanillaScreenButton;
+	private EditBox portEdit;
+	private StringWidget portLabel;
 
-	private boolean oldUPnPEnabled;
-	private boolean oldCopyIP;
-	private String oldMotd;
-
-	@Nullable
-	private MultiplayerScope oldScope;
+    private final boolean oldUPnPEnabled;
+	private final boolean oldCopyIP;
+	private final String oldMotd;
+	private final int oldPort;
+	private final MinecraftServer.MultiplayerScope oldScope;
 
 	public ShareToLanScreenNew(Screen screen) {
 		super(Component.translatable("lanServer.title"));
 		this.lastScreen = screen;
+		IntegratedServer server = Minecraft.getInstance().getSingleplayerServer();
+
 		this.serverPublished = this.minecraft.hasSingleplayerServer()
 				&& this.minecraft.getSingleplayerServer().isPublished();
-
-		IntegratedServer server = Minecraft.getInstance().getSingleplayerServer();
 
 		this.cfg = Config.read(server);
 
@@ -91,17 +79,20 @@ public class ShareToLanScreenNew extends Screen {
 			this.cfg.allowHostCheat = server.getWorldData().isAllowCommands();
 		}
 
-		this.oldMotd = this.cfg.motd;
-		this.oldUPnPEnabled = this.cfg.useUPnP;
-		this.oldCopyIP = this.cfg.getPublicIP;
-		this.oldScope = server.getMultiplayerScope();
+		this.oldPort = cfg.port;
+		this.oldMotd = cfg.motd;
+		this.oldUPnPEnabled = cfg.useUPnP;
+		this.oldCopyIP = cfg.getPublicIP;
+		this.oldScope = cfg.multiplayerScope;
 	}
 
 	protected void onConfirmClicked() {
 		IntegratedServer server = Minecraft.getInstance().getSingleplayerServer();
 		PlayerList playerList = server.getPlayerList();
 		NameAndId hostPlayer = new NameAndId(server.getSingleplayerProfile());
-		this.cfg.save();
+		if (cfg.multiplayerScope != MinecraftServer.MultiplayerScope.ONLINE) {
+			this.cfg.save();
+		}
 
 		if (cfg.multiplayerScope != oldScope) {
 			this.changeMultiplayerScope(server);
@@ -118,7 +109,7 @@ public class ShareToLanScreenNew extends Screen {
 					server.getPlayerList().getPlayer(hostPlayer.id()).sendSystemMessage(IpCommand.getBrief(server));
 				}, "MCWiFiPnP").start();
 			}
-		} else if (cfg.multiplayerScope != IntegratedServer.MultiplayerScope.OFF) {
+		} else if (cfg.multiplayerScope != MinecraftServer.MultiplayerScope.OFF) {
 			UPnPModule.startIfEnabled(server, cfg);
 			if (this.cfg.getPublicIP) {
 				new Thread(() -> {
@@ -132,7 +123,10 @@ public class ShareToLanScreenNew extends Screen {
 			playerList.getOps().clear();
 		}
 		if (this.cfg.allowHostCheat) {
-			playerList.getOps().add(new ServerOpListEntry(hostPlayer, LevelBasedPermissionSet.OWNER, playerList.canBypassPlayerLimit(hostPlayer)));
+			playerList.getOps().add(new ServerOpListEntry(hostPlayer, LevelBasedPermissionSet.OWNER,
+					playerList.canBypassPlayerLimit(hostPlayer)));
+		} else {
+			playerList.getOps().remove(hostPlayer);
 		}
 		for (ServerPlayer serverPlayer : server.getPlayerList().getPlayers()) {
 			playerList.sendPlayerPermissionLevel(serverPlayer);
@@ -157,8 +151,10 @@ public class ShareToLanScreenNew extends Screen {
 
 		// Add footer widgets
 		LinearLayout footer = this.layout.addToFooter(LinearLayout.horizontal().spacing(8));
-		this.confirmButton = Button.builder(Component.translatable("menu.multiplayerOptions.applyChanges"), button -> this.onConfirmClicked()).width(150).build();
-		footer.addChild(this.confirmButton);
+		this.applyChanges = Button
+				.builder(Component.translatable("menu.multiplayerOptions.applyChanges"), button -> this.onConfirmClicked())
+				.width(150).build();
+		footer.addChild(this.applyChanges);
 		footer.addChild(Button.builder(CommonComponents.GUI_CANCEL, button -> this.onClose()).build());
 
 		this.layout.visitWidgets(this::addRenderableWidget);
@@ -168,89 +164,78 @@ public class ShareToLanScreenNew extends Screen {
 
 	private class DefaultTab1 extends GridLayoutTab {
 		public DefaultTab1() {
-			super(Component.translatable("mcwifipnp.gui.lanServerOptions"));
+			super(Component.translatable("menu.multiplayerOptions.network.header"));
 			GridLayout.RowHelper tabContents = this.layout.columnSpacing(8).rowSpacing(4).createRowHelper(4);
 
 			// Row 1
 			// Port field
-			EditBox portField;
-			if (ShareToLanScreenNew.this.serverPublished) {
-				portField = new EditBox(ShareToLanScreenNew.this.font, 0, 0, 70, 20, Component.translatable("lanServer.port"));
-				portField.setEditable(false);
-				portField.setValue(Integer.toString(cfg.port));
+			portEdit = new EditBox(ShareToLanScreenNew.this.font, Component.translatable("lanServer.port"));
+			portEdit.setResponder(value -> {
+				ShareToLanScreenNew.this.setPortError(ShareToLanScreenNew.this.tryParsePort(value));
+				portEdit.setHint(Component.literal(String.valueOf(cfg.port)));
+			});
+			if (cfg.multiplayerScope == MinecraftServer.MultiplayerScope.LAN) {
+				portEdit.setValue(String.valueOf(cfg.port));
+				if (ShareToLanScreenNew.this.serverPublished) {
+					portEdit.setEditable(false);
+					portEdit.setTooltip(null);
+				}
 			} else {
-				portField = EditBoxEx
-						.numerical(ShareToLanScreenNew.this.font, 0, 0, 70, 20, Component.translatable("lanServer.port"))
-						.defaults(cfg.port, EditBoxEx.TEXT_COLOR_HINT,
-								Tooltip.create(Component.translatable("mcwifipnp.gui.port.info")))
-						.invalid(EditBoxEx.TEXT_COLOR_ERROR,
-								Tooltip.create(Component.translatable("mcwifipnp.gui.port.invalid")))
-						.validator((port) -> {
-							if (port < 1024 || port > 65535) {
-								throw new NumberFormatException("Port out of range:" + port);
-							} else if (!HttpUtil.isPortAvailable(port)) {
-								return new EditBoxEx.ValidatorResult(EditBoxEx.TEXT_COLOR_WARN,
-										Tooltip.create(Component.translatable("mcwifipnp.gui.port.unavailable")), false,
-										true);
-							} else {
-								return null;
-							}
-						}).responder((newState, newPort) -> {
-							confirmButton.active = newState.valid();
-							if (newState.updateBackendValue())
-								cfg.port = newPort;
-						});
-				portField.setMaxLength(5);
+				portEdit.setEditable(false);
+				portEdit.setTooltip(null);
 			}
-			tabContents.addChild(new StringWidget(portField.getMessage(), ShareToLanScreenNew.this.font),
-					1, this.layout.newCellSettings().alignHorizontallyLeft().paddingTop(6));
-			tabContents.addChild(portField,
-					1, this.layout.newCellSettings().alignHorizontallyRight());
+			LinearLayout portRow = LinearLayout.vertical().spacing(4);
+			portLabel = portRow
+					.addChild(new StringWidget(Component.translatable("lanServer.port"), ShareToLanScreenNew.this.font));
+			portRow.addChild(portEdit);
+			tabContents.addChild(portRow, 2);
 
-			// Number of players field
-			EditBoxEx<Integer> maxPlayersField = EditBoxEx
-					.numerical(ShareToLanScreenNew.this.font, 0, 0, 70, 20, Component.translatable("mcwifipnp.gui.players"))
-					.bistate(cfg.maxPlayers, Tooltip.create(Component.translatable("mcwifipnp.gui.players.info")),
-							(maxPlayers) -> maxPlayers > 0)
-					.responder((newState, maxPlayers) -> {
-						confirmButton.active = newState.valid();
-						if (newState.updateBackendValue())
-							cfg.maxPlayers = maxPlayers;
-					});
-			tabContents.addChild(new StringWidget(maxPlayersField.getMessage(), ShareToLanScreenNew.this.font),
-					1, this.layout.newCellSettings().alignHorizontallyLeft().paddingTop(6));
-			tabContents.addChild(maxPlayersField,
-					1, this.layout.newCellSettings().alignHorizontallyRight());
+			// // Number of players field
+            EditBox maxPlayersEdit = new EditBox(ShareToLanScreenNew.this.font,
+                    Component.translatable("mcwifipnp.gui.players"));
+			maxPlayersEdit.setResponder(value -> {
+				try {
+					int parsed = Integer.parseInt(value);
+					if (parsed >= 0) {
+						cfg.maxPlayers = Integer.parseInt(value);
+					}
+				} catch (NumberFormatException _) {
+				}
+			});
+			maxPlayersEdit.setHint(Component.literal(String.valueOf(cfg.maxPlayers)));
+			maxPlayersEdit.setValue(String.valueOf(cfg.maxPlayers));
+			maxPlayersEdit.setTooltip(Tooltip.create(Component.translatable("mcwifipnp.gui.players.info")));
+			LinearLayout maxPlayersRow = LinearLayout.vertical().spacing(4);
+			maxPlayersRow
+					.addChild(new StringWidget(Component.translatable("mcwifipnp.gui.players"), ShareToLanScreenNew.this.font));
+			maxPlayersRow.addChild(maxPlayersEdit);
+			tabContents.addChild(maxPlayersRow, 2);
 
 			// Row2
 			// Motd field
-			tabContents.addChild(CommonLayouts.labeledElement(ShareToLanScreenNew.this.font, EditBoxEx
-					.text(ShareToLanScreenNew.this.font, 0, 0, 308, 20, Component.translatable("mcwifipnp.gui.motd"))
-					.bistate(cfg.motd, Tooltip.create(Component.translatable("mcwifipnp.gui.motd.info")), (newMotd) -> true)
-					.responder((newState, newMotd) -> {
-						confirmButton.active = newState.valid();
-						if (newState.updateBackendValue())
-							cfg.motd = newMotd;
-					}).maxLength(32), Component.translatable("mcwifipnp.gui.motd")), 4);
+            EditBox motdEdit = new EditBox(ShareToLanScreenNew.this.font, 308, 20,
+                    Component.translatable("mcwifipnp.gui.motd"));
+			motdEdit.setValue(cfg.motd);
+			motdEdit.setHint(Component.literal(cfg.motd));
+			motdEdit.setResponder(value -> {
+				cfg.motd = value;
+			});
+			motdEdit.setTooltip(Tooltip.create(Component.translatable("mcwifipnp.gui.motd.info")));
+			tabContents.addChild(CommonLayouts.labeledElement(ShareToLanScreenNew.this.font, motdEdit,
+					Component.translatable("mcwifipnp.gui.motd")), 4);
 
 			// Row3
 			// Allow Cheat button (for other joined players)
 			tabContents.addChild(
 					CycleButton
-							.builder(IntegratedServer.MultiplayerScope::getDisplayName, cfg.multiplayerScope)
+							.builder(MinecraftServer.MultiplayerScope::getDisplayName, cfg.multiplayerScope)
 							.withValues(GetScopeValues())
-							.withTooltip(IntegratedServer.MultiplayerScope::getTooltip)
+							.withTooltip(scope -> Tooltip.create(scope.getTooltip()))
 							.create(Component.translatable("menu.multiplayerOptions.network"), (cycleButton, value) -> {
 								cfg.multiplayerScope = value;
+								ShareToLanScreenNew.this.updatePortControlsState();
 							}),
 					2);
-
-			if (!ShareToLanScreenNew.this.serverPublished) {
-				tabContents.addChild(CycleButton.onOffBuilder(cfg.allowHostCheat)
-						.create(Component.translatable("selectWorld.allowCommands"), (cycleButton, allowHostCheat) -> {
-							cfg.allowHostCheat = allowHostCheat;
-						}), 2);
-			}
 
 			tabContents.addChild(CycleButton.onOffBuilder(cfg.enforceWhitelist)
 					.withTooltip((state) -> Tooltip.create(Component.translatable("mcwifipnp.gui.Whitelist.info")))
@@ -268,26 +253,35 @@ public class ShareToLanScreenNew extends Screen {
 								cfg.enableUUIDFixer = onlineMode.fixUUID;
 							}), 2);
 
-			tabContents.addChild(CycleButton.onOffBuilder(cfg.enablePvP)
-					.withTooltip((state) -> Tooltip.create(Component.translatable("mcwifipnp.gui.PvP.info")))
-					.create(Component.translatable("mcwifipnp.gui.PvP"), (cycleButton, PvP) -> {
-						cfg.enablePvP = PvP;
-					}), 2);
 		}
 	}
 
 	private class DefaultTab2 extends GridLayoutTab {
 		public DefaultTab2() {
-			super(Component.translatable("lanServer.otherPlayers"));
+			super(Component.translatable("menu.multiplayerOptions.otherPlayers.header"));
 			GridLayout.RowHelper tabContents = this.layout.columnSpacing(8).rowSpacing(4).createRowHelper(4);
 
 			// Row 1
 			// GameMode toggle button
-			tabContents.addChild(CycleButton.builder(GameType::getShortDisplayName, cfg.gameType)
+			tabContents.addChild(CycleButton.builder(GameType::getShortDisplayName, cfg.gameMode)
 					.withValues(GameType.values())
-					.create(Component.translatable("selectWorld.gameMode"), (cycleButton, gameType) -> {
-						cfg.gameType = gameType;
+					.create(Component.translatable("selectWorld.gameMode"), (cycleButton, gameMode) -> {
+						cfg.gameMode = gameMode;
 					}), 2);
+
+			tabContents.addChild(CycleButton.onOffBuilder(cfg.enablePvP)
+					.withTooltip((state) -> Tooltip.create(Component.translatable("mcwifipnp.gui.PvP.info")))
+					.create(Component.translatable("mcwifipnp.gui.PvP"), (cycleButton, PvP) -> {
+						cfg.enablePvP = PvP;
+					}), 2);
+
+			// Row 2
+			if (!ShareToLanScreenNew.this.serverPublished) {
+				tabContents.addChild(CycleButton.onOffBuilder(cfg.allowHostCheat)
+						.create(Component.translatable("selectWorld.allowCommands"), (cycleButton, allowHostCheat) -> {
+							cfg.allowHostCheat = allowHostCheat;
+						}), 2);
+			}
 
 			// Allow Cheat button (for other joined players)
 			tabContents.addChild(CycleButton.onOffBuilder(cfg.allowEveryoneCheat)
@@ -317,13 +311,11 @@ public class ShareToLanScreenNew extends Screen {
 					}), 2);
 
 			// Row 2
-			if (!ShareToLanScreenNew.this.serverPublished) {
-				tabContents
-						.addChild(Button.builder(Component.translatable("mcwifipnp.gui.backToVanillaScreen"), button -> {
-							ShareToLanScreenNew.this.minecraft.gui
-									.setScreen(new MultiplayerOptionsScreen(ShareToLanScreenNew.this.lastScreen));
-						}).build(), 2);
-			}
+			tabContents
+					.addChild(Button.builder(Component.translatable("mcwifipnp.gui.backToVanillaScreen"), button -> {
+						ShareToLanScreenNew.this.minecraft.gui
+								.setScreen(new MultiplayerOptionsScreen(ShareToLanScreenNew.this.lastScreen));
+					}).build(), 2);
 		}
 	}
 
@@ -353,60 +345,37 @@ public class ShareToLanScreenNew extends Screen {
 				this.height - this.layout.getFooterHeight() - 2, 0.0F, 0.0F, this.width, 2, 32, 2);
 	}
 
-	private MultiplayerScope[] GetScopeValues() {
+	private MinecraftServer.MultiplayerScope[] GetScopeValues() {
 		return this.minecraft.getPlayerSocialManager().isFriendListEnabled()
-				? IntegratedServer.MultiplayerScope.values()
-				: (IntegratedServer.MultiplayerScope[]) Arrays.stream(IntegratedServer.MultiplayerScope.values())
-						.filter(scope -> scope != IntegratedServer.MultiplayerScope.ONLINE)
-						.toArray(IntegratedServer.MultiplayerScope[]::new);
+				? MinecraftServer.MultiplayerScope.values()
+				: (MinecraftServer.MultiplayerScope[]) Arrays.stream(MinecraftServer.MultiplayerScope.values())
+						.filter(scope -> scope != MinecraftServer.MultiplayerScope.ONLINE)
+						.toArray(MinecraftServer.MultiplayerScope[]::new);
 	}
 
 	private void changeMultiplayerScope(final IntegratedServer server) {
-		switch (cfg.multiplayerScope) {
-			case OFF:
-				if (server.unpublishServer()) {
-					this.sendPublishMessage(Component.translatable("menu.multiplayerOptions.publish.stopped"));
-					this.minecraft.getPlayerSocialManager().getPresenceHandler().clearInvites();
-					UPnPModule.stop(server);
-				}
-				break;
-			case LAN:
-				if (server.unpublishServer()) {
-					this.sendPublishMessage(Component.translatable("menu.multiplayerOptions.publish.stopped"));
-					this.minecraft.getPlayerSocialManager().getPresenceHandler().clearInvites();
-				}
+		if (server.unpublishServer()) {
+			this.sendPublishMessage(Component.translatable("menu.multiplayerOptions.publish.stopped"));
+			this.minecraft.getPlayerSocialManager().getPresenceHandler().clearInvites();
+			UPnPModule.stop(server);
+		}
 
-				this.publish(server, IntegratedServer.MultiplayerScope.LAN);
-				break;
-			case ONLINE:
-				if (server.unpublishServer()) {
-					this.sendPublishMessage(Component.translatable("menu.multiplayerOptions.publish.stopped"));
-					this.minecraft.getPlayerSocialManager().getPresenceHandler().clearInvites();
-				}
-
-				this.publish(server, IntegratedServer.MultiplayerScope.ONLINE);
+		if (cfg.multiplayerScope != MinecraftServer.MultiplayerScope.OFF) {
+			this.publish(server, cfg.multiplayerScope);
 		}
 
 		this.minecraft.getPlayerSocialManager().getPresenceHandler().tryUpdatePresence();
 	}
 
-	private void publish(final IntegratedServer server, final IntegratedServer.MultiplayerScope scope) {
-		String key = scope == IntegratedServer.MultiplayerScope.LAN
-				? "menu.multiplayerOptions.publish.started.lan"
-				: "menu.multiplayerOptions.publish.started.online";
-		if (server.isPublished()) {
-			server.setMultiplayerScope(scope);
-			this.sendPublishMessage(
-					Component.translatable(key, ComponentUtils.copyOnClickText(String.valueOf(server.getPort()))));
+	private void publish(final IntegratedServer server, final MinecraftServer.MultiplayerScope scope) {
+		boolean published = server.publishServer(scope, cfg.gameMode, cfg.allowEveryoneCheat, cfg.port);
+		if (!published) {
+			this.sendPublishMessage(Component.translatable("commands.publish.failed"));
 		} else {
-			boolean published = server.publishServer(cfg.gameType, cfg.allowEveryoneCheat, cfg.port);
-			Component message = published
-					? Component.translatable(key, ComponentUtils.copyOnClickText(String.valueOf(cfg.port)))
-					: Component.translatable("commands.publish.failed");
-			if (published) {
-				server.setMultiplayerScope(scope);
-			}
-
+			Component message = scope == MinecraftServer.MultiplayerScope.LAN
+					? Component.translatable("menu.multiplayerOptions.publish.started.lan",
+							ComponentUtils.copyOnClickText(String.valueOf(cfg.port)))
+					: Component.translatable("menu.multiplayerOptions.publish.started.online");
 			this.sendPublishMessage(message);
 		}
 	}
@@ -415,6 +384,59 @@ public class ShareToLanScreenNew extends Screen {
 		this.minecraft.gui.hud.getChat().addClientSystemMessage(message);
 		this.minecraft.getNarrator().saySystemQueued(message);
 		this.minecraft.updateTitle();
+	}
+
+	private void updatePortControlsState() {
+		boolean lanWanted = cfg.multiplayerScope == MinecraftServer.MultiplayerScope.LAN;
+		if (this.portEdit != null) {
+			this.portEdit.setValue(lanWanted ? String.valueOf(cfg.port) : "");
+			this.portEdit.setEditable(lanWanted);
+			this.portEdit.active = lanWanted;
+			this.portEdit.setHint(lanWanted ? Component.literal(String.valueOf(cfg.port)) : Component.empty());
+			if (!lanWanted) {
+				this.portEdit.setFocused(false);
+				this.setPortError(null);
+			}
+			portEdit.setTooltip(Tooltip.create(Component.translatable("mcwifipnp.gui.port.info")));
+		}
+
+		if (this.portLabel != null) {
+			this.portLabel.setMessage(lanWanted ? Component.translatable("lanServer.port")
+					: Component.translatable("lanServer.port").copy().withStyle(ChatFormatting.GRAY));
+		}
+	}
+
+	@Nullable
+	private Component tryParsePort(final String value) {
+		if (value.isBlank()) {
+			return null;
+		} else {
+			try {
+				int parsed = Integer.parseInt(value);
+				if (parsed < 1024 || parsed > 65535) {
+					return Component.translatable("lanServer.port.invalid", 1024, 65535);
+				} else if (parsed != this.oldPort && !HttpUtil.isPortAvailable(parsed)) {
+					return Component.translatable("lanServer.port.unavailable", 1024, 65535);
+				} else {
+					cfg.port = parsed;
+					return null;
+				}
+			} catch (NumberFormatException var3) {
+				return Component.translatable("lanServer.port.invalid", 1024, 65535);
+			}
+		}
+	}
+
+	private void setPortError(@Nullable final Component errorMessage) {
+		if (portEdit != null) {
+			if (errorMessage == null) {
+				portEdit.setTextColor(-2039584);
+				portEdit.setTooltip(Tooltip.create(Component.translatable("mcwifipnp.gui.port.info")));
+			} else {
+				portEdit.setTextColor(-2142128);
+				portEdit.setTooltip(Tooltip.create(errorMessage));
+			}
+		}
 	}
 
 }
