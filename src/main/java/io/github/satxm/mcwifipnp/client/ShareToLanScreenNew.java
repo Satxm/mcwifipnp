@@ -55,7 +55,7 @@ public class ShareToLanScreenNew extends Screen {
 	private EditBox portEdit;
 	private StringWidget portLabel;
 
-    private final boolean oldUPnPEnabled;
+	private final boolean oldUPnPEnabled;
 	private final boolean oldCopyIP;
 	private final String oldMotd;
 	private final int oldPort;
@@ -71,31 +71,34 @@ public class ShareToLanScreenNew extends Screen {
 
 		this.cfg = Config.read(server);
 
-		if (serverPublished) {
+		if (serverPublished && server.getMultiplayerScope() == MinecraftServer.MultiplayerScope.LAN) {
 			this.cfg.readFromRunningServer(server);
 		} else if (this.cfg.usingDefaults) {
 			this.cfg.readFromRunningServer(server);
 			this.cfg.port = HttpUtil.getAvailablePort();
 			this.cfg.allowHostCheat = server.getWorldData().isAllowCommands();
+			this.cfg.multiplayerScope = server.getMultiplayerScope();
 		}
 
 		this.oldPort = cfg.port;
 		this.oldMotd = cfg.motd;
 		this.oldUPnPEnabled = cfg.useUPnP;
 		this.oldCopyIP = cfg.getPublicIP;
-		this.oldScope = cfg.multiplayerScope;
+		this.oldScope = server.getMultiplayerScope();
 	}
 
 	protected void onConfirmClicked() {
 		IntegratedServer server = Minecraft.getInstance().getSingleplayerServer();
 		PlayerList playerList = server.getPlayerList();
 		NameAndId hostPlayer = new NameAndId(server.getSingleplayerProfile());
-		if (cfg.multiplayerScope != MinecraftServer.MultiplayerScope.ONLINE) {
-			this.cfg.save();
-		}
+		this.cfg.save();
 
-		if (cfg.multiplayerScope != oldScope) {
+		if (cfg.multiplayerScope != oldScope || cfg.port != oldPort) {
 			this.changeMultiplayerScope(server);
+			if (cfg.multiplayerScope == MinecraftServer.MultiplayerScope.LAN) {
+				UPnPModule.startIfEnabled(server, cfg);
+				GetPublicIP(server);
+			}
 		}
 
 		if (this.serverPublished) {
@@ -104,17 +107,8 @@ public class ShareToLanScreenNew extends Screen {
 				UPnPModule.stop(server);
 				UPnPModule.startIfEnabled(server, cfg);
 			}
-			if (this.cfg.getPublicIP && this.cfg.getPublicIP ^ oldCopyIP) {
-				new Thread(() -> {
-					server.getPlayerList().getPlayer(hostPlayer.id()).sendSystemMessage(IpCommand.getBrief(server));
-				}, "MCWiFiPnP").start();
-			}
-		} else if (cfg.multiplayerScope != MinecraftServer.MultiplayerScope.OFF) {
-			UPnPModule.startIfEnabled(server, cfg);
-			if (this.cfg.getPublicIP) {
-				new Thread(() -> {
-					server.getPlayerList().getPlayer(hostPlayer.id()).sendSystemMessage(IpCommand.getBrief(server));
-				}, "MCWiFiPnP").start();
+			if (this.cfg.getPublicIP ^ oldCopyIP) {
+				GetPublicIP(server);
 			}
 		}
 		this.cfg.applyTo(server);
@@ -174,25 +168,16 @@ public class ShareToLanScreenNew extends Screen {
 				ShareToLanScreenNew.this.setPortError(ShareToLanScreenNew.this.tryParsePort(value));
 				portEdit.setHint(Component.literal(String.valueOf(cfg.port)));
 			});
-			if (cfg.multiplayerScope == MinecraftServer.MultiplayerScope.LAN) {
-				portEdit.setValue(String.valueOf(cfg.port));
-				if (ShareToLanScreenNew.this.serverPublished) {
-					portEdit.setEditable(false);
-					portEdit.setTooltip(null);
-				}
-			} else {
-				portEdit.setEditable(false);
-				portEdit.setTooltip(null);
-			}
 			LinearLayout portRow = LinearLayout.vertical().spacing(4);
 			portLabel = portRow
 					.addChild(new StringWidget(Component.translatable("lanServer.port"), ShareToLanScreenNew.this.font));
 			portRow.addChild(portEdit);
+			ShareToLanScreenNew.this.updatePortControlsState();
 			tabContents.addChild(portRow, 2);
 
 			// // Number of players field
-            EditBox maxPlayersEdit = new EditBox(ShareToLanScreenNew.this.font,
-                    Component.translatable("mcwifipnp.gui.players"));
+			EditBox maxPlayersEdit = new EditBox(ShareToLanScreenNew.this.font,
+					Component.translatable("mcwifipnp.gui.players"));
 			maxPlayersEdit.setResponder(value -> {
 				try {
 					int parsed = Integer.parseInt(value);
@@ -213,8 +198,8 @@ public class ShareToLanScreenNew extends Screen {
 
 			// Row2
 			// Motd field
-            EditBox motdEdit = new EditBox(ShareToLanScreenNew.this.font, 308, 20,
-                    Component.translatable("mcwifipnp.gui.motd"));
+			EditBox motdEdit = new EditBox(ShareToLanScreenNew.this.font, 308, 20,
+					Component.translatable("mcwifipnp.gui.motd"));
 			motdEdit.setValue(cfg.motd);
 			motdEdit.setHint(Component.literal(cfg.motd));
 			motdEdit.setResponder(value -> {
@@ -436,6 +421,15 @@ public class ShareToLanScreenNew extends Screen {
 				portEdit.setTextColor(-2142128);
 				portEdit.setTooltip(Tooltip.create(errorMessage));
 			}
+		}
+	}
+
+	private void GetPublicIP(MinecraftServer server) {
+		NameAndId hostPlayer = new NameAndId(server.getSingleplayerProfile());
+		if (this.cfg.getPublicIP) {
+			new Thread(() -> {
+				server.getPlayerList().getPlayer(hostPlayer.id()).sendSystemMessage(IpCommand.getBrief(server));
+			}, "MCWiFiPnP").start();
 		}
 	}
 
