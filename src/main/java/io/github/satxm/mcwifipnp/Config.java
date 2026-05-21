@@ -39,7 +39,7 @@ public class Config {
 	public int maxPlayers = 8;
 
 	@SerializedName(value = "gamemode", alternate = { "GameMode" })
-	public GameType gameType = GameType.SURVIVAL;
+	public GameType gameMode = GameType.SURVIVAL;
 
 	public String motd = Component.translatable("lanServer.title").getString();
 
@@ -160,7 +160,7 @@ public class Config {
 		this.port = server.getPort();
 
 		this.allowEveryoneCheat = playerList.isAllowCommandsForAllPlayers();
-		this.gameType = server.getDefaultGameType();
+		this.gameMode = server.getDefaultGameType();
 
 		this.maxPlayers = playerList.getMaxPlayers();
 		this.onlineMode = server.usesAuthentication();
@@ -173,7 +173,7 @@ public class Config {
 
 	public void applyTo(MinecraftServer server) {
 		PlayerList playerList = server.getPlayerList();
-		server.setDefaultGameType(this.gameType);
+		server.setDefaultGameType(this.gameMode);
 		playerList.setAllowCommandsForAllPlayers(this.allowEveryoneCheat);
 
 		server.setUsesAuthentication(this.onlineMode);
