@@ -1,5 +1,7 @@
 package io.github.satxm.mcwifipnp.client;
 
+import org.jspecify.annotations.Nullable;
+
 import io.github.satxm.mcwifipnp.Config;
 import io.github.satxm.mcwifipnp.MCWiFiPnPUnit;
 import io.github.satxm.mcwifipnp.OnlineMode;
@@ -34,9 +36,6 @@ import net.minecraft.server.players.ServerOpListEntry;
 import net.minecraft.server.players.UserWhiteListEntry;
 import net.minecraft.util.HttpUtil;
 import net.minecraft.world.level.GameType;
-import org.jspecify.annotations.Nullable;
-
-import java.util.Arrays;
 
 public class ShareToLanScreenNew extends Screen {
 	private final Config cfg;
@@ -214,7 +213,7 @@ public class ShareToLanScreenNew extends Screen {
 			tabContents.addChild(
 					CycleButton
 							.builder(MinecraftServer.MultiplayerScope::getDisplayName, cfg.multiplayerScope)
-							.withValues(GetScopeValues())
+							.withValues(MinecraftServer.MultiplayerScope.values())
 							.withTooltip(scope -> Tooltip.create(scope.getTooltip()))
 							.create(Component.translatable("menu.multiplayerOptions.network"), (cycleButton, value) -> {
 								cfg.multiplayerScope = value;
@@ -330,18 +329,9 @@ public class ShareToLanScreenNew extends Screen {
 				this.height - this.layout.getFooterHeight() - 2, 0.0F, 0.0F, this.width, 2, 32, 2);
 	}
 
-	private MinecraftServer.MultiplayerScope[] GetScopeValues() {
-		return this.minecraft.getPlayerSocialManager().isFriendListEnabled()
-				? MinecraftServer.MultiplayerScope.values()
-				: (MinecraftServer.MultiplayerScope[]) Arrays.stream(MinecraftServer.MultiplayerScope.values())
-						.filter(scope -> scope != MinecraftServer.MultiplayerScope.ONLINE)
-						.toArray(MinecraftServer.MultiplayerScope[]::new);
-	}
-
 	private void changeMultiplayerScope(final IntegratedServer server) {
 		if (server.unpublishServer()) {
 			this.sendPublishMessage(Component.translatable("menu.multiplayerOptions.publish.stopped"));
-			this.minecraft.getPlayerSocialManager().getPresenceHandler().clearInvites();
 			UPnPModule.stop(server);
 		}
 
