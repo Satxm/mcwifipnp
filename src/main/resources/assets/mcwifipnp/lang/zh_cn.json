@@ -4,7 +4,7 @@
   "mcwifipnp.gui.port.unavailable": "§4端口不可用。",
   "mcwifipnp.gui.players": "最大允许玩家数",
   "mcwifipnp.gui.players.info": "服务器同时能容纳的最大玩家数量。",
-  "mcwifipnp.gui.lanServerOptions": "局域网游戏设置",
+  "mcwifipnp.gui.lanServerOptions": "局域网设置",
   "mcwifipnp.gui.otherOptions": "更多设置",
   "mcwifipnp.gui.backToVanillaScreen": "返回原版局域网设置",
   "mcwifipnp.gui.motd": "服务器信息",

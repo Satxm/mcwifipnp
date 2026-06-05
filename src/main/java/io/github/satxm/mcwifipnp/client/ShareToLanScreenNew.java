@@ -157,7 +157,7 @@ public class ShareToLanScreenNew extends Screen {
 
 	private class DefaultTab1 extends GridLayoutTab {
 		public DefaultTab1() {
-			super(Component.translatable("menu.multiplayerOptions.network.header"));
+			super(Component.translatable("mcwifipnp.gui.lanServerOptions"));
 			GridLayout.RowHelper tabContents = this.layout.columnSpacing(8).rowSpacing(4).createRowHelper(4);
 
 			// Row 1
