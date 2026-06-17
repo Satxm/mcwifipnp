@@ -182,7 +182,7 @@ public class ShareToLanScreenNew extends Screen {
 			tabContents.addChild(portRow, 2);
 
 			// // Number of players field
-			EditBox maxPlayersEdit = new EditBox(ShareToLanScreenNew.this.font,150,20,
+			EditBox maxPlayersEdit = new EditBox(ShareToLanScreenNew.this.font, 150, 20,
 					Component.translatable("mcwifipnp.gui.players"));
 			maxPlayersEdit.setResponder(value -> {
 				try {
@@ -254,15 +254,14 @@ public class ShareToLanScreenNew extends Screen {
 						cfg.enablePvP = PvP;
 					}), 2);
 
-			// Allow Cheat button (for other joined players)
-			if (!ShareToLanScreenNew.this.serverPublished) {
-				tabContents.addChild(CycleButton.onOffBuilder(cfg.allowHostCheat)
-						.create(Component.translatable("selectWorld.allowCommands"), (cycleButton, allowHostCheat) -> {
-							cfg.allowHostCheat = allowHostCheat;
-						}), 2);
-			}
+			// Row 2
+			// Allow Host Cheat button
+			tabContents.addChild(CycleButton.onOffBuilder(cfg.allowHostCheat)
+					.create(Component.translatable("selectWorld.allowCommands"), (cycleButton, allowHostCheat) -> {
+						cfg.allowHostCheat = allowHostCheat;
+					}), 2);
 
-					// Allow Cheat button (for other joined players)
+			// Allow Cheat button (for other joined players)
 			tabContents.addChild(CycleButton.onOffBuilder(cfg.allowEveryoneCheat)
 					.withTooltip((state) -> Tooltip.create(Component.translatable("mcwifipnp.gui.AllPlayersCheats.info")))
 					.create(Component.translatable("mcwifipnp.gui.AllPlayersCheats"), (cycleButton, allowEveryoneCheat) -> {
