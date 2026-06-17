@@ -24,10 +24,15 @@ public abstract class MixinPauseScreen extends Screen {
 	@Inject(method = "createPauseMenu", at = @At("TAIL"), locals = LocalCapture.CAPTURE_FAILHARD)
 	protected void addOrReplaceButton(CallbackInfo ci, GridLayout gridLayout, GridLayout.RowHelper dummy) {
 
+		Component MODIFY_LAN_OPTIONS = this.minecraft.hasSingleplayerServer()
+				&& this.minecraft.getSingleplayerServer().isPublished()
+						? Component.translatable("mcwifipnp.gui.lanServerOptions")
+						: Component.translatable("menu.multiplayerOptions.button");
+
 		// Replace the vanilla "Multiplayer" button.
 		Button oldButton = GuiUtils.findWidget(this.children(), Button.class, "menu.multiplayerOptions.button");
 		if (oldButton != null) {
-			Button newButton = Button.builder(Component.translatable("menu.multiplayerOptions.button"), btn -> {
+			Button newButton = Button.builder(MODIFY_LAN_OPTIONS, btn -> {
 				this.minecraft.gui.setScreen(new ShareToLanScreenNew(this));
 			}).bounds(oldButton.getX(), oldButton.getY(), oldButton.getWidth(), oldButton.getHeight()).build();
 			this.children().remove(oldButton);

@@ -260,12 +260,11 @@ public class ShareToLanScreenNew extends Screen {
 					}), 2);
 
 			// Row 2
-			if (!ShareToLanScreenNew.this.serverPublished) {
-				tabContents.addChild(CycleButton.onOffBuilder(cfg.allowHostCheat)
-						.create(Component.translatable("selectWorld.allowCommands"), (cycleButton, allowHostCheat) -> {
-							cfg.allowHostCheat = allowHostCheat;
-						}), 2);
-			}
+			// Allow Host Cheat button
+			tabContents.addChild(CycleButton.onOffBuilder(cfg.allowHostCheat)
+					.create(Component.translatable("selectWorld.allowCommands"), (cycleButton, allowHostCheat) -> {
+						cfg.allowHostCheat = allowHostCheat;
+					}), 2);
 
 			// Allow Cheat button (for other joined players)
 			tabContents.addChild(CycleButton.onOffBuilder(cfg.allowEveryoneCheat)
