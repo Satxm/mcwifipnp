@@ -35,7 +35,7 @@ public abstract class MixinPauseScreen extends Screen {
 			Button newButton = Button.builder(MODIFY_LAN_OPTIONS, btn -> {
 				this.minecraft.gui.setScreen(new ShareToLanScreenNew(this));
 			}).bounds(oldButton.getX(), oldButton.getY(), oldButton.getWidth(), oldButton.getHeight()).build();
-			this.children().remove(oldButton);
+			this.removeWidget(oldButton);
 			this.addRenderableWidget(newButton);
 		}
 	}
