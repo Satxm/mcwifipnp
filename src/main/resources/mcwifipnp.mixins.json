@@ -3,7 +3,6 @@
   "minVersion": "0.8",
   "package": "io.github.satxm.mcwifipnp.mixin",
   "compatibilityLevel": "JAVA_25",
-  "refmap": "mcwifipnp-refmap.json",
   "client": [
     "MixinIntegratedServer",
     "MixinPauseScreen"
@@ -14,5 +13,6 @@
   ],
   "injectors": {
     "defaultRequire": 1
-  }
+  },
+  "priority": 99999
 }
