@@ -13,7 +13,6 @@ import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.SpriteIconButton;
 import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.gui.layouts.GridLayout;
-import net.minecraft.client.gui.layouts.LayoutElement;
 import net.minecraft.client.gui.screens.PauseScreen;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.server.IntegratedServer;
@@ -68,7 +67,7 @@ public abstract class MixinPauseScreen extends Screen {
 				this.minecraft.setScreen(new ShareToLanScreenNew(this,
 						(this.minecraft.hasSingleplayerServer() && this.minecraft.getSingleplayerServer().isPublished())));
 			}).bounds(oldButton.getX(), oldButton.getY(), oldButton.getWidth(), oldButton.getHeight()).build();
-			this.children().remove(oldButton);
+			this.removeWidget(oldButton);
 			this.addRenderableWidget(newButton);
 		}
 	}
