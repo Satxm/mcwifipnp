@@ -7,6 +7,7 @@
   "mcwifipnp.gui.lanServerOptions": "局域网设置",
   "mcwifipnp.gui.otherOptions": "更多设置",
   "mcwifipnp.gui.backToVanillaScreen": "返回原版局域网设置",
+  "mcwifipnp.gui.applyforallworld": "应用到所有世界",
   "mcwifipnp.gui.motd": "服务器信息",
   "mcwifipnp.gui.motd.info": "玩家客户端的多人游戏服务器列表中显示于名称下方的服务器信息。",
   "mcwifipnp.gui.AllPlayersCheats": "其他玩家作弊",
