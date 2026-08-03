@@ -46,7 +46,7 @@ public class Config {
 	public String motd = Component.translatable("lanServer.title").getString();
 
 	@SerializedName(value = "allow-everyone-cheat", alternate = { "AllPlayersCheats" })
-	public boolean allowEveryoneCheat = false;
+	public boolean allowGuestCheat = false;
 
 	@SerializedName(value = "enforce-whitelist", alternate = { "Whitelist" })
 	public boolean enforceWhitelist = false;
@@ -198,7 +198,7 @@ public class Config {
 
 		this.port = server.getPort();
 
-		this.allowEveryoneCheat = singleplayerServer.getGuestCommandAccess();
+		this.allowGuestCheat = singleplayerServer.getGuestCommandAccess();
 		this.gameMode = server.getDefaultGameType();
 
 		this.maxPlayers = playerList.getMaxPlayers();
@@ -213,7 +213,9 @@ public class Config {
 	public void applyTo(MinecraftServer server) {
 		IntegratedServer singleplayerServer = Minecraft.getInstance().getSingleplayerServer();
 		server.setDefaultGameType(this.gameMode);
-		singleplayerServer.setGuestCommandAccess(this.allowEveryoneCheat);
+		// singleplayerServer.setWorldGameType(this.gameMode);
+		// singleplayerServer.setWorldAllowCommands(this.allowHostCheat);
+		singleplayerServer.setGuestCommandAccess(this.allowGuestCheat);
 
 		server.setUsesAuthentication(this.onlineMode);
 		server.getGameRules().set(GameRules.PVP, this.enablePvP, server);

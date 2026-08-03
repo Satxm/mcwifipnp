@@ -13,6 +13,7 @@ import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.AbstractSelectionList;
+import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.CycleButton;
 import net.minecraft.client.gui.components.EditBox;
@@ -21,8 +22,6 @@ import net.minecraft.client.gui.components.PopupScreen;
 import net.minecraft.client.gui.components.ScrollableLayout;
 import net.minecraft.client.gui.components.StringWidget;
 import net.minecraft.client.gui.components.Tooltip;
-import net.minecraft.client.gui.components.tabs.TabNavigationBar;
-import net.minecraft.client.gui.layouts.CommonLayouts;
 import net.minecraft.client.gui.layouts.EqualSpacingLayout;
 import net.minecraft.client.gui.layouts.GridLayout;
 import net.minecraft.client.gui.layouts.HeaderAndFooterLayout;
@@ -31,6 +30,8 @@ import net.minecraft.client.gui.layouts.LinearLayout;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.WorldOptionsScreen;
 import net.minecraft.client.gui.screens.multiplayer.RestrictionsScreen;
+import net.minecraft.client.gui.screens.options.HasDifficultyReaction;
+import net.minecraft.client.gui.screens.options.HasGamemasterPermissionReaction;
 import net.minecraft.client.gui.screens.options.InWorldGameRulesScreen;
 import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.client.server.IntegratedServer;
@@ -52,99 +53,103 @@ import net.minecraft.world.Difficulty;
 import net.minecraft.world.level.GameType;
 import net.minecraft.world.level.Level;
 
-public class WorldOptionsScreenNew extends Screen {
+public class WorldOptionsScreenNew extends Screen implements HasGamemasterPermissionReaction, HasDifficultyReaction {
 	private final Config cfg;
 	private final Screen lastScreen;
 	private final Level level;
 	private final boolean serverPublished;
 
-	@Nullable
-	private TabNavigationBar tabNavigationBar;
-
 	public final HeaderAndFooterLayout layout = new HeaderAndFooterLayout(this);
 	private @Nullable ScrollableLayout scrollArea;
+	private @Nullable CycleButton<Boolean> guestCommandAccessButton;
+	private @Nullable Button applyChanges;
+	private @Nullable Button gameRulesButton;
+	private @Nullable CycleButton<GameType> gameModeButton;
+	private @Nullable CycleButton<Boolean> pvpButton;
 
-	protected Button applyChanges;
-
-	private EditBox portEdit;
-	private StringWidget portLabel;
-
-	private final boolean oldUPnPEnabled;
-	private final boolean oldCopyIP;
-	private final String oldMotd;
-	private final int oldPort;
-	private final MinecraftServer.MultiplayerScope oldScope;
+	private @Nullable EditBox portEdit;
+	private @Nullable EditBox motdEdit;
+	private @Nullable EditBox maxPlayersEdit;
+	private @Nullable StringWidget portLabel;
+	private @Nullable StringWidget motdLabel;
+	private @Nullable StringWidget maxPlayersLabel;
 	private DifficultyButtons difficultyButtons;
-	public Difficulty wantedDifficulty;
-	public Difficulty initialDifficulty;
-	public boolean wantedDifficultyLocked;
-	public boolean initialDifficultyLocked;
+
+	private final boolean initialUseUPnP;
+	private final boolean initialGetPublicIP;
+	private final String initialMotd;
+	private final int initialPort;
+	private final MinecraftServer.MultiplayerScope initialMultiplayerScope;
+	private Difficulty wantedDifficulty;
+	private Difficulty initialDifficulty;
+	private boolean wantedDifficultyLocked;
+	private boolean initialDifficultyLocked;
 
 	public WorldOptionsScreenNew(final Screen lastScreen, final Level level) {
 		super(Component.translatable("lanServer.title"));
 		this.lastScreen = lastScreen;
 		this.level = level;
 		this.difficultyButtons = DifficultyButtons.create(this.minecraft, level, this);
-		IntegratedServer server = Minecraft.getInstance().getSingleplayerServer();
+		IntegratedServer singleplayerServer = Minecraft.getInstance().getSingleplayerServer();
 
 		this.serverPublished = this.minecraft.hasSingleplayerServer()
-				&& this.minecraft.getSingleplayerServer().isPublished();
+				&& singleplayerServer.isPublished();
 
-		this.cfg = Config.read(server);
+		cfg = Config.read(singleplayerServer);
 
-		if (serverPublished && server.getMultiplayerScope() == MinecraftServer.MultiplayerScope.LAN) {
-			this.cfg.readFromRunningServer(server);
-		} else if (this.cfg.usingDefaults) {
-			this.cfg.readFromRunningServer(server);
-			this.cfg.port = HttpUtil.getAvailablePort();
-			this.cfg.allowHostCheat = server.getWorldData().isAllowCommands();
-			this.cfg.multiplayerScope = server.getMultiplayerScope();
+		if (serverPublished && singleplayerServer.getMultiplayerScope() == MinecraftServer.MultiplayerScope.LAN) {
+			cfg.readFromRunningServer(singleplayerServer);
+		} else if (cfg.usingDefaults) {
+			cfg.readFromRunningServer(singleplayerServer);
+			cfg.port = HttpUtil.getAvailablePort();
+			cfg.allowHostCheat = singleplayerServer.getWorldData().isAllowCommands();
+			cfg.multiplayerScope = singleplayerServer.getMultiplayerScope();
 		}
 
-		this.oldPort = cfg.port;
-		this.oldMotd = cfg.motd;
-		this.oldUPnPEnabled = cfg.useUPnP;
-		this.oldCopyIP = cfg.getPublicIP;
-		this.oldScope = server.getMultiplayerScope();
+		this.initialPort = cfg.port;
+		this.initialMotd = cfg.motd;
+		this.initialUseUPnP = cfg.useUPnP;
+		this.initialGetPublicIP = cfg.getPublicIP;
+		this.initialMultiplayerScope = singleplayerServer.getMultiplayerScope();
 	}
 
 	protected void onConfirmClicked() {
-		IntegratedServer server = Minecraft.getInstance().getSingleplayerServer();
-		PlayerList playerList = server.getPlayerList();
-		NameAndId hostPlayer = new NameAndId(server.getSingleplayerProfile());
+		IntegratedServer singleplayerServer = Minecraft.getInstance().getSingleplayerServer();
+		PlayerList playerList = singleplayerServer.getPlayerList();
+		NameAndId hostPlayer = new NameAndId(singleplayerServer.getSingleplayerProfile());
 		updateDifficulty();
-		this.cfg.save(server);
+		cfg.save(singleplayerServer);
 
-		if (cfg.multiplayerScope != oldScope || cfg.port != oldPort) {
-			this.changeMultiplayerScope(server);
+		if (cfg.multiplayerScope != initialMultiplayerScope || cfg.port != initialPort) {
+			this.changeMultiplayerScope(singleplayerServer);
 			if (cfg.multiplayerScope == MinecraftServer.MultiplayerScope.LAN) {
-				UPnPModule.startIfEnabled(server, cfg);
-				GetPublicIP(server);
+				UPnPModule.startIfEnabled(singleplayerServer, cfg);
+				GetPublicIP(singleplayerServer);
 			}
 		}
 
 		if (this.serverPublished) {
-			if (!this.oldMotd.equals(this.cfg.motd) || this.cfg.useUPnP ^ oldUPnPEnabled) {
+			if (!this.initialMotd.equals(cfg.motd) || cfg.useUPnP ^ initialUseUPnP) {
 				// Motd has changed, update UPnP display name
-				UPnPModule.stop(server);
-				UPnPModule.startIfEnabled(server, cfg);
+				UPnPModule.stop(singleplayerServer);
+				UPnPModule.startIfEnabled(singleplayerServer, cfg);
 			}
-			if (this.cfg.getPublicIP ^ oldCopyIP) {
-				GetPublicIP(server);
+			if (cfg.getPublicIP ^ initialGetPublicIP) {
+				GetPublicIP(singleplayerServer);
 			}
 		}
-		this.cfg.applyTo(server);
+		cfg.applyTo(singleplayerServer);
 
-		if (!this.cfg.allowEveryoneCheat) {
+		if (!cfg.allowGuestCheat) {
 			playerList.getOps().clear();
 		}
-		if (this.cfg.allowHostCheat) {
+		if (cfg.allowHostCheat) {
 			playerList.getOps().add(new ServerOpListEntry(hostPlayer, LevelBasedPermissionSet.OWNER,
 					playerList.canBypassPlayerLimit(hostPlayer)));
 		} else {
 			playerList.getOps().remove(hostPlayer);
 		}
-		for (ServerPlayer serverPlayer : server.getPlayerList().getPlayers()) {
+		for (ServerPlayer serverPlayer : singleplayerServer.getPlayerList().getPlayers()) {
 			playerList.sendPlayerPermissionLevel(serverPlayer);
 		}
 
@@ -173,7 +178,6 @@ public class WorldOptionsScreenNew extends Screen {
 			this.multiplayerOptions(content);
 		}
 
-		// Add footer widgets
 		LinearLayout footer = this.layout.addToFooter(LinearLayout.horizontal().spacing(8));
 		this.applyChanges = Button
 				.builder(Component.translatable("menu.multiplayerOptions.applyChanges"), button -> this.onConfirmClicked())
@@ -190,64 +194,68 @@ public class WorldOptionsScreenNew extends Screen {
 		GridLayout.RowHelper rowHelper = grid.columnSpacing(8).rowSpacing(4).createRowHelper(2);
 		rowHelper.defaultCellSetting().alignHorizontallyCenter();
 
-		rowHelper.addChild(new StringWidget(Component.translatable("options.worldOptions.general.title"), this.font), 2);
+		rowHelper.addChild(new StringWidget(Component.translatable("options.worldOptions.general.title")
+				.withStyle(ChatFormatting.UNDERLINE, ChatFormatting.BOLD), this.font), 2);
 
 		Minecraft minecraft = Minecraft.getInstance();
 		IntegratedServer singleplayerServer = Minecraft.getInstance().getSingleplayerServer();
 
-		Button gameRulesButton = Button.builder(Component.translatable("editGamerule.inGame.button"), var1 -> {
+		gameRulesButton = Button.builder(Component.translatable("editGamerule.inGame.button"), var1 -> {
 			if (minecraft.player != null) {
 				minecraft.gui.setScreen(new InWorldGameRulesScreen(minecraft.player.connection,
 						var1x -> minecraft.gui.setScreen(lastScreen), this));
 			}
 		}).build();
+		this.updateButton(gameRulesButton, singleplayerServer,
+				Tooltip.create(Component.translatable("editGamerule.inGame.disabled.hardcore.tooltip")),
+				Tooltip.create(Component.translatable("editGamerule.inGame.disabled.tooltip")));
 		rowHelper.addChild(gameRulesButton);
-		boolean hardcore = singleplayerServer != null && singleplayerServer.isHardcore();
-		boolean hasGameMasterPermission = minecraft.player != null
-				&& minecraft.player.permissions().hasPermission(Permissions.COMMANDS_GAMEMASTER);
-		gameRulesButton.active = !hardcore && hasGameMasterPermission;
-		gameRulesButton
-				.setTooltip(hardcore ? Tooltip.create(Component.translatable("editGamerule.inGame.disabled.hardcore.tooltip"))
-						: (hasGameMasterPermission ? null
-								: Tooltip.create(Component.translatable("editGamerule.inGame.disabled.tooltip"))));
 
 		rowHelper.addChild(this.difficultyButtons.layout());
-		// Row 1
+
 		// GameMode toggle button
-		rowHelper.addChild(CycleButton.builder(GameType::getShortDisplayName, cfg.gameMode)
+		this.gameModeButton = rowHelper.addChild(CycleButton.builder(GameType::getShortDisplayName, cfg.gameMode)
 				.withValues(GameType.values())
 				.create(Component.translatable("selectWorld.gameMode"), (cycleButton, gameMode) -> {
 					cfg.gameMode = gameMode;
 				}));
+		this.updateButton(gameModeButton, singleplayerServer,
+				Tooltip.create(Component.translatable("options.worldOptions.game_mode.disabled.tooltip")),
+				Tooltip.create(Component.translatable("options.worldOptions.game_mode.disabled.operator.tooltip")));
 
-		// Row 2
 		// Allow Host Cheat button
 		rowHelper.addChild(CycleButton.onOffBuilder(cfg.allowHostCheat)
 				.create(Component.translatable("selectWorld.allowCommands"), (cycleButton, allowHostCheat) -> {
 					cfg.allowHostCheat = allowHostCheat;
+					this.updatePermissionButtonActiveState(singleplayerServer);
 				}));
 
-		rowHelper.addChild(CycleButton.onOffBuilder(cfg.enablePvP)
+		// Enable PvP button
+		this.pvpButton = rowHelper.addChild(CycleButton.onOffBuilder(cfg.enablePvP)
 				.withTooltip((state) -> Tooltip.create(Component.translatable("mcwifipnp.gui.PvP.info")))
 				.create(Component.translatable("mcwifipnp.gui.PvP"), (cycleButton, PvP) -> {
 					cfg.enablePvP = PvP;
 				}));
+		this.updateButton(this.pvpButton, singleplayerServer, null, null);
 
+		// Restrictions button
 		rowHelper.addChild(Button.builder(Component.translatable("restrictions_screen.button"), button -> {
 			if (this.minecraft.player != null) {
 				this.minecraft.gui.setScreen(new RestrictionsScreen(this, this.minecraft.player.chatAbilities()));
 			}
 		}).build());
 
+		// Apply for All World button
 		rowHelper.addChild(CycleButton.onOffBuilder(cfg.applyforallworld)
 				.create(Component.translatable("mcwifipnp.gui.applyforallworld"), (cycleButton, applyforallworld) -> {
 					cfg.applyforallworld = applyforallworld;
 				}));
 
+		// Back to Vanilla Screen button
 		rowHelper
 				.addChild(Button.builder(Component.translatable("mcwifipnp.gui.backToVanillaScreen"), button -> {
-					WorldOptionsScreenNew.this.minecraft.gui
-							.setScreen(new WorldOptionsScreen(WorldOptionsScreenNew.this.lastScreen, minecraft.level));
+					this.minecraft.gui
+							.setScreen(new WorldOptionsScreen(this.lastScreen, minecraft.level));
 				}).build());
 
 	}
@@ -257,42 +265,46 @@ public class WorldOptionsScreenNew extends Screen {
 		GridLayout.RowHelper rowHelper = grid.columnSpacing(8).rowSpacing(4).createRowHelper(2);
 		rowHelper.defaultCellSetting().alignHorizontallyCenter();
 
-		rowHelper.addChild(new StringWidget(Component.translatable("options.worldOptions.multiplayer.title"), this.font),
+		IntegratedServer singleplayerServer = Minecraft.getInstance().getSingleplayerServer();
+
+		rowHelper.addChild(
+				new StringWidget(Component.translatable("options.worldOptions.multiplayer.title")
+						.withStyle(ChatFormatting.UNDERLINE, ChatFormatting.BOLD), this.font),
 				2);
 
-		// Row3
-		// Allow Cheat button (for other joined players)
+		// Multiplayer Scope button
 		rowHelper.addChild(CycleButton.builder(MinecraftServer.MultiplayerScope::getDisplayName, cfg.multiplayerScope)
 				.withValues(MinecraftServer.MultiplayerScope.values()).withTooltip(scope -> Tooltip.create(scope.getTooltip()))
 				.create(Component.translatable("menu.multiplayerOptions.network"), (cycleButton, value) -> {
 					cfg.multiplayerScope = value;
-					WorldOptionsScreenNew.this.updatePortControlsState();
+					this.updatePermissionButtonActiveState(singleplayerServer);
+					this.updateEditBoxState();
 				}));
 
-		rowHelper.addChild(CycleButton.onOffBuilder(cfg.allowEveryoneCheat)
+		// Guest Command Access button
+		this.guestCommandAccessButton = rowHelper.addChild(CycleButton.onOffBuilder(cfg.allowGuestCheat)
 				.withTooltip(
 						(state) -> Tooltip.create(Component.translatable("options.worldOptions.guest.command_access.tooltip")))
 				.create(Component.translatable("options.worldOptions.guest.command_access"),
-						(cycleButton, allowEveryoneCheat) -> {
-							cfg.allowEveryoneCheat = allowEveryoneCheat;
+						(cycleButton, allowGuestCheat) -> {
+							cfg.allowGuestCheat = allowGuestCheat;
 						}));
+		this.updatePermissionButtonActiveState(singleplayerServer);
 
-		// Row 1
 		// Port field
-		portEdit = new EditBox(WorldOptionsScreenNew.this.font, Component.translatable("lanServer.port"));
+		portEdit = new EditBox(this.font, Component.translatable("lanServer.port"));
 		portEdit.setResponder(value -> {
-			WorldOptionsScreenNew.this.setPortError(WorldOptionsScreenNew.this.tryParsePort(value));
+			this.setPortError(this.tryParsePort(value));
 			portEdit.setHint(Component.literal(String.valueOf(cfg.port)));
 		});
 		LinearLayout portRow = LinearLayout.vertical().spacing(4);
 		portLabel = portRow
-				.addChild(new StringWidget(Component.translatable("lanServer.port"), WorldOptionsScreenNew.this.font));
+				.addChild(new StringWidget(Component.translatable("lanServer.port"), this.font));
 		portRow.addChild(portEdit);
-		WorldOptionsScreenNew.this.updatePortControlsState();
 		rowHelper.addChild(portRow);
 
-		// // Number of players field
-		EditBox maxPlayersEdit = new EditBox(WorldOptionsScreenNew.this.font,
+		// Number of players field
+		maxPlayersEdit = new EditBox(this.font,
 				Component.translatable("mcwifipnp.gui.players"));
 		maxPlayersEdit.setResponder(value -> {
 			try {
@@ -307,31 +319,36 @@ public class WorldOptionsScreenNew extends Screen {
 		maxPlayersEdit.setValue(String.valueOf(cfg.maxPlayers));
 		maxPlayersEdit.setTooltip(Tooltip.create(Component.translatable("mcwifipnp.gui.players.info")));
 		LinearLayout maxPlayersRow = LinearLayout.vertical().spacing(4);
-		maxPlayersRow
-				.addChild(new StringWidget(Component.translatable("mcwifipnp.gui.players"), WorldOptionsScreenNew.this.font));
+		maxPlayersLabel = maxPlayersRow
+				.addChild(new StringWidget(Component.translatable("mcwifipnp.gui.players"), this.font));
 		maxPlayersRow.addChild(maxPlayersEdit);
 		rowHelper.addChild(maxPlayersRow);
 
-		// Row2
 		// Motd field
-		EditBox motdEdit = new EditBox(WorldOptionsScreenNew.this.font, 308, 20,
+		motdEdit = new EditBox(this.font, 308, 20,
 				Component.translatable("mcwifipnp.gui.motd"));
 		motdEdit.setValue(cfg.motd);
 		motdEdit.setHint(Component.literal(cfg.motd));
 		motdEdit.setResponder(value -> {
-			cfg.motd = value;
+			if (!value.isBlank()) {
+				cfg.motd = value;
+			}
 		});
 		motdEdit.setTooltip(Tooltip.create(Component.translatable("mcwifipnp.gui.motd.info")));
-		rowHelper.addChild(CommonLayouts.labeledElement(WorldOptionsScreenNew.this.font, motdEdit,
-				Component.translatable("mcwifipnp.gui.motd")), 2);
+		LinearLayout motdRow = LinearLayout.vertical().spacing(4);
+		motdLabel = motdRow.addChild(new StringWidget(Component.translatable("mcwifipnp.gui.motd"), this.font));
+		motdRow.addChild(motdEdit);
+		rowHelper.addChild(motdRow, 2);
+		this.updateEditBoxState();
 
+		// Enforce Whitelist button
 		rowHelper.addChild(CycleButton.onOffBuilder(cfg.enforceWhitelist)
 				.withTooltip((state) -> Tooltip.create(Component.translatable("mcwifipnp.gui.Whitelist.info")))
 				.create(Component.translatable("mcwifipnp.gui.Whitelist"), (cycleButton, enforceWhitelist) -> {
 					cfg.enforceWhitelist = enforceWhitelist;
 				}));
 
-		// Row 4
+		// Online Mode button
 		rowHelper
 				.addChild(CycleButton.builder(OnlineMode::getDisplayName, OnlineMode.of(cfg.onlineMode, cfg.enableUUIDFixer))
 						.withValues(OnlineMode.values()).withTooltip((OnlineMode) -> Tooltip.create(OnlineMode.gettoolTip()))
@@ -340,13 +357,14 @@ public class WorldOptionsScreenNew extends Screen {
 							cfg.enableUUIDFixer = onlineMode.fixUUID;
 						}));
 
-		// Row 1
+		// Use UPnP button
 		rowHelper.addChild(CycleButton.onOffBuilder(cfg.useUPnP)
 				.withTooltip((state) -> Tooltip.create(Component.translatable("mcwifipnp.gui.UseUPnP.info")))
 				.create(Component.translatable("mcwifipnp.gui.UseUPnP"), (cycleButton, useUPnP) -> {
 					cfg.useUPnP = useUPnP;
 				}));
 
+		// Get Public IP button
 		rowHelper.addChild(CycleButton.onOffBuilder(cfg.getPublicIP)
 				.withTooltip((state) -> Tooltip.create(Component.translatable("mcwifipnp.gui.CopyIP.info")))
 				.create(Component.translatable("mcwifipnp.gui.CopyIP"), (cycleButton, getPublicIP) -> {
@@ -357,6 +375,8 @@ public class WorldOptionsScreenNew extends Screen {
 
 	@Override
 	protected void repositionElements() {
+		this.scrollArea.arrangeElements();
+		this.scrollArea.setMaxHeight(this.layout.getContentHeight());
 		this.layout.arrangeElements();
 	}
 
@@ -400,6 +420,42 @@ public class WorldOptionsScreenNew extends Screen {
 		this.minecraft.gui.setScreen(this.lastScreen);
 	}
 
+	@Override
+	public void onGamemasterPermissionChanged(final boolean hasGamemasterPermission) {
+		IntegratedServer singleplayerServer = this.minecraft.getSingleplayerServer();
+		this.updateButton(this.gameRulesButton, singleplayerServer,
+				Tooltip.create(Component.translatable("editGamerule.inGame.disabled.hardcore.tooltip")),
+				Tooltip.create(Component.translatable("editGamerule.inGame.disabled.hardcore.tooltip")));
+		this.updateButton(this.gameModeButton, singleplayerServer,
+				Tooltip.create(Component.translatable("options.worldOptions.game_mode.disabled.tooltip")),
+				Tooltip.create(Component.translatable("options.worldOptions.game_mode.disabled.operator.tooltip")));
+		this.updateButton(this.pvpButton, singleplayerServer, null, null);
+		this.difficultyButtons.refresh(this.minecraft);
+		if (!hasGamemasterPermission && !this.minecraft.hasSingleplayerServer()) {
+			this.minecraft.gui.setScreen(this.lastScreen);
+			if (this.minecraft.gui.screen() instanceof HasGamemasterPermissionReaction screen) {
+				screen.onGamemasterPermissionChanged(hasGamemasterPermission);
+			}
+		}
+	}
+
+	private void updateButton(
+			final @Nullable AbstractWidget widget, final @Nullable IntegratedServer singleplayerServer,
+			final Tooltip hardcoreTooltip, final Tooltip disabledTooltip) {
+		if (widget != null) {
+			boolean hardcore = singleplayerServer != null && singleplayerServer.isHardcore();
+			boolean hasGameMasterPermission = this.minecraft.player != null
+					&& this.minecraft.player.permissions().hasPermission(Permissions.COMMANDS_GAMEMASTER);
+			widget.active = !hardcore && hasGameMasterPermission;
+			widget.setTooltip(hardcore ? hardcoreTooltip : (hasGameMasterPermission ? null : disabledTooltip));
+		}
+	}
+
+	@Override
+	public void onDifficultyChanged() {
+		this.difficultyButtons.refresh(this.minecraft);
+	}
+
 	private void changeMultiplayerScope(final IntegratedServer server) {
 		if (server.unpublishServer()) {
 			this.sendPublishMessage(Component.translatable("menu.multiplayerOptions.publish.stopped"));
@@ -414,7 +470,7 @@ public class WorldOptionsScreenNew extends Screen {
 	}
 
 	private void publish(final IntegratedServer server, final MinecraftServer.MultiplayerScope scope) {
-		boolean published = server.publishServer(scope, cfg.allowEveryoneCheat, cfg.port);
+		boolean published = server.publishServer(scope, cfg.allowGuestCheat, cfg.port);
 		if (!published) {
 			this.sendPublishMessage(Component.translatable("commands.publish.failed"));
 		} else {
@@ -432,7 +488,7 @@ public class WorldOptionsScreenNew extends Screen {
 		this.minecraft.updateTitle();
 	}
 
-	private void updatePortControlsState() {
+	private void updateEditBoxState() {
 		boolean lanWanted = cfg.multiplayerScope == MinecraftServer.MultiplayerScope.LAN;
 		if (this.portEdit != null) {
 			this.portEdit.setValue(lanWanted ? String.valueOf(cfg.port) : "");
@@ -445,10 +501,34 @@ public class WorldOptionsScreenNew extends Screen {
 			}
 			portEdit.setTooltip(Tooltip.create(Component.translatable("mcwifipnp.gui.port.info")));
 		}
+		if (this.motdEdit != null) {
+			this.motdEdit.setValue(lanWanted ? String.valueOf(cfg.motd) : "");
+			this.motdEdit.setEditable(lanWanted);
+			this.motdEdit.active = lanWanted;
+			this.motdEdit.setHint(lanWanted ? Component.literal(String.valueOf(cfg.motd)) : Component.empty());
+			if (!lanWanted) {
+				this.motdEdit.setFocused(false);
+			}
+			motdEdit.setTooltip(Tooltip.create(Component.translatable("mcwifipnp.gui.motd.info")));
+		}
+		if (this.maxPlayersEdit != null) {
+			this.maxPlayersEdit.setValue(lanWanted ? String.valueOf(cfg.maxPlayers) : "");
+			this.maxPlayersEdit.setEditable(lanWanted);
+			this.maxPlayersEdit.active = lanWanted;
+			this.maxPlayersEdit.setHint(lanWanted ? Component.literal(String.valueOf(cfg.maxPlayers)) : Component.empty());
+			if (!lanWanted) {
+				this.maxPlayersEdit.setFocused(false);
+			}
+			maxPlayersEdit.setTooltip(Tooltip.create(Component.translatable("mcwifipnp.gui.players.info")));
+		}
 
 		if (this.portLabel != null) {
 			this.portLabel.setMessage(lanWanted ? Component.translatable("lanServer.port")
 					: Component.translatable("lanServer.port").copy().withStyle(ChatFormatting.GRAY));
+			this.maxPlayersLabel.setMessage(lanWanted ? Component.translatable("mcwifipnp.gui.players")
+					: Component.translatable("mcwifipnp.gui.players").copy().withStyle(ChatFormatting.GRAY));
+			this.motdLabel.setMessage(lanWanted ? Component.translatable("mcwifipnp.gui.motd")
+					: Component.translatable("mcwifipnp.gui.motd").copy().withStyle(ChatFormatting.GRAY));
 		}
 	}
 
@@ -461,7 +541,7 @@ public class WorldOptionsScreenNew extends Screen {
 				int parsed = Integer.parseInt(value);
 				if (parsed < 1024 || parsed > 65535) {
 					return Component.translatable("lanServer.port.invalid", 1024, 65535);
-				} else if (parsed != this.oldPort && !HttpUtil.isPortAvailable(parsed)) {
+				} else if (parsed != this.initialPort && !HttpUtil.isPortAvailable(parsed)) {
 					return Component.translatable("lanServer.port.unavailable", 1024, 65535);
 				} else {
 					cfg.port = parsed;
@@ -485,9 +565,33 @@ public class WorldOptionsScreenNew extends Screen {
 		}
 	}
 
+	private void updatePermissionButtonActiveState(final IntegratedServer singleplayerServer) {
+		if (this.guestCommandAccessButton != null) {
+			boolean lanScope = cfg.multiplayerScope == MinecraftServer.MultiplayerScope.LAN;
+			boolean allowCommands = Boolean.TRUE.equals(cfg.allowHostCheat);
+			Tooltip tooltip;
+			if (!lanScope) {
+				cfg.allowGuestCheat = false;
+				tooltip = Tooltip
+						.create(Component.translatable("options.worldOptions.guest.command_access.disabled.scope.tooltip"));
+			} else if (!allowCommands) {
+				cfg.allowGuestCheat = false;
+				tooltip = Tooltip
+						.create(Component.translatable("options.worldOptions.guest.command_access.disabled.commands.tooltip"));
+			} else {
+				cfg.allowGuestCheat = singleplayerServer.getGuestCommandAccess();
+				tooltip = Tooltip.create(Component.translatable("options.worldOptions.guest.command_access.tooltip"));
+			}
+
+			this.guestCommandAccessButton.setValue(cfg.allowGuestCheat);
+			this.guestCommandAccessButton.setTooltip(tooltip);
+			this.guestCommandAccessButton.active = lanScope && allowCommands;
+		}
+	}
+
 	private void GetPublicIP(MinecraftServer server) {
 		NameAndId hostPlayer = new NameAndId(server.getSingleplayerProfile());
-		if (this.cfg.getPublicIP) {
+		if (cfg.getPublicIP) {
 			new Thread(() -> {
 				server.getPlayerList().getPlayer(hostPlayer.id()).sendSystemMessage(IpCommand.getBrief(server));
 			}, "MCWiFiPnP").start();
@@ -551,6 +655,12 @@ public class WorldOptionsScreenNew extends Screen {
 			return new DifficultyButtons(linearLayout, difficultyButton, lockButton, level);
 		}
 
+		public void refresh(final Minecraft minecraft) {
+			this.difficultyButton.setValue(this.level.getDifficulty());
+			this.lockButton.setLocked(isDifficultyLocked(this.level));
+			updateDifficultyButtonsState(minecraft, this.level, this.difficultyButton, this.lockButton);
+		}
+
 		private static void updateDifficultyButtonsState(
 				final Minecraft minecraft, final Level level, final CycleButton<Difficulty> difficultyButton,
 				final LockIconButton lockButton) {
@@ -577,9 +687,10 @@ public class WorldOptionsScreenNew extends Screen {
 			return level.getLevelData().isDifficultyLocked() || level.getLevelData().isHardcore();
 		}
 	}
-	
+
 	protected void updateDifficulty() {
-		if (this.wantedDifficulty != null && this.wantedDifficulty != this.initialDifficulty && this.minecraft.getConnection() != null) {
+		if (this.wantedDifficulty != null && this.wantedDifficulty != this.initialDifficulty
+				&& this.minecraft.getConnection() != null) {
 			this.minecraft.getConnection().send(new ServerboundChangeDifficultyPacket(this.wantedDifficulty));
 		}
 
@@ -587,8 +698,7 @@ public class WorldOptionsScreenNew extends Screen {
 			this.minecraft.getConnection().send(new ServerboundLockDifficultyPacket(true));
 			this.difficultyButtons.lockButton.setLocked(true);
 			DifficultyButtons.updateDifficultyButtonsState(
-				this.minecraft, this.level, this.difficultyButtons.difficultyButton, this.difficultyButtons.lockButton
-			);
+					this.minecraft, this.level, this.difficultyButtons.difficultyButton, this.difficultyButtons.lockButton);
 		}
 	}
 
