@@ -33,20 +33,21 @@ public class Config {
 	// These fields require special handling and consideration
 	public int port = 25565;
 
-	@SerializedName(value = "allow-host-cheat", alternate = { "AllowCommands" })
-	public boolean allowHostCheat = false;
+	@SerializedName(value = "allow-host-commands", alternate = { "HostCommandAccess" })
+	public boolean allowHostCommands = false;
 
 	// These fields are read, synced, and save as normal
-	@SerializedName(value = "max-players", alternate = { "maxPlayers" })
+	@SerializedName(value = "max-players", alternate = { "MaxPlayers" })
 	public int maxPlayers = 8;
 
 	@SerializedName(value = "gamemode", alternate = { "GameMode" })
 	public GameType gameMode = GameType.SURVIVAL;
 
+	@SerializedName(value = "motd", alternate = { "MOTD" })
 	public String motd = Component.translatable("lanServer.title").getString();
 
-	@SerializedName(value = "allow-everyone-cheat", alternate = { "AllPlayersCheats" })
-	public boolean allowGuestCheat = false;
+	@SerializedName(value = "allow-guest-commands", alternate = { "GuestCommandAccess" })
+	public boolean allowGuestCommands = false;
 
 	@SerializedName(value = "enforce-whitelist", alternate = { "Whitelist" })
 	public boolean enforceWhitelist = false;
@@ -162,8 +163,7 @@ public class Config {
 			} catch (IOException e) {
 				LOGGER.error("Failed to save global config", e);
 			}
-		}
-		if (!this.applyforallworld) {
+		} else {
 			try {
 				Files.deleteIfExists(globalPath);
 			} catch (IOException e) {
@@ -198,7 +198,7 @@ public class Config {
 
 		this.port = server.getPort();
 
-		this.allowGuestCheat = singleplayerServer.getGuestCommandAccess();
+		this.allowGuestCommands = singleplayerServer.getGuestCommandAccess();
 		this.gameMode = server.getDefaultGameType();
 
 		this.maxPlayers = playerList.getMaxPlayers();
@@ -212,10 +212,10 @@ public class Config {
 
 	public void applyTo(MinecraftServer server) {
 		IntegratedServer singleplayerServer = Minecraft.getInstance().getSingleplayerServer();
-		server.setDefaultGameType(this.gameMode);
-		// singleplayerServer.setWorldGameType(this.gameMode);
-		// singleplayerServer.setWorldAllowCommands(this.allowHostCheat);
-		singleplayerServer.setGuestCommandAccess(this.allowGuestCheat);
+		// server.setDefaultGameType(this.gameMode);
+		singleplayerServer.setWorldGameType(this.gameMode);
+		// singleplayerServer.setWorldAllowCommands(this.allowHostCommands);
+		singleplayerServer.setGuestCommandAccess(this.allowGuestCommands);
 
 		server.setUsesAuthentication(this.onlineMode);
 		server.getGameRules().set(GameRules.PVP, this.enablePvP, server);
@@ -224,7 +224,7 @@ public class Config {
 
 		server.setMotd(this.motd);
 		UUIDFixer.enabled = this.enableUUIDFixer;
-		ReadListFile.ReadListFile(server);
+		ReadListFile.readListFiles(server);
 	}
 
 }

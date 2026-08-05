@@ -42,7 +42,7 @@ GitHub : [https://github.com/Satxm/mcwifipnp](https://github.com/Satxm/mcwifipnp
 
 ## Introduction
 
-**This Branch is for Minecraft 26.x!**
+**This Branch is for Minecraft 26.3!**
 
 Uses the vanilla Minecraft GUI style, Uses the official mojang mappings.
 
@@ -54,7 +54,7 @@ Uses the vanilla Minecraft GUI style, Uses the official mojang mappings.
 
 <div align="center">
 
-![GUI ZH-CN](https://cdn.modrinth.com/data/cached_images/f0cc15cbe6b9f9e45736b12c036f2c28c2f4f9a0.jpeg)
+![GUI](https://cdn.modrinth.com/data/cached_images/7679311208018ad159099824b623f9ed76292975.jpeg)
 
 </div>
 

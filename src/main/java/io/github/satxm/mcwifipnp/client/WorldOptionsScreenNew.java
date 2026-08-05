@@ -7,8 +7,6 @@ import io.github.satxm.mcwifipnp.MCWiFiPnPUnit;
 import io.github.satxm.mcwifipnp.OnlineMode;
 import io.github.satxm.mcwifipnp.commands.IpCommand;
 import io.github.satxm.mcwifipnp.network.UPnPModule;
-import net.fabricmc.api.EnvType;
-import net.fabricmc.api.Environment;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
@@ -84,6 +82,7 @@ public class WorldOptionsScreenNew extends Screen implements HasGamemasterPermis
 	private Difficulty initialDifficulty;
 	private boolean wantedDifficultyLocked;
 	private boolean initialDifficultyLocked;
+	private boolean initialallowGuestCommands;
 
 	public WorldOptionsScreenNew(final Screen lastScreen, final Level level) {
 		super(Component.translatable("lanServer.title"));
@@ -102,7 +101,7 @@ public class WorldOptionsScreenNew extends Screen implements HasGamemasterPermis
 		} else if (cfg.usingDefaults) {
 			cfg.readFromRunningServer(singleplayerServer);
 			cfg.port = HttpUtil.getAvailablePort();
-			cfg.allowHostCheat = singleplayerServer.getWorldData().isAllowCommands();
+			cfg.allowHostCommands = singleplayerServer.getWorldData().isAllowCommands();
 			cfg.multiplayerScope = singleplayerServer.getMultiplayerScope();
 		}
 
@@ -111,6 +110,7 @@ public class WorldOptionsScreenNew extends Screen implements HasGamemasterPermis
 		this.initialUseUPnP = cfg.useUPnP;
 		this.initialGetPublicIP = cfg.getPublicIP;
 		this.initialMultiplayerScope = singleplayerServer.getMultiplayerScope();
+		this.initialallowGuestCommands = cfg.allowGuestCommands;
 	}
 
 	protected void onConfirmClicked() {
@@ -120,7 +120,7 @@ public class WorldOptionsScreenNew extends Screen implements HasGamemasterPermis
 		updateDifficulty();
 		cfg.save(singleplayerServer);
 
-		if (cfg.multiplayerScope != initialMultiplayerScope || cfg.port != initialPort) {
+		if (cfg.multiplayerScope != initialMultiplayerScope || cfg.port != initialPort || cfg.allowGuestCommands != initialallowGuestCommands) {
 			this.changeMultiplayerScope(singleplayerServer);
 			if (cfg.multiplayerScope == MinecraftServer.MultiplayerScope.LAN) {
 				UPnPModule.startIfEnabled(singleplayerServer, cfg);
@@ -140,10 +140,10 @@ public class WorldOptionsScreenNew extends Screen implements HasGamemasterPermis
 		}
 		cfg.applyTo(singleplayerServer);
 
-		if (!cfg.allowGuestCheat) {
+		if (!cfg.allowGuestCommands) {
 			playerList.getOps().clear();
 		}
-		if (cfg.allowHostCheat) {
+		if (cfg.allowHostCommands) {
 			playerList.getOps().add(new ServerOpListEntry(hostPlayer, LevelBasedPermissionSet.OWNER,
 					playerList.canBypassPlayerLimit(hostPlayer)));
 		} else {
@@ -224,10 +224,10 @@ public class WorldOptionsScreenNew extends Screen implements HasGamemasterPermis
 				Tooltip.create(Component.translatable("options.worldOptions.game_mode.disabled.operator.tooltip")));
 
 		// Allow Host Cheat button
-		rowHelper.addChild(CycleButton.onOffBuilder(cfg.allowHostCheat)
-				.create(Component.translatable("selectWorld.allowCommands"), (cycleButton, allowHostCheat) -> {
-					cfg.allowHostCheat = allowHostCheat;
-					this.updatePermissionButtonActiveState(singleplayerServer);
+		rowHelper.addChild(CycleButton.onOffBuilder(cfg.allowHostCommands)
+				.create(Component.translatable("selectWorld.allowCommands"), (cycleButton, allowHostCommands) -> {
+					cfg.allowHostCommands = allowHostCommands;
+					this.updateGuestCommandAccessButton(singleplayerServer);
 				}));
 
 		// Enable PvP button
@@ -255,7 +255,7 @@ public class WorldOptionsScreenNew extends Screen implements HasGamemasterPermis
 		rowHelper
 				.addChild(Button.builder(Component.translatable("mcwifipnp.gui.backToVanillaScreen"), button -> {
 					this.minecraft.gui
-							.setScreen(new WorldOptionsScreen(this.lastScreen, minecraft.level));
+							.setScreen(new WorldOptionsScreen(this, minecraft.level));
 				}).build());
 
 	}
@@ -277,19 +277,20 @@ public class WorldOptionsScreenNew extends Screen implements HasGamemasterPermis
 				.withValues(MinecraftServer.MultiplayerScope.values()).withTooltip(scope -> Tooltip.create(scope.getTooltip()))
 				.create(Component.translatable("menu.multiplayerOptions.network"), (cycleButton, value) -> {
 					cfg.multiplayerScope = value;
-					this.updatePermissionButtonActiveState(singleplayerServer);
+					this.updateGuestCommandAccessButton(singleplayerServer);
 					this.updateEditBoxState();
 				}));
 
 		// Guest Command Access button
-		this.guestCommandAccessButton = rowHelper.addChild(CycleButton.onOffBuilder(cfg.allowGuestCheat)
+		this.guestCommandAccessButton = rowHelper.addChild(CycleButton.onOffBuilder(cfg.allowGuestCommands)
 				.withTooltip(
 						(state) -> Tooltip.create(Component.translatable("options.worldOptions.guest.command_access.tooltip")))
 				.create(Component.translatable("options.worldOptions.guest.command_access"),
-						(cycleButton, allowGuestCheat) -> {
-							cfg.allowGuestCheat = allowGuestCheat;
+						(cycleButton, allowGuestCommands) -> {
+							cfg.allowGuestCommands = allowGuestCommands;
+							initialallowGuestCommands = allowGuestCommands;
 						}));
-		this.updatePermissionButtonActiveState(singleplayerServer);
+		this.updateGuestCommandAccessButton(singleplayerServer);
 
 		// Port field
 		portEdit = new EditBox(this.font, Component.translatable("lanServer.port"));
@@ -470,7 +471,7 @@ public class WorldOptionsScreenNew extends Screen implements HasGamemasterPermis
 	}
 
 	private void publish(final IntegratedServer server, final MinecraftServer.MultiplayerScope scope) {
-		boolean published = server.publishServer(scope, cfg.allowGuestCheat, cfg.port);
+		boolean published = server.publishServer(scope, cfg.allowGuestCommands, cfg.port);
 		if (!published) {
 			this.sendPublishMessage(Component.translatable("commands.publish.failed"));
 		} else {
@@ -565,25 +566,25 @@ public class WorldOptionsScreenNew extends Screen implements HasGamemasterPermis
 		}
 	}
 
-	private void updatePermissionButtonActiveState(final IntegratedServer singleplayerServer) {
+	private void updateGuestCommandAccessButton(final IntegratedServer singleplayerServer) {
 		if (this.guestCommandAccessButton != null) {
 			boolean lanScope = cfg.multiplayerScope == MinecraftServer.MultiplayerScope.LAN;
-			boolean allowCommands = Boolean.TRUE.equals(cfg.allowHostCheat);
+			boolean allowCommands = Boolean.TRUE.equals(cfg.allowHostCommands);
 			Tooltip tooltip;
 			if (!lanScope) {
-				cfg.allowGuestCheat = false;
+				cfg.allowGuestCommands = false;
 				tooltip = Tooltip
 						.create(Component.translatable("options.worldOptions.guest.command_access.disabled.scope.tooltip"));
 			} else if (!allowCommands) {
-				cfg.allowGuestCheat = false;
+				cfg.allowGuestCommands = false;
 				tooltip = Tooltip
 						.create(Component.translatable("options.worldOptions.guest.command_access.disabled.commands.tooltip"));
 			} else {
-				cfg.allowGuestCheat = singleplayerServer.getGuestCommandAccess();
+				cfg.allowGuestCommands = initialallowGuestCommands;
 				tooltip = Tooltip.create(Component.translatable("options.worldOptions.guest.command_access.tooltip"));
 			}
 
-			this.guestCommandAccessButton.setValue(cfg.allowGuestCheat);
+			this.guestCommandAccessButton.setValue(cfg.allowGuestCommands);
 			this.guestCommandAccessButton.setTooltip(tooltip);
 			this.guestCommandAccessButton.active = lanScope && allowCommands;
 		}
@@ -598,7 +599,6 @@ public class WorldOptionsScreenNew extends Screen implements HasGamemasterPermis
 		}
 	}
 
-	@Environment(EnvType.CLIENT)
 	private record DifficultyButtons(LayoutElement layout, CycleButton<Difficulty> difficultyButton,
 			LockIconButton lockButton, Level level) {
 		private static final Component DIFFICULTY_TITLE = Component.translatable("options.difficulty");
