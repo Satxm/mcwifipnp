@@ -42,7 +42,7 @@ GitHub : [https://github.com/Satxm/mcwifipnp](https://github.com/Satxm/mcwifipnp
 
 ## 简介
 
-**这个分支仅适用于 Minecraft 版本 26.x!**
+**这个分支仅适用于 Minecraft 版本 26.2!**
 
 使用Minecraft原生界面样式，使用Mojang官方混淆表。
 
@@ -54,7 +54,7 @@ GitHub : [https://github.com/Satxm/mcwifipnp](https://github.com/Satxm/mcwifipnp
 
 <div align="center">
 
-![GUI ZH-CN](https://cdn.modrinth.com/data/cached_images/289c4b460fb56d3166be341cfbd6888f8fb8e72d.jpeg)
+![GUI](https://cdn.modrinth.com/data/cached_images/f5a01276a9912e2fd7304010393a06cc251569e7.jpeg)
 
 </div>
 

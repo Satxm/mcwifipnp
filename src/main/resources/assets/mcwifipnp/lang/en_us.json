@@ -7,6 +7,7 @@
   "mcwifipnp.gui.lanServerOptions": "Lan Server Settings",
   "mcwifipnp.gui.otherOptions": "Other Settings",
   "mcwifipnp.gui.backToVanillaScreen": "Back to Vanilla Screen",
+  "mcwifipnp.gui.applyforallworld": "Apply for All World",
   "mcwifipnp.gui.motd": "The MOTD (Message of the day)",
   "mcwifipnp.gui.motd.info": "The server information displayed below the name in the multiplayer server list.",
   "mcwifipnp.gui.AllPlayersCheats": "Other Players Cheats",
@@ -48,5 +49,13 @@
   "mcwifipnp.commands.uuidfixer.list": "There are %s rules in the UUID Fixer's policy list:",
   "mcwifipnp.commands.uuidfixer.none": "UUID Fixer's policy list is empty.",
   "mcwifipnp.commands.uuidfixer.policy.not-exist": "%s is not in the UUID Fixer's policy list!",
-  "mcwifipnp.commands.uuidfixer.remove.success": "Removed %s from the UUID Fixer's policy list."
+  "mcwifipnp.commands.uuidfixer.remove.success": "Removed %s from the UUID Fixer's policy list.",
+  "options.worldOptions.general.title": "General",
+  "options.worldOptions.guest.command_access": "Command Access",
+  "options.worldOptions.guest.command_access.disabled.commands.tooltip": "Cannot change the command access of players joining your world when commands are not allowed.",
+  "options.worldOptions.guest.command_access.disabled.scope.tooltip": "Cannot change the command access of players joining your world when the world's multiplayer scope is set to \"Off\".",
+  "options.worldOptions.guest.command_access.tooltip": "Controls whether players that join your world can use commands or not.",
+  "options.worldOptions.multiplayer.title": "Multiplayer",
+  "editGamerule.inGame.disabled.hardcore.tooltip": "Cannot change game rules in a hardcore world.",
+  "editGamerule.inGame.disabled.tooltip": "Updating game rules requires operator permissions."
 }

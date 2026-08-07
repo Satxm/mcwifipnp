@@ -7,7 +7,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 
 import io.github.satxm.mcwifipnp.client.GuiUtils;
-import io.github.satxm.mcwifipnp.client.ShareToLanScreenNew;
+import io.github.satxm.mcwifipnp.client.MultiplayerOptionsScreenNew;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.layouts.GridLayout;
 import net.minecraft.client.gui.screens.PauseScreen;
@@ -33,7 +33,7 @@ public abstract class MixinPauseScreen extends Screen {
 		Button oldButton = GuiUtils.findWidget(this.children(), Button.class, "menu.multiplayerOptions.button");
 		if (oldButton != null) {
 			Button newButton = Button.builder(MODIFY_LAN_OPTIONS, btn -> {
-				this.minecraft.gui.setScreen(new ShareToLanScreenNew(this));
+				this.minecraft.gui.setScreen(new MultiplayerOptionsScreenNew(this, this.minecraft.level));
 			}).bounds(oldButton.getX(), oldButton.getY(), oldButton.getWidth(), oldButton.getHeight()).build();
 			this.removeWidget(oldButton);
 			this.addRenderableWidget(newButton);

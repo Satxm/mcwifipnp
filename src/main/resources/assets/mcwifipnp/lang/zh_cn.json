@@ -7,6 +7,7 @@
   "mcwifipnp.gui.lanServerOptions": "局域网设置",
   "mcwifipnp.gui.otherOptions": "更多设置",
   "mcwifipnp.gui.backToVanillaScreen": "返回原版局域网设置",
+  "mcwifipnp.gui.applyforallworld": "应用到所有世界",
   "mcwifipnp.gui.motd": "服务器信息",
   "mcwifipnp.gui.motd.info": "玩家客户端的多人游戏服务器列表中显示于名称下方的服务器信息。",
   "mcwifipnp.gui.AllPlayersCheats": "其他玩家作弊",
@@ -48,5 +49,13 @@
   "mcwifipnp.commands.uuidfixer.list": "修复UUID的策略列表有%s项:",
   "mcwifipnp.commands.uuidfixer.none": "修复UUID的策略列表为空.",
   "mcwifipnp.commands.uuidfixer.policy.not-exist": "%s不在修复UUID的策略列表里!",
-  "mcwifipnp.commands.uuidfixer.remove.success": "从修复UUID的策略列表中删除%s的规则."
+  "mcwifipnp.commands.uuidfixer.remove.success": "从修复UUID的策略列表中删除%s的规则.",
+  "options.worldOptions.general.title": "通用",
+  "options.worldOptions.guest.command_access": "命令使用权限",
+  "options.worldOptions.guest.command_access.disabled.commands.tooltip": "无法在禁用命令时更改加入世界的玩家的命令使用权限。",
+  "options.worldOptions.guest.command_access.disabled.scope.tooltip": "无法在未开启多人游戏时更改加入世界的玩家的命令使用权限。",
+  "options.worldOptions.guest.command_access.tooltip": "控制加入世界的玩家能否使用命令。",
+  "options.worldOptions.multiplayer.title": "多人游戏",
+  "editGamerule.inGame.disabled.hardcore.tooltip": "无法在极限模式世界中更改游戏规则。",
+  "editGamerule.inGame.disabled.tooltip": "更新游戏规则需要管理员权限。"
 }
