@@ -1,4 +1,4 @@
-[__中文__![zh-cn](https://img.shields.io/badge/lang-zh--cn-green.svg)](README.zh-CN.md)
+[__中文__![zh-cn](https://img.shields.io/badge/lang-zh--cn-green.svg)](README.zh-CN.md) __English__![en](https://img.shields.io/badge/lang-en-red.svg) [__日本語__![ja](https://img.shields.io/badge/lang-ja-blue.svg)](./README_ja.md) [__Español__![es](https://img.shields.io/badge/lang-es-orange.svg)](./README_es.md)
 
 # LAN World Plug-n-Play
 
