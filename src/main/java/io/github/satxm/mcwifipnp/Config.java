@@ -32,7 +32,7 @@ public class Config {
 	public int port = 25565;
 
 	@SerializedName(value = "allow-host-cheat", alternate = { "AllowCommands" })
-	public boolean allowHostCheat = false;
+	public boolean allowHostCommands = false;
 
 	// These fields are read, synced, and save as normal
 	@SerializedName(value = "max-players", alternate = { "maxPlayers" })
@@ -41,10 +41,11 @@ public class Config {
 	@SerializedName(value = "gamemode", alternate = { "GameMode" })
 	public GameType gameType = GameType.SURVIVAL;
 
+	@SerializedName(value = "motd", alternate = { "MOTD" })
 	public String motd = Component.translatable("lanServer.title").getString();
 
 	@SerializedName(value = "allow-everyone-cheat", alternate = { "AllPlayersCheats" })
-	public boolean allowEveryoneCheat = false;
+	public boolean allowGuestCommands = false;
 
 	@SerializedName(value = "enforce-whitelist", alternate = { "Whitelist" })
 	public boolean enforceWhitelist = false;
@@ -67,6 +68,9 @@ public class Config {
 	@SerializedName(value = "remove-player-reporting", alternate = { "removePlayerReportingButton" })
 	public boolean removePlayerReportingButton = false;
 
+	@SerializedName(value = "apply-for-all-world", alternate = { "applyforallworld" })
+	public boolean applyforallworld = false;
+
 	// These fields will not be serialized
 	public transient Path location;
 	public transient final boolean usingDefaults;
@@ -86,8 +90,12 @@ public class Config {
 		this.usingDefaults = usingDefaults;
 	}
 
-	public static Path getConfigPath(MinecraftServer server) {
+	public static Path getWorldPath(MinecraftServer server) {
 		return server.getWorldPath(LevelResource.ROOT).resolve("mcwifipnp.json");
+	}
+
+	public static Path getConfigPath(MinecraftServer server) {
+		return server.getServerDirectory().resolve("config").resolve("mcwifipnp.json");
 	}
 
 	/**
@@ -95,11 +103,21 @@ public class Config {
 	 * @return the latest config instance read from the path
 	 */
 	public static Config read(MinecraftServer server) {
-		return read(getConfigPath(server));
+		Path worldPath = getWorldPath(server);
+		Path globalPath = getConfigPath(server);
+		Config cfg;
+
+		if (Files.exists(globalPath)) {
+			cfg = read(globalPath);
+		} else {
+			cfg = read(worldPath);
+		}
+
+		return cfg;
 	}
 
 	public static Config readFromPublishedServer(MinecraftServer server) {
-		Config cfg = read(getConfigPath(server));
+		Config cfg = read(getWorldPath(server));
 		if (server.isPublished())
 			cfg.readFromRunningServer(server);
 
@@ -125,19 +143,37 @@ public class Config {
 		return cfg;
 	}
 
-	public void save() {
+	public void save(MinecraftServer server) {
+		Path worldPath = getWorldPath(server);
+		Path globalPath = getConfigPath(server);
+		byte[] jsoncfg = GSON.toJson(this).getBytes(StandardCharsets.UTF_8);
 		try {
-			Files.write(this.location, GSON.toJson(this).getBytes(StandardCharsets.UTF_8), StandardOpenOption.TRUNCATE_EXISTING,
-					StandardOpenOption.CREATE);
+			Files.write(worldPath, jsoncfg, StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
+			LOGGER.info("Config applied to this world and saved to world directory.");
 		} catch (IOException e) {
-			LOGGER.warn("Unable to write config file!", e);
+			LOGGER.warn("Failed to save world config", e);
+		}
+		if (this.applyforallworld) {
+			try {
+				Files.createDirectories(globalPath.getParent());
+				Files.write(globalPath, jsoncfg, StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
+				LOGGER.info("Config applied to all worlds and saved to config directory.");
+			} catch (IOException e) {
+				LOGGER.error("Failed to save global config", e);
+			}
+		} else {
+			try {
+				Files.deleteIfExists(globalPath);
+			} catch (IOException e) {
+				LOGGER.error("Failed to deleteI global config", e);
+			}
 		}
 	}
 
 	public void saveAndApply(MinecraftServer server) {
 		if (server.isPublished())
 			this.applyTo(server);
-		this.save();
+		this.save(server);
 	}
 
 	private static class EnumLowerCaseAdapter<T extends Enum<T>> implements JsonSerializer<T>, JsonDeserializer<T> {
@@ -159,7 +195,7 @@ public class Config {
 
 		this.port = server.getPort();
 
-		this.allowEveryoneCheat = playerList.isAllowCommandsForAllPlayers();
+		this.allowGuestCommands = playerList.isAllowCommandsForAllPlayers();
 		this.gameType = server.getDefaultGameType();
 
 		this.maxPlayers = playerList.getMaxPlayers();
@@ -174,7 +210,7 @@ public class Config {
 	public void applyTo(MinecraftServer server) {
 		PlayerList playerList = server.getPlayerList();
 		server.setDefaultGameType(this.gameType);
-		playerList.setAllowCommandsForAllPlayers(this.allowEveryoneCheat);
+		playerList.setAllowCommandsForAllPlayers(this.allowGuestCommands);
 
 		server.setUsesAuthentication(this.onlineMode);
 		server.getGameRules().getRule(GameRules.RULE_PVP).set(this.enablePvP, server);
@@ -183,7 +219,7 @@ public class Config {
 
 		server.setMotd(this.motd);
 		UUIDFixer.enabled = this.enableUUIDFixer;
-		ReadListFile.ReadListFile(server);
+		ReadListFile.readListFiles(server);
 	}
 
 }

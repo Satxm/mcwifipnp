@@ -1,5 +1,6 @@
 package io.github.satxm.mcwifipnp.commands;
 
+import java.net.StandardProtocolFamily;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -11,7 +12,6 @@ import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.context.ParsedCommandNode;
 import com.mojang.brigadier.tree.LiteralCommandNode;
 
-import io.netty.channel.socket.InternetProtocolFamily;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 
@@ -32,8 +32,8 @@ import net.minecraft.commands.Commands;
  * @param <T> the Enum type
  */
 public class EnumArgument<T extends Enum<T>> {
-	public final static EnumArgument<InternetProtocolFamily> IP_FAMILY =
-		new EnumArgument<>(InternetProtocolFamily.class);
+	public final static EnumArgument<StandardProtocolFamily> IP_FAMILY =
+		new EnumArgument<>(StandardProtocolFamily.class);
 
 	private final Function<T, String> namingFunction;
 	private final Map<String, T> mapping = new HashMap<>();

@@ -2,25 +2,25 @@ package io.github.satxm.mcwifipnp.network;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
+import java.net.StandardProtocolFamily;
 import java.net.URI;
 import java.net.URL;
 import java.net.URLConnection;
 
 import javax.annotation.Nullable;
 
-import io.netty.channel.socket.InternetProtocolFamily;
 import io.netty.util.NetUtil;
 
 public enum GlobalIPs {
-	IP_SB_4("https://api-ipv4.ip.sb/ip", InternetProtocolFamily.IPv4),
-	IP_SB_6("https://api-ipv6.ip.sb/ip", InternetProtocolFamily.IPv6),
-	IPW_CN_4("https://4.ipw.cn", InternetProtocolFamily.IPv4),
-	IPW_CN_6("https://6.ipw.cn", InternetProtocolFamily.IPv6);
+	IP_SB_4("https://api-ipv4.ip.sb/ip", StandardProtocolFamily.INET),
+	IP_SB_6("https://api-ipv6.ip.sb/ip", StandardProtocolFamily.INET6),
+	IPW_CN_4("https://4.ipw.cn", StandardProtocolFamily.INET),
+	IPW_CN_6("https://6.ipw.cn", StandardProtocolFamily.INET6);
 
 	public final String apiEndPoint;
-	public final InternetProtocolFamily family;
+	public final StandardProtocolFamily family;
 
-	private GlobalIPs(String apiEndPoint, InternetProtocolFamily family) {
+	private GlobalIPs(String apiEndPoint, StandardProtocolFamily family) {
 		this.apiEndPoint = apiEndPoint;
 		this.family = family;
 	}
@@ -41,11 +41,11 @@ public enum GlobalIPs {
 	 * result.
 	 *
 	 * @param apiProvider the API provider's URL
-	 * @param family      IP family to be verify against, can be IPv4 or IPv6
+	 * @param family      IP family to be verify against, can be INET or INET6
 	 * @return the IP, or null if failed or the IP is invalid
 	 */
 	@Nullable
-	public static String fetchGlobalIP(String apiProvider, InternetProtocolFamily family) {
+	public static String fetchGlobalIP(String apiProvider, StandardProtocolFamily family) {
 		String ip = null;
 		try {
 			URL url = URI.create(apiProvider).toURL();
@@ -66,12 +66,12 @@ public enum GlobalIPs {
 			return null;
 
 		switch (family) {
-			case IPv4:
+			case INET:
 				if (!NetUtil.isValidIpV4Address(ip))
 					ip = null;
 				break;
 
-			case IPv6:
+			case INET6:
 				if (!NetUtil.isValidIpV6Address(ip))
 					ip = null;
 				break;
@@ -94,7 +94,7 @@ public enum GlobalIPs {
 	 * @return the IP, or null if failed or the IP is invalid
 	 */
 	@Nullable
-	public static String fetchGlobalIP(InternetProtocolFamily family) {
+	public static String fetchGlobalIP(StandardProtocolFamily family) {
 		for (GlobalIPs api : GlobalIPs.values()) {
 			if (api.family != family)
 				continue;
