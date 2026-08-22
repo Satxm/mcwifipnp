@@ -30,7 +30,7 @@ public abstract class MixinPauseScreen extends Screen {
 		super(title);
 	}
 
-	@Inject(method = "createPauseMenu", at = @At("TAIL"), locals = LocalCapture.CAPTURE_FAILHARD)
+	@Inject(method = "createPauseMenu", at = @At("TAIL"), remap = false, locals = LocalCapture.CAPTURE_FAILHARD)
 	protected void addOrReplaceButton(CallbackInfo ci, GridLayout gridLayout, GridLayout.RowHelper dummy) {
 
 		IntegratedServer server = this.minecraft.getSingleplayerServer();

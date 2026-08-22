@@ -18,7 +18,6 @@ import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.gui.components.tabs.GridLayoutTab;
 import net.minecraft.client.gui.components.tabs.TabManager;
 import net.minecraft.client.gui.components.tabs.TabNavigationBar;
-import net.minecraft.client.gui.layouts.CommonLayouts;
 import net.minecraft.client.gui.layouts.GridLayout;
 import net.minecraft.client.gui.layouts.HeaderAndFooterLayout;
 import net.minecraft.client.gui.layouts.LinearLayout;
@@ -55,6 +54,7 @@ public class ShareToLanScreenNew extends Screen {
 	protected Button confirmButton;
 
 	protected Checkbox removePlayerReportingButtonBox;
+	protected EditBox portEdit;
 
 	@Nullable
 	protected Button backToVanillaScreenButton;
@@ -77,7 +77,7 @@ public class ShareToLanScreenNew extends Screen {
 		} else if (this.cfg.usingDefaults) {
 			this.cfg.readFromRunningServer(server);
 			this.cfg.port = HttpUtil.getAvailablePort();
-			this.cfg.allowHostCheat = server.getWorldData().isAllowCommands();
+			this.cfg.allowHostCommands = server.getWorldData().isAllowCommands();
 		}
 
 		this.oldMotd = this.cfg.motd;
@@ -89,7 +89,7 @@ public class ShareToLanScreenNew extends Screen {
 		IntegratedServer server = Minecraft.getInstance().getSingleplayerServer();
 		PlayerList playerList = server.getPlayerList();
 		NameAndId hostPlayer = new NameAndId(server.getSingleplayerProfile());
-		this.cfg.save();
+		this.cfg.save(server);
 
 		if (this.serverPublished) {
 			if (!this.oldMotd.equals(this.cfg.motd) || this.cfg.useUPnP ^ oldUPnPEnabled) {
@@ -104,7 +104,7 @@ public class ShareToLanScreenNew extends Screen {
 			}
 		} else {
 			// Publish server
-			MutableComponent component = server.publishServer(this.cfg.gameType, this.cfg.allowEveryoneCheat, this.cfg.port)
+			MutableComponent component = server.publishServer(this.cfg.gameType, this.cfg.allowGuestCommands, this.cfg.port)
 					? PublishCommand.getSuccessMessage(this.cfg.port)
 					: Component.translatable("commands.publish.failed");
 			this.minecraft.gui.getChat().addMessage(component);
@@ -118,10 +118,10 @@ public class ShareToLanScreenNew extends Screen {
 		}
 		this.cfg.applyTo(server);
 
-		if (!this.cfg.allowEveryoneCheat) {
+		if (!this.cfg.allowGuestCommands) {
 			playerList.getOps().clear();
 		}
-		if (this.cfg.allowHostCheat) {
+		if (this.cfg.allowHostCommands) {
 			playerList.getOps().add(new ServerOpListEntry(hostPlayer, LevelBasedPermissionSet.OWNER, playerList.canBypassPlayerLimit(hostPlayer)));
 		}
 		for (ServerPlayer serverPlayer : server.getPlayerList().getPlayers()) {
@@ -165,72 +165,65 @@ public class ShareToLanScreenNew extends Screen {
 
 			// Row 1
 			// Port field
-			EditBox portField;
-			if (ShareToLanScreenNew.this.serverPublished) {
-				portField = new EditBox(ShareToLanScreenNew.this.font, 0, 0, 70, 20, Component.translatable("lanServer.port"));
-				portField.setEditable(false);
-				portField.setValue(Integer.toString(cfg.port));
-			} else {
-				portField = EditBoxEx
-						.numerical(ShareToLanScreenNew.this.font, 0, 0, 70, 20, Component.translatable("lanServer.port"))
-						.defaults(cfg.port, EditBoxEx.TEXT_COLOR_HINT,
-								Tooltip.create(Component.translatable("mcwifipnp.gui.port.info")))
-						.invalid(EditBoxEx.TEXT_COLOR_ERROR,
-								Tooltip.create(Component.translatable("mcwifipnp.gui.port.invalid")))
-						.validator((port) -> {
-							if (port < 1024 || port > 65535) {
-								throw new NumberFormatException("Port out of range:" + port);
-							} else if (!HttpUtil.isPortAvailable(port)) {
-								return new EditBoxEx.ValidatorResult(EditBoxEx.TEXT_COLOR_WARN,
-										Tooltip.create(Component.translatable("mcwifipnp.gui.port.unavailable")), false,
-										true);
-							} else {
-								return null;
-							}
-						}).responder((newState, newPort) -> {
-							confirmButton.active = newState.valid();
-							if (newState.updateBackendValue())
-								cfg.port = newPort;
-						});
-				portField.setMaxLength(5);
-			}
-			tabContents.addChild(new StringWidget(portField.getMessage(), ShareToLanScreenNew.this.font),
-					1, this.layout.newCellSettings().alignHorizontallyLeft().paddingTop(6));
-			tabContents.addChild(portField,
-					1, this.layout.newCellSettings().alignHorizontallyRight());
+			portEdit = new EditBox(ShareToLanScreenNew.this.font, 150, 20, Component.translatable("lanServer.port"));
+			portEdit.setValue(Integer.toString(cfg.port));
+			portEdit.setResponder(value -> {
+				setPortError(tryParsePort(value));
+				portEdit.setHint(Component.literal(String.valueOf(cfg.port)));
+			});
+			portEdit.setTooltip(Tooltip.create(Component.translatable("mcwifipnp.gui.port.info")));
+
+			LinearLayout portRow = LinearLayout.vertical().spacing(4);
+			portRow.addChild(new StringWidget(Component.translatable("lanServer.port"), ShareToLanScreenNew.this.font));
+			portRow.addChild(portEdit);
+			if (ShareToLanScreenNew.this.serverPublished)
+				portEdit.setEditable(false);
+			tabContents.addChild(portRow, 2);
 
 			// Number of players field
-			EditBoxEx<Integer> maxPlayersField = EditBoxEx
-					.numerical(ShareToLanScreenNew.this.font, 0, 0, 70, 20, Component.translatable("mcwifipnp.gui.players"))
-					.bistate(cfg.maxPlayers, Tooltip.create(Component.translatable("mcwifipnp.gui.players.info")),
-							(maxPlayers) -> maxPlayers > 0)
-					.responder((newState, maxPlayers) -> {
-						confirmButton.active = newState.valid();
-						if (newState.updateBackendValue())
-							cfg.maxPlayers = maxPlayers;
-					});
-			tabContents.addChild(new StringWidget(maxPlayersField.getMessage(), ShareToLanScreenNew.this.font),
-					1, this.layout.newCellSettings().alignHorizontallyLeft().paddingTop(6));
-			tabContents.addChild(maxPlayersField,
-					1, this.layout.newCellSettings().alignHorizontallyRight());
+			EditBox maxPlayersEdit = new EditBox(ShareToLanScreenNew.this.font, 150, 20,
+					Component.translatable("mcwifipnp.gui.players"));
+			maxPlayersEdit.setResponder(value -> {
+				try {
+					int parsed = Integer.parseInt(value);
+					if (parsed >= 0) {
+						cfg.maxPlayers = Integer.parseInt(value);
+					}
+				} catch (NumberFormatException e) {
+				}
+			});
+			maxPlayersEdit.setHint(Component.literal(String.valueOf(cfg.maxPlayers)));
+			maxPlayersEdit.setValue(String.valueOf(cfg.maxPlayers));
+			maxPlayersEdit.setTooltip(Tooltip.create(Component.translatable("mcwifipnp.gui.players.info")));
+			LinearLayout maxPlayersRow = LinearLayout.vertical().spacing(4);
+			maxPlayersRow
+					.addChild(new StringWidget(Component.translatable("mcwifipnp.gui.players"), ShareToLanScreenNew.this.font));
+			maxPlayersRow.addChild(maxPlayersEdit);
+			tabContents.addChild(maxPlayersRow, 2);
 
 			// Row2
 			// Motd field
-			tabContents.addChild(CommonLayouts.labeledElement(ShareToLanScreenNew.this.font, EditBoxEx
-					.text(ShareToLanScreenNew.this.font, 0, 0, 308, 20, Component.translatable("mcwifipnp.gui.motd"))
-					.bistate(cfg.motd, Tooltip.create(Component.translatable("mcwifipnp.gui.motd.info")), (newMotd) -> true)
-					.responder((newState, newMotd) -> {
-						confirmButton.active = newState.valid();
-						if (newState.updateBackendValue())
-							cfg.motd = newMotd;
-					}).maxLength(32), Component.translatable("mcwifipnp.gui.motd")), 4);
+			EditBox motdEdit = new EditBox(ShareToLanScreenNew.this.font, 308, 20,
+					Component.translatable("mcwifipnp.gui.motd"));
+			motdEdit.setValue(cfg.motd);
+			motdEdit.setHint(Component.literal(cfg.motd));
+			motdEdit.setResponder(value -> {
+				if (!value.isBlank()) {
+					cfg.motd = value;
+				}
+			});
+			motdEdit.setTooltip(Tooltip.create(Component.translatable("mcwifipnp.gui.motd.info")));
+			LinearLayout motdRow = LinearLayout.vertical().spacing(4);
+			motdRow.addChild(new StringWidget(Component.translatable("mcwifipnp.gui.motd"), ShareToLanScreenNew.this.font));
+			motdRow.addChild(motdEdit);
+			tabContents.addChild(motdRow, 4);
 
 			// Row3
 			// Allow Cheat button (for other joined players)
 			if (!ShareToLanScreenNew.this.serverPublished) {
-				tabContents.addChild(CycleButton.onOffBuilder(cfg.allowHostCheat)
-						.create(Component.translatable("selectWorld.allowCommands"), (cycleButton, allowHostCheat) -> {
-							cfg.allowHostCheat = allowHostCheat;
+				tabContents.addChild(CycleButton.onOffBuilder(cfg.allowHostCommands)
+						.create(Component.translatable("selectWorld.allowCommands"), (cycleButton, allowHostCommands) -> {
+							cfg.allowHostCommands = allowHostCommands;
 						}), 2);
 			}
 
@@ -271,10 +264,10 @@ public class ShareToLanScreenNew extends Screen {
 					}), 2);
 
 			// Allow Cheat button (for other joined players)
-			tabContents.addChild(CycleButton.onOffBuilder(cfg.allowEveryoneCheat)
+			tabContents.addChild(CycleButton.onOffBuilder(cfg.allowGuestCommands)
 					.withTooltip((state) -> Tooltip.create(Component.translatable("mcwifipnp.gui.AllPlayersCheats.info")))
-					.create(Component.translatable("mcwifipnp.gui.AllPlayersCheats"), (cycleButton, allowEveryoneCheat) -> {
-						cfg.allowEveryoneCheat = allowEveryoneCheat;
+					.create(Component.translatable("mcwifipnp.gui.AllPlayersCheats"), (cycleButton, allowGuestCommands) -> {
+						cfg.allowGuestCommands = allowGuestCommands;
 					}), 2);
 		}
 	}
@@ -304,6 +297,12 @@ public class ShareToLanScreenNew extends Screen {
 								cfg.removePlayerReportingButton = removePlayerReportingButton;
 							}),
 					2);
+
+			// Apply for All World button
+			tabContents.addChild(CycleButton.onOffBuilder(cfg.applyforallworld)
+					.create(Component.translatable("mcwifipnp.gui.applyforallworld"), (cycleButton, applyforallworld) -> {
+						cfg.applyforallworld = applyforallworld;
+					}), 2);
 
 			if (!ShareToLanScreenNew.this.serverPublished) {
 				tabContents
@@ -339,4 +338,38 @@ public class ShareToLanScreenNew extends Screen {
 		guiGraphics.blit(RenderPipelines.GUI_TEXTURED, Screen.FOOTER_SEPARATOR, 0,
 				this.height - this.layout.getFooterHeight() - 2, 0.0F, 0.0F, this.width, 2, 32, 2);
 	}
+
+	@Nullable
+	private Component tryParsePort(final String value) {
+		if (value.isBlank()) {
+			return null;
+		} else {
+			try {
+				int parsed = Integer.parseInt(value);
+				if (parsed < 1024 || parsed > 65535) {
+					return Component.translatable("mcwifipnp.gui.port.invalid");
+				} else if (!HttpUtil.isPortAvailable(parsed)) {
+					return Component.translatable("mcwifipnp.gui.port.unavailable");
+				} else {
+					cfg.port = parsed;
+					return null;
+				}
+			} catch (NumberFormatException var3) {
+				return Component.translatable("mcwifipnp.gui.port.invalid");
+			}
+		}
+	}
+
+	private void setPortError(@Nullable final Component errorMessage) {
+		if (portEdit != null) {
+			if (errorMessage == null) {
+				portEdit.setTextColor(-2039584);
+				portEdit.setTooltip(Tooltip.create(Component.translatable("mcwifipnp.gui.port.info")));
+			} else {
+				portEdit.setTextColor(-2142128);
+				portEdit.setTooltip(Tooltip.create(errorMessage));
+			}
+		}
+	}
+
 }

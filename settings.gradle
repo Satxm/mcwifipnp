@@ -44,6 +44,6 @@ plugins {
 rootProject.name = "mcwifipnp"
 
 include("fabric")
-// include("forge")
+include("forge")
 include("neoforge")
 // include("quilt")
