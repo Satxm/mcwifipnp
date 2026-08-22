@@ -15,6 +15,8 @@ import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.CycleButton;
 import net.minecraft.client.gui.components.EditBox;
+import net.minecraft.client.gui.components.FocusableTextWidget;
+import net.minecraft.client.gui.components.FocusableTextWidget.BackgroundFill;
 import net.minecraft.client.gui.components.LockIconButton;
 import net.minecraft.client.gui.components.PopupScreen.Builder;
 import net.minecraft.client.gui.components.ScrollableLayout;
@@ -41,6 +43,7 @@ import net.minecraft.network.chat.ComponentUtils;
 import net.minecraft.network.protocol.game.ServerboundChangeDifficultyPacket;
 import net.minecraft.network.protocol.game.ServerboundLockDifficultyPacket;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.MinecraftServer.MultiplayerScope;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.permissions.LevelBasedPermissionSet;
 import net.minecraft.server.permissions.Permissions;
@@ -85,7 +88,7 @@ public class WorldOptionsScreenNew extends Screen implements HasGamemasterPermis
 	private final boolean initialGetPublicIP;
 	private final String initialMotd;
 	private final int initialPort;
-	private final MinecraftServer.MultiplayerScope initialMultiplayerScope;
+	private final MultiplayerScope initialMultiplayerScope;
 	private Difficulty wantedDifficulty;
 	private Difficulty initialDifficulty;
 	private @Nullable Boolean initialDifficultyLocked;
@@ -105,7 +108,7 @@ public class WorldOptionsScreenNew extends Screen implements HasGamemasterPermis
 
 		cfg = Config.read(singleplayerServer);
 
-		if (serverPublished && singleplayerServer.getMultiplayerScope() == MinecraftServer.MultiplayerScope.LAN) {
+		if (serverPublished && singleplayerServer.getMultiplayerScope() == MultiplayerScope.LAN) {
 			cfg.readFromRunningServer(singleplayerServer);
 		} else if (cfg.usingDefaults) {
 			cfg.readFromRunningServer(singleplayerServer);
@@ -133,7 +136,7 @@ public class WorldOptionsScreenNew extends Screen implements HasGamemasterPermis
 		if (cfg.multiplayerScope != initialMultiplayerScope || cfg.port != initialPort
 				|| cfg.allowGuestCommands != initialallowGuestCommands) {
 			this.changeMultiplayerScope(singleplayerServer);
-			if (cfg.multiplayerScope == MinecraftServer.MultiplayerScope.LAN) {
+			if (cfg.multiplayerScope == MultiplayerScope.LAN) {
 				UPnPModule.startIfEnabled(singleplayerServer, cfg);
 				GetPublicIP(singleplayerServer);
 			}
@@ -206,8 +209,11 @@ public class WorldOptionsScreenNew extends Screen implements HasGamemasterPermis
 		RowHelper helper = grid.columnSpacing(8).rowSpacing(4).createRowHelper(2);
 		helper.defaultCellSetting().alignHorizontallyCenter();
 
-		helper.addChild(new StringWidget(Component.translatable("options.worldOptions.general.title")
-				.withStyle(ChatFormatting.UNDERLINE, ChatFormatting.BOLD), this.font), 2);
+		helper
+				.addChild(FocusableTextWidget
+						.builder(Component.translatable("options.worldOptions.general.title").withStyle(ChatFormatting.UNDERLINE,
+								ChatFormatting.BOLD), this.font)
+						.alwaysShowBorder(false).backgroundFill(BackgroundFill.ON_FOCUS).build(), 2);
 
 		// Default GameMode toggle button
 		this.defaultGameModeButton = helper
@@ -296,14 +302,15 @@ public class WorldOptionsScreenNew extends Screen implements HasGamemasterPermis
 		RowHelper helper = grid.columnSpacing(8).rowSpacing(4).createRowHelper(2);
 		helper.defaultCellSetting().alignHorizontallyCenter();
 
-		helper.addChild(
-				new StringWidget(Component.translatable("options.worldOptions.multiplayer.title")
-						.withStyle(ChatFormatting.UNDERLINE, ChatFormatting.BOLD), this.font),
-				2);
+		helper
+				.addChild(FocusableTextWidget
+						.builder(Component.translatable("options.worldOptions.multiplayer.title")
+								.withStyle(ChatFormatting.UNDERLINE, ChatFormatting.BOLD), this.font)
+						.alwaysShowBorder(false).backgroundFill(BackgroundFill.ON_FOCUS).build(), 2);
 
 		// Multiplayer Scope button
-		helper.addChild(CycleButton.builder(MinecraftServer.MultiplayerScope::getDisplayName, cfg.multiplayerScope)
-				.withValues(MinecraftServer.MultiplayerScope.values()).withTooltip(scope -> Tooltip.create(scope.getTooltip()))
+		helper.addChild(CycleButton.builder(MultiplayerScope::getDisplayName, cfg.multiplayerScope)
+				.withValues(MultiplayerScope.values()).withTooltip(scope -> Tooltip.create(scope.getTooltip()))
 				.create(Component.translatable("menu.multiplayerOptions.network"), (cycleButton, value) -> {
 					cfg.multiplayerScope = value;
 					this.updateGuestCommandAccessButton(singleplayerServer);
@@ -522,7 +529,7 @@ public class WorldOptionsScreenNew extends Screen implements HasGamemasterPermis
 				UPnPModule.stop(singleplayerServer);
 			}
 
-			if (cfg.multiplayerScope != MinecraftServer.MultiplayerScope.OFF) {
+			if (cfg.multiplayerScope != MultiplayerScope.OFF) {
 				this.publish(singleplayerServer, cfg.multiplayerScope);
 			}
 
@@ -530,11 +537,11 @@ public class WorldOptionsScreenNew extends Screen implements HasGamemasterPermis
 		}
 	}
 
-	private void publish(final IntegratedServer singleplayerServer, final MinecraftServer.MultiplayerScope scope) {
+	private void publish(final IntegratedServer singleplayerServer, final MultiplayerScope scope) {
 		if (!singleplayerServer.publishServer(scope, cfg.port)) {
 			this.sendPublishMessage(Component.translatable("commands.publish.failed"));
 		} else {
-			Component message = scope == MinecraftServer.MultiplayerScope.LAN
+			Component message = scope == MultiplayerScope.LAN
 					? Component.translatable("menu.multiplayerOptions.publish.started.lan",
 							ComponentUtils.copyOnClickText(String.valueOf(cfg.port)))
 					: Component.translatable("menu.multiplayerOptions.publish.started.online");
@@ -549,7 +556,7 @@ public class WorldOptionsScreenNew extends Screen implements HasGamemasterPermis
 	}
 
 	private void updateMultiplayerOptions(final IntegratedServer singleplayerServer) {
-		boolean lanWanted = cfg.multiplayerScope == MinecraftServer.MultiplayerScope.LAN;
+		boolean lanWanted = cfg.multiplayerScope == MultiplayerScope.LAN;
 		if (this.portEdit != null) {
 			this.portEdit.setValue(lanWanted ? String.valueOf(cfg.port) : "");
 			this.portEdit.setEditable(lanWanted);
@@ -642,7 +649,7 @@ public class WorldOptionsScreenNew extends Screen implements HasGamemasterPermis
 
 	private void updateGuestCommandAccessButton(final IntegratedServer singleplayerServer) {
 		if (this.guestCommandAccessButton != null) {
-			boolean lanScope = cfg.multiplayerScope == MinecraftServer.MultiplayerScope.LAN;
+			boolean lanScope = cfg.multiplayerScope == MultiplayerScope.LAN;
 			boolean allowCommands = Boolean.TRUE.equals(cfg.allowHostCommands);
 			Tooltip tooltip;
 			if (!lanScope) {
@@ -666,7 +673,7 @@ public class WorldOptionsScreenNew extends Screen implements HasGamemasterPermis
 
 	private void updateForceGameModeButton(final IntegratedServer singleplayerServer) {
 		if (this.forceGameModeButton != null) {
-			boolean lanScope = cfg.multiplayerScope == MinecraftServer.MultiplayerScope.LAN;
+			boolean lanScope = cfg.multiplayerScope == MultiplayerScope.LAN;
 			boolean guestCommandAccess = Boolean.TRUE.equals(cfg.allowGuestCommands);
 			Tooltip tooltip;
 			if (!lanScope || guestCommandAccess) {
