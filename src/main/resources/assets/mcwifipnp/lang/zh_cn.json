@@ -1,4 +1,5 @@
 {
+  "mcwifipnp.gui.applyGeneralChanges": "应用通用设置",
   "mcwifipnp.gui.port.info": "多人游戏端口号。",
   "mcwifipnp.gui.port.invalid": "端口无效。\n请输入一个介于§41024至65535§f之间的数字。",
   "mcwifipnp.gui.port.unavailable": "§4端口不可用。",
@@ -50,12 +51,25 @@
   "mcwifipnp.commands.uuidfixer.none": "修复UUID的策略列表为空.",
   "mcwifipnp.commands.uuidfixer.policy.not-exist": "%s不在修复UUID的策略列表里!",
   "mcwifipnp.commands.uuidfixer.remove.success": "从修复UUID的策略列表中删除%s的规则.",
+  "options.worldOptions.button": "世界选项…",
+  "options.worldOptions.difficulty.disabled.hardcore.tooltip": "无法在极限模式世界中更改难度。",
+  "options.worldOptions.difficulty.disabled.locked.tooltip": "难度已锁定。",
+  "options.worldOptions.difficulty.disabled.operator.tooltip": "更改难度需要管理员权限。",
+  "options.worldOptions.game_mode": "默认游戏模式",
+  "options.worldOptions.game_mode.disabled.operator.tooltip": "更改游戏模式需要管理员权限。",
+  "options.worldOptions.game_mode.disabled.tooltip": "无法在极限模式世界中更改游戏模式。",
+  "options.worldOptions.game_mode.tooltip": "更改世界的默认游戏模式。",
   "options.worldOptions.general.title": "通用",
   "options.worldOptions.guest.command_access": "命令使用权限",
   "options.worldOptions.guest.command_access.disabled.commands.tooltip": "无法在禁用命令时更改加入世界的玩家的命令使用权限。",
   "options.worldOptions.guest.command_access.disabled.scope.tooltip": "无法在未开启多人游戏时更改加入世界的玩家的命令使用权限。",
   "options.worldOptions.guest.command_access.tooltip": "控制加入世界的玩家能否使用命令。",
+  "options.worldOptions.guest.force_game_mode": "强制游戏模式",
+  "options.worldOptions.guest.force_game_mode.off.commands.tooltip": "其他玩家可以通过命令设置自己的游戏模式。",
+  "options.worldOptions.guest.force_game_mode.off.tooltip": "其他玩家将保留其当前游戏模式，且不受世界默认游戏模式的影响。",
+  "options.worldOptions.guest.force_game_mode.on.tooltip": "其他玩家将被强制设为世界的默认游戏模式。",
   "options.worldOptions.multiplayer.title": "多人游戏",
-  "editGamerule.inGame.disabled.hardcore.tooltip": "无法在极限模式世界中更改游戏规则。",
-  "editGamerule.inGame.disabled.tooltip": "更新游戏规则需要管理员权限。"
+  "options.worldOptions.personal_game_mode": "个人游戏模式",
+  "options.worldOptions.personal_game_mode.tooltip": "更改你在此世界中的游戏模式。",
+  "options.worldOptions.title": "世界选项"
 }

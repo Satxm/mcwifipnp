@@ -15,12 +15,14 @@ import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.CycleButton;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.components.LockIconButton;
-import net.minecraft.client.gui.components.PopupScreen;
+import net.minecraft.client.gui.components.PopupScreen.Builder;
 import net.minecraft.client.gui.components.ScrollableLayout;
 import net.minecraft.client.gui.components.StringWidget;
 import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.gui.layouts.EqualSpacingLayout;
+import net.minecraft.client.gui.layouts.EqualSpacingLayout.Orientation;
 import net.minecraft.client.gui.layouts.GridLayout;
+import net.minecraft.client.gui.layouts.GridLayout.RowHelper;
 import net.minecraft.client.gui.layouts.HeaderAndFooterLayout;
 import net.minecraft.client.gui.layouts.LayoutElement;
 import net.minecraft.client.gui.layouts.LinearLayout;
@@ -39,6 +41,7 @@ import net.minecraft.network.protocol.game.ServerboundChangeDifficultyPacket;
 import net.minecraft.network.protocol.game.ServerboundLockDifficultyPacket;
 import net.minecraft.resources.Identifier;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.MinecraftServer.MultiplayerScope;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.permissions.LevelBasedPermissionSet;
 import net.minecraft.server.permissions.Permissions;
@@ -50,9 +53,9 @@ import net.minecraft.util.HttpUtil;
 import net.minecraft.world.Difficulty;
 import net.minecraft.world.level.GameType;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.gamerules.GameRules;
 
-public class MultiplayerOptionsScreenNew extends Screen
-		implements HasGamemasterPermissionReaction, HasDifficultyReaction {
+public class WorldOptionsScreenNew extends Screen implements HasGamemasterPermissionReaction, HasDifficultyReaction {
 	private final Config cfg;
 	private final Screen lastScreen;
 	private final Level level;
@@ -63,8 +66,14 @@ public class MultiplayerOptionsScreenNew extends Screen
 	private @Nullable CycleButton<Boolean> guestCommandAccessButton;
 	private @Nullable Button applyChanges;
 	private @Nullable Button gameRulesButton;
-	private @Nullable CycleButton<GameType> gameModeButton;
+	private @Nullable CycleButton<GameType> defaultGameModeButton;
+	private @Nullable CycleButton<GameType> personalGameModeButton;
 	private @Nullable CycleButton<Boolean> pvpButton;
+	private @Nullable CycleButton<Boolean> forceGameModeButton;
+	private @Nullable CycleButton<Boolean> getPublicIPButton;
+	private @Nullable CycleButton<Boolean> useUPnPButton;
+	private @Nullable CycleButton<Boolean> enforceWhitelistButton;
+	private @Nullable CycleButton<OnlineMode> onlineModeButton;
 
 	private @Nullable EditBox portEdit;
 	private @Nullable EditBox motdEdit;
@@ -78,16 +87,18 @@ public class MultiplayerOptionsScreenNew extends Screen
 	private final boolean initialGetPublicIP;
 	private final String initialMotd;
 	private final int initialPort;
-	private final MinecraftServer.MultiplayerScope initialMultiplayerScope;
+	private final MultiplayerScope initialMultiplayerScope;
 	private Difficulty wantedDifficulty;
 	private Difficulty initialDifficulty;
-	private boolean wantedDifficultyLocked;
-	private boolean initialDifficultyLocked;
+	private @Nullable Boolean initialDifficultyLocked;
+	private @Nullable Boolean wantedDifficultyLocked;
 	private boolean initialallowGuestCommands;
-	
-	private static final Identifier INWORLD_MENU_LIST_BACKGROUND = Identifier.withDefaultNamespace("textures/gui/inworld_menu_list_background.png");
+	private boolean initialForceGameMode;
 
-	public MultiplayerOptionsScreenNew(final Screen lastScreen, final Level level) {
+	private static final Identifier INWORLD_MENU_LIST_BACKGROUND = Identifier
+			.withDefaultNamespace("textures/gui/inworld_menu_list_background.png");
+
+	public WorldOptionsScreenNew(final Screen lastScreen, final Level level) {
 		super(Component.translatable("lanServer.title"));
 		this.lastScreen = lastScreen;
 		this.level = level;
@@ -99,7 +110,7 @@ public class MultiplayerOptionsScreenNew extends Screen
 
 		cfg = Config.read(singleplayerServer);
 
-		if (serverPublished && singleplayerServer.getMultiplayerScope() == MinecraftServer.MultiplayerScope.LAN) {
+		if (serverPublished && singleplayerServer.getMultiplayerScope() == MultiplayerScope.LAN) {
 			cfg.readFromRunningServer(singleplayerServer);
 		} else if (cfg.usingDefaults) {
 			cfg.readFromRunningServer(singleplayerServer);
@@ -114,19 +125,44 @@ public class MultiplayerOptionsScreenNew extends Screen
 		this.initialGetPublicIP = cfg.getPublicIP;
 		this.initialMultiplayerScope = singleplayerServer.getMultiplayerScope();
 		this.initialallowGuestCommands = cfg.allowGuestCommands;
+		this.initialForceGameMode = cfg.forceGameMode;
 	}
 
-	protected void onConfirmClicked() {
+	protected void applyGeneralChanges() {
 		IntegratedServer singleplayerServer = Minecraft.getInstance().getSingleplayerServer();
 		PlayerList playerList = singleplayerServer.getPlayerList();
 		NameAndId hostPlayer = new NameAndId(singleplayerServer.getSingleplayerProfile());
-		updateDifficulty();
 		cfg.save(singleplayerServer);
+
+		updateDifficulty();
+		playerList.getPlayer(singleplayerServer.getSingleplayerProfile().id()).setGameMode(cfg.personalGameMode);
+		singleplayerServer.setDefaultGameType(cfg.defaultGameMode);
+		singleplayerServer.getWorldData().setAllowCommands(cfg.allowHostCommands);
+		singleplayerServer.getGameRules().set(GameRules.PVP, cfg.enablePvP, singleplayerServer);
+
+		if (cfg.allowHostCommands) {
+			playerList.getOps().add(new ServerOpListEntry(hostPlayer, LevelBasedPermissionSet.OWNER,
+					playerList.canBypassPlayerLimit(hostPlayer)));
+		} else {
+			playerList.getOps().remove(hostPlayer);
+		}
+		for (ServerPlayer serverPlayer : singleplayerServer.getPlayerList().getPlayers()) {
+			playerList.sendPlayerPermissionLevel(serverPlayer);
+		}
+	}
+
+	protected void applyChanges() {
+		IntegratedServer singleplayerServer = Minecraft.getInstance().getSingleplayerServer();
+		PlayerList playerList = singleplayerServer.getPlayerList();
+		NameAndId hostPlayer = new NameAndId(singleplayerServer.getSingleplayerProfile());
+
+		cfg.save(singleplayerServer);
+		updateDifficulty();
 
 		if (cfg.multiplayerScope != initialMultiplayerScope || cfg.port != initialPort
 				|| cfg.allowGuestCommands != initialallowGuestCommands) {
 			this.changeMultiplayerScope(singleplayerServer);
-			if (cfg.multiplayerScope == MinecraftServer.MultiplayerScope.LAN) {
+			if (cfg.multiplayerScope == MultiplayerScope.LAN) {
 				UPnPModule.startIfEnabled(singleplayerServer, cfg);
 				GetPublicIP(singleplayerServer);
 			}
@@ -170,77 +206,94 @@ public class MultiplayerOptionsScreenNew extends Screen
 
 	@Override
 	protected void init() {
-		IntegratedServer singleplayerServer = this.minecraft.getSingleplayerServer();
 		this.layout.addTitleHeader(Component.translatable("options.worldOptions.title"), this.font);
+		IntegratedServer singleplayerServer = this.minecraft.getSingleplayerServer();
 		LinearLayout content = LinearLayout.vertical().spacing(8);
 		content.defaultCellSetting().padding(8).alignHorizontallyCenter().alignVerticallyTop();
 		this.scrollArea = this.layout
 				.addToContents(new ScrollableLayout(this.minecraft, content, this.layout.getContentHeight()));
 
-		this.generalOptions(content);
+		this.generalOptions(content, singleplayerServer);
 		if (singleplayerServer != null) {
-			this.multiplayerOptions(content);
+			this.multiplayerOptions(content, singleplayerServer);
 		}
 
-		LinearLayout footer = this.layout.addToFooter(LinearLayout.horizontal().spacing(8));
-		this.applyChanges = Button
-				.builder(Component.translatable("menu.multiplayerOptions.applyChanges"), button -> this.onConfirmClicked())
-				.build();
-		footer.addChild(this.applyChanges);
-		footer.addChild(Button.builder(CommonComponents.GUI_CANCEL, button -> this.onClose()).build());
+		GridLayout footer = this.layout.addToFooter(new GridLayout().columnSpacing(4).rowSpacing(4));
+		footer.defaultCellSetting().alignHorizontallyCenter();
+		GridLayout.RowHelper rowHelper = footer.createRowHelper(3);
+
+		rowHelper.addChild(Button
+				.builder(Component.translatable("mcwifipnp.gui.applyGeneralChanges"), button -> this.applyGeneralChanges())
+				.width(100).build());
+		rowHelper.addChild(Button
+				.builder(Component.translatable("menu.multiplayerOptions.applyChanges"),
+						button -> this.applyChanges())
+				.width(100).build());
+		rowHelper.addChild(Button.builder(CommonComponents.GUI_CANCEL, button -> this.onClose()).width(100).build());
 
 		this.layout.visitWidgets(this::addRenderableWidget);
 		this.repositionElements();
 	}
 
-	private void generalOptions(final LinearLayout content) {
+	private void generalOptions(final LinearLayout content, final @Nullable IntegratedServer singleplayerServer) {
 		GridLayout grid = content.addChild(new GridLayout());
-		GridLayout.RowHelper rowHelper = grid.columnSpacing(8).rowSpacing(4).createRowHelper(2);
+		grid.defaultCellSetting().alignHorizontallyCenter();
+		RowHelper rowHelper = grid.columnSpacing(8).rowSpacing(4).createRowHelper(2);
 		rowHelper.defaultCellSetting().alignHorizontallyCenter();
 
 		rowHelper.addChild(new StringWidget(Component.translatable("options.worldOptions.general.title")
 				.withStyle(ChatFormatting.UNDERLINE, ChatFormatting.BOLD), this.font), 2);
 
-		Minecraft minecraft = Minecraft.getInstance();
-		IntegratedServer singleplayerServer = Minecraft.getInstance().getSingleplayerServer();
+		// Default GameMode toggle button
+		this.defaultGameModeButton = rowHelper
+				.addChild(CycleButton.builder(GameType::getShortDisplayName, cfg.defaultGameMode)
+						.withValues(GameType.values())
+						.create(0, 0, 308, 20, Component.translatable("options.worldOptions.game_mode"),
+								(cycleButton, gameMode) -> {
+									cfg.defaultGameMode = gameMode;
+								}),
+						2);
+		this.updateButton(defaultGameModeButton, singleplayerServer,
+				Tooltip.create(Component.translatable("options.worldOptions.game_mode.tooltip")),
+				Tooltip.create(Component.translatable("options.worldOptions.game_mode.disabled.operator.tooltip")),
+				Tooltip.create(Component.translatable("options.worldOptions.game_mode.disabled.tooltip")));
 
-		gameRulesButton = Button.builder(Component.translatable("editGamerule.inGame.button"), var1 -> {
-			if (minecraft.player != null) {
-				minecraft.gui.setScreen(new InWorldGameRulesScreen(minecraft.player.connection,
-						var1x -> minecraft.gui.setScreen(lastScreen), this));
-			}
-		}).build();
-		this.updateButton(gameRulesButton, singleplayerServer,
-				Tooltip.create(Component.translatable("editGamerule.inGame.disabled.hardcore.tooltip")),
-				Tooltip.create(Component.translatable("editGamerule.inGame.disabled.tooltip")));
-		rowHelper.addChild(gameRulesButton);
-
-		rowHelper.addChild(this.difficultyButtons.layout());
-
-		// GameMode toggle button
-		this.gameModeButton = rowHelper.addChild(CycleButton.builder(GameType::getShortDisplayName, cfg.gameMode)
-				.withValues(GameType.values())
-				.create(Component.translatable("selectWorld.gameMode"), (cycleButton, gameMode) -> {
-					cfg.gameMode = gameMode;
-				}));
-		this.updateButton(gameModeButton, singleplayerServer,
-				Tooltip.create(Component.translatable("options.worldOptions.game_mode.disabled.tooltip")),
-				Tooltip.create(Component.translatable("options.worldOptions.game_mode.disabled.operator.tooltip")));
+		// Personal GameMode toggle button
+		this.personalGameModeButton = rowHelper
+				.addChild(CycleButton.builder(GameType::getShortDisplayName, cfg.personalGameMode)
+						.withValues(GameType.values())
+						.create(0, 0, 308, 20, Component.translatable("options.worldOptions.personal_game_mode"),
+								(cycleButton, gameMode) -> {
+									cfg.personalGameMode = gameMode;
+								}),
+						2);
+		this.updateButton(personalGameModeButton, singleplayerServer,
+				Tooltip.create(Component.translatable("options.worldOptions.personal_game_mode.tooltip")),
+				Tooltip.create(Component.translatable("options.worldOptions.game_mode.disabled.operator.tooltip")),
+				Tooltip.create(Component.translatable("options.worldOptions.game_mode.disabled.tooltip")));
 
 		// Allow Host Cheat button
 		rowHelper.addChild(CycleButton.onOffBuilder(cfg.allowHostCommands)
 				.create(Component.translatable("selectWorld.allowCommands"), (cycleButton, allowHostCommands) -> {
 					cfg.allowHostCommands = allowHostCommands;
 					this.updateGuestCommandAccessButton(singleplayerServer);
+					this.updateForceGameModeButton(singleplayerServer);
 				}));
 
-		// Enable PvP button
-		this.pvpButton = rowHelper.addChild(CycleButton.onOffBuilder(cfg.enablePvP)
-				.withTooltip((state) -> Tooltip.create(Component.translatable("mcwifipnp.gui.PvP.info")))
-				.create(Component.translatable("mcwifipnp.gui.PvP"), (cycleButton, PvP) -> {
-					cfg.enablePvP = PvP;
-				}));
-		this.updateButton(this.pvpButton, singleplayerServer, null, null);
+		// Difficulty buttons
+		rowHelper.addChild(this.difficultyButtons.layout());
+
+		// GameRules button
+		gameRulesButton = rowHelper
+				.addChild(Button.builder(Component.translatable("editGamerule.inGame.button"), button -> {
+					if (this.minecraft.player != null) {
+						this.minecraft.gui.setScreen(new InWorldGameRulesScreen(this.minecraft.player.connection,
+								var1x -> this.minecraft.gui.setScreen(this), this));
+					}
+				}).build());
+		this.updateButton(gameRulesButton, singleplayerServer, null,
+				Tooltip.create(Component.translatable("editGamerule.inGame.disabled.tooltip")),
+				Tooltip.create(Component.translatable("editGamerule.inGame.disabled.hardcore.tooltip")));
 
 		// Restrictions button
 		rowHelper.addChild(Button.builder(Component.translatable("restrictions_screen.button"), button -> {
@@ -249,6 +302,17 @@ public class MultiplayerOptionsScreenNew extends Screen
 			}
 		}).build());
 
+		// Enable PvP button
+		this.pvpButton = rowHelper.addChild(CycleButton.onOffBuilder(cfg.enablePvP)
+				.withTooltip((state) -> Tooltip.create(Component.translatable("mcwifipnp.gui.PvP.info")))
+				.create(Component.translatable("mcwifipnp.gui.PvP"), (cycleButton, PvP) -> {
+					cfg.enablePvP = PvP;
+				}));
+		this.updateButton(pvpButton, singleplayerServer, 
+				Tooltip.create(Component.translatable("mcwifipnp.gui.PvP.info")),
+				Tooltip.create(Component.translatable("editGamerule.inGame.disabled.tooltip")),
+				Tooltip.create(Component.translatable("editGamerule.inGame.disabled.hardcore.tooltip")));
+
 		// Apply for All World button
 		rowHelper.addChild(CycleButton.onOffBuilder(cfg.applyforallworld)
 				.create(Component.translatable("mcwifipnp.gui.applyforallworld"), (cycleButton, applyforallworld) -> {
@@ -256,33 +320,31 @@ public class MultiplayerOptionsScreenNew extends Screen
 				}));
 
 		// Back to Vanilla Screen button
-		rowHelper
-				.addChild(Button.builder(Component.translatable("mcwifipnp.gui.backToVanillaScreen"), button -> {
-					this.minecraft.gui
-								.setScreen(new MultiplayerOptionsScreen(this));
-				}).build());
+		rowHelper.addChild(Button.builder(Component.translatable("mcwifipnp.gui.backToVanillaScreen"), button -> {
+			this.minecraft.gui
+					.setScreen(new MultiplayerOptionsScreen(this));
+		}).build());
 
 	}
 
-	private void multiplayerOptions(final LinearLayout content) {
+	private void multiplayerOptions(final LinearLayout content, final @Nullable IntegratedServer singleplayerServer) {
 		GridLayout grid = content.addChild(new GridLayout());
-		GridLayout.RowHelper rowHelper = grid.columnSpacing(8).rowSpacing(4).createRowHelper(2);
+		grid.defaultCellSetting().alignHorizontallyCenter();
+		RowHelper rowHelper = grid.columnSpacing(8).rowSpacing(4).createRowHelper(2);
 		rowHelper.defaultCellSetting().alignHorizontallyCenter();
 
-		IntegratedServer singleplayerServer = Minecraft.getInstance().getSingleplayerServer();
-
-		rowHelper.addChild(
-				new StringWidget(Component.translatable("options.worldOptions.multiplayer.title")
-						.withStyle(ChatFormatting.UNDERLINE, ChatFormatting.BOLD), this.font),
+		rowHelper.addChild(new StringWidget(Component.translatable("options.worldOptions.multiplayer.title")
+				.withStyle(ChatFormatting.UNDERLINE, ChatFormatting.BOLD), this.font),
 				2);
 
 		// Multiplayer Scope button
-		rowHelper.addChild(CycleButton.builder(MinecraftServer.MultiplayerScope::getDisplayName, cfg.multiplayerScope)
-				.withValues(MinecraftServer.MultiplayerScope.values()).withTooltip(scope -> Tooltip.create(scope.getTooltip()))
+		rowHelper.addChild(CycleButton.builder(MultiplayerScope::getDisplayName, cfg.multiplayerScope)
+				.withValues(MultiplayerScope.values()).withTooltip(scope -> Tooltip.create(scope.getTooltip()))
 				.create(Component.translatable("menu.multiplayerOptions.network"), (cycleButton, value) -> {
 					cfg.multiplayerScope = value;
 					this.updateGuestCommandAccessButton(singleplayerServer);
-					this.updateEditBoxState();
+					this.updateForceGameModeButton(singleplayerServer);
+					this.updateMultiplayerOptions(singleplayerServer);
 				}));
 
 		// Guest Command Access button
@@ -293,13 +355,14 @@ public class MultiplayerOptionsScreenNew extends Screen
 						(cycleButton, allowGuestCommands) -> {
 							cfg.allowGuestCommands = allowGuestCommands;
 							initialallowGuestCommands = allowGuestCommands;
+							this.updateForceGameModeButton(singleplayerServer);
 						}));
 		this.updateGuestCommandAccessButton(singleplayerServer);
 
 		// Port field
 		portEdit = new EditBox(this.font, Component.translatable("lanServer.port"));
 		portEdit.setResponder(value -> {
-			this.setPortError(this.tryParsePort(value));
+			this.setPortError(this.portEdit, this.tryParsePort(value));
 			portEdit.setHint(Component.literal(String.valueOf(cfg.port)));
 		});
 		LinearLayout portRow = LinearLayout.vertical().spacing(4);
@@ -344,37 +407,50 @@ public class MultiplayerOptionsScreenNew extends Screen
 		motdLabel = motdRow.addChild(new StringWidget(Component.translatable("mcwifipnp.gui.motd"), this.font));
 		motdRow.addChild(motdEdit);
 		rowHelper.addChild(motdRow, 2);
-		this.updateEditBoxState();
+
+		// Force GameMode button
+		this.forceGameModeButton = rowHelper.addChild(
+				CycleButton.onOffBuilder(cfg.forceGameMode)
+						.withTooltip(value -> value
+								? Tooltip.create(Component.translatable("options.worldOptions.guest.force_game_mode.on.tooltip"))
+								: Tooltip.create(Component.translatable("options.worldOptions.guest.force_game_mode.off.tooltip")))
+						.create(Component.translatable("options.worldOptions.guest.force_game_mode"),
+								(cycleButton, forceGameMode) -> {
+									cfg.forceGameMode = forceGameMode;
+								}));
+		this.updateForceGameModeButton(singleplayerServer);
 
 		// Enforce Whitelist button
-		rowHelper.addChild(CycleButton.onOffBuilder(cfg.enforceWhitelist)
+		this.enforceWhitelistButton = rowHelper.addChild(CycleButton.onOffBuilder(cfg.enforceWhitelist)
 				.withTooltip((state) -> Tooltip.create(Component.translatable("mcwifipnp.gui.Whitelist.info")))
 				.create(Component.translatable("mcwifipnp.gui.Whitelist"), (cycleButton, enforceWhitelist) -> {
 					cfg.enforceWhitelist = enforceWhitelist;
 				}));
 
 		// Online Mode button
-		rowHelper
+		this.onlineModeButton = rowHelper
 				.addChild(CycleButton.builder(OnlineMode::getDisplayName, OnlineMode.of(cfg.onlineMode, cfg.enableUUIDFixer))
 						.withValues(OnlineMode.values()).withTooltip((OnlineMode) -> Tooltip.create(OnlineMode.gettoolTip()))
-						.create(Component.translatable("mcwifipnp.gui.OnlineMode"), (cycleButton, onlineMode) -> {
+						.create(0, 0, 308, 20, Component.translatable("mcwifipnp.gui.OnlineMode"), (cycleButton, onlineMode) -> {
 							cfg.onlineMode = onlineMode.onlineMode;
 							cfg.enableUUIDFixer = onlineMode.fixUUID;
-						}));
+						}), 2);
 
 		// Use UPnP button
-		rowHelper.addChild(CycleButton.onOffBuilder(cfg.useUPnP)
+		this.useUPnPButton = rowHelper.addChild(CycleButton.onOffBuilder(cfg.useUPnP)
 				.withTooltip((state) -> Tooltip.create(Component.translatable("mcwifipnp.gui.UseUPnP.info")))
 				.create(Component.translatable("mcwifipnp.gui.UseUPnP"), (cycleButton, useUPnP) -> {
 					cfg.useUPnP = useUPnP;
 				}));
 
 		// Get Public IP button
-		rowHelper.addChild(CycleButton.onOffBuilder(cfg.getPublicIP)
+		this.getPublicIPButton = rowHelper.addChild(CycleButton.onOffBuilder(cfg.getPublicIP)
 				.withTooltip((state) -> Tooltip.create(Component.translatable("mcwifipnp.gui.CopyIP.info")))
 				.create(Component.translatable("mcwifipnp.gui.CopyIP"), (cycleButton, getPublicIP) -> {
 					cfg.getPublicIP = getPublicIP;
 				}));
+
+		this.updateMultiplayerOptions(singleplayerServer);
 
 	}
 
@@ -382,6 +458,7 @@ public class MultiplayerOptionsScreenNew extends Screen
 	protected void repositionElements() {
 		this.scrollArea.arrangeElements();
 		this.scrollArea.setMaxHeight(this.layout.getContentHeight());
+		this.scrollArea.setMinHeight(this.layout.getContentHeight());
 		this.layout.arrangeElements();
 	}
 
@@ -428,14 +505,22 @@ public class MultiplayerOptionsScreenNew extends Screen
 	@Override
 	public void onGamemasterPermissionChanged(final boolean hasGamemasterPermission) {
 		IntegratedServer singleplayerServer = this.minecraft.getSingleplayerServer();
-		this.updateButton(this.gameRulesButton, singleplayerServer,
-				Tooltip.create(Component.translatable("editGamerule.inGame.disabled.hardcore.tooltip")),
+		this.updateButton(this.defaultGameModeButton, singleplayerServer,
+				Tooltip.create(Component.translatable("options.worldOptions.game_mode.tooltip")),
+				Tooltip.create(Component.translatable("options.worldOptions.game_mode.disabled.operator.tooltip")),
+				Tooltip.create(Component.translatable("options.worldOptions.game_mode.disabled.tooltip")));
+		this.updateButton(this.personalGameModeButton, singleplayerServer,
+				Tooltip.create(Component.translatable("options.worldOptions.personal_game_mode.tooltip")),
+				Tooltip.create(Component.translatable("options.worldOptions.game_mode.disabled.operator.tooltip")),
+				Tooltip.create(Component.translatable("options.worldOptions.game_mode.disabled.tooltip")));
+		this.updateButton(this.gameRulesButton, singleplayerServer, null,
+				Tooltip.create(Component.translatable("editGamerule.inGame.disabled.tooltip")),
 				Tooltip.create(Component.translatable("editGamerule.inGame.disabled.hardcore.tooltip")));
-		this.updateButton(this.gameModeButton, singleplayerServer,
-				Tooltip.create(Component.translatable("options.worldOptions.game_mode.disabled.tooltip")),
-				Tooltip.create(Component.translatable("options.worldOptions.game_mode.disabled.operator.tooltip")));
-		this.updateButton(this.pvpButton, singleplayerServer, null, null);
-		this.difficultyButtons.refresh(this.minecraft);
+		this.updateButton(this.pvpButton, singleplayerServer, 
+				Tooltip.create(Component.translatable("mcwifipnp.gui.PvP.info")),
+				Tooltip.create(Component.translatable("editGamerule.inGame.disabled.tooltip")),
+				Tooltip.create(Component.translatable("editGamerule.inGame.disabled.hardcore.tooltip")));
+		this.difficultyButtons.refresh(this.minecraft, this);
 		if (!hasGamemasterPermission && !this.minecraft.hasSingleplayerServer()) {
 			this.minecraft.gui.setScreen(this.lastScreen);
 			if (this.minecraft.gui.screen() instanceof HasGamemasterPermissionReaction screen) {
@@ -445,41 +530,50 @@ public class MultiplayerOptionsScreenNew extends Screen
 	}
 
 	private void updateButton(
-			final @Nullable AbstractWidget widget, final @Nullable IntegratedServer singleplayerServer,
-			final Tooltip hardcoreTooltip, final Tooltip disabledTooltip) {
+			final @Nullable AbstractWidget widget,
+			final @Nullable IntegratedServer singleplayerServer,
+			final @Nullable Tooltip tooltip,
+			final Tooltip disabledTooltip,
+			final Tooltip hardcoreTooltip) {
 		if (widget != null) {
 			boolean hardcore = singleplayerServer != null && singleplayerServer.isHardcore();
 			boolean hasGameMasterPermission = this.minecraft.player != null
 					&& this.minecraft.player.permissions().hasPermission(Permissions.COMMANDS_GAMEMASTER);
 			widget.active = !hardcore && hasGameMasterPermission;
-			widget.setTooltip(hardcore ? hardcoreTooltip : (hasGameMasterPermission ? null : disabledTooltip));
+			widget.setTooltip(hardcore ? hardcoreTooltip : (hasGameMasterPermission ? tooltip : disabledTooltip));
 		}
 	}
 
 	@Override
+	public void added() {
+		this.difficultyButtons.refresh(this.minecraft, this);
+	}
+
+	@Override
 	public void onDifficultyChanged() {
-		this.difficultyButtons.refresh(this.minecraft);
+		this.difficultyButtons.refresh(this.minecraft, this);
 	}
 
-	private void changeMultiplayerScope(final IntegratedServer server) {
-		if (server.unpublishServer()) {
-			this.sendPublishMessage(Component.translatable("menu.multiplayerOptions.publish.stopped"));
-			UPnPModule.stop(server);
-		}
+	private void changeMultiplayerScope(final IntegratedServer singleplayerServer) {
+		if (cfg.multiplayerScope != null) {
+			if (singleplayerServer.unpublishServer()) {
+				this.sendPublishMessage(Component.translatable("menu.multiplayerOptions.publish.stopped"));
+				UPnPModule.stop(singleplayerServer);
+			}
 
-		if (cfg.multiplayerScope != MinecraftServer.MultiplayerScope.OFF) {
-			this.publish(server, cfg.multiplayerScope);
-		}
+			if (cfg.multiplayerScope != MultiplayerScope.OFF) {
+				this.publish(singleplayerServer, cfg.multiplayerScope);
+			}
 
-		this.minecraft.getPlayerSocialManager().getPresenceHandler().tryUpdatePresence();
+			this.minecraft.getPlayerSocialManager().getPresenceHandler().tryUpdatePresence();
+		}
 	}
 
-	private void publish(final IntegratedServer server, final MinecraftServer.MultiplayerScope scope) {
-		boolean published = server.publishServer(scope, cfg.gameMode, cfg.allowGuestCommands, cfg.port);
-		if (!published) {
+	private void publish(final IntegratedServer singleplayerServer, final MultiplayerScope scope) {
+		if (!singleplayerServer.publishServer(scope, cfg.port)) {
 			this.sendPublishMessage(Component.translatable("commands.publish.failed"));
 		} else {
-			Component message = scope == MinecraftServer.MultiplayerScope.LAN
+			Component message = scope == MultiplayerScope.LAN
 					? Component.translatable("menu.multiplayerOptions.publish.started.lan",
 							ComponentUtils.copyOnClickText(String.valueOf(cfg.port)))
 					: Component.translatable("menu.multiplayerOptions.publish.started.online");
@@ -493,8 +587,8 @@ public class MultiplayerOptionsScreenNew extends Screen
 		this.minecraft.updateTitle();
 	}
 
-	private void updateEditBoxState() {
-		boolean lanWanted = cfg.multiplayerScope == MinecraftServer.MultiplayerScope.LAN;
+	private void updateMultiplayerOptions(final IntegratedServer singleplayerServer) {
+		boolean lanWanted = cfg.multiplayerScope == MultiplayerScope.LAN;
 		if (this.portEdit != null) {
 			this.portEdit.setValue(lanWanted ? String.valueOf(cfg.port) : "");
 			this.portEdit.setEditable(lanWanted);
@@ -502,7 +596,7 @@ public class MultiplayerOptionsScreenNew extends Screen
 			this.portEdit.setHint(lanWanted ? Component.literal(String.valueOf(cfg.port)) : Component.empty());
 			if (!lanWanted) {
 				this.portEdit.setFocused(false);
-				this.setPortError(null);
+				this.setPortError(this.portEdit, null);
 			}
 			portEdit.setTooltip(Tooltip.create(Component.translatable("mcwifipnp.gui.port.info")));
 		}
@@ -530,10 +624,26 @@ public class MultiplayerOptionsScreenNew extends Screen
 		if (this.portLabel != null) {
 			this.portLabel.setMessage(lanWanted ? Component.translatable("lanServer.port")
 					: Component.translatable("lanServer.port").copy().withStyle(ChatFormatting.GRAY));
+		}
+		if (this.maxPlayersLabel != null) {
 			this.maxPlayersLabel.setMessage(lanWanted ? Component.translatable("mcwifipnp.gui.players")
 					: Component.translatable("mcwifipnp.gui.players").copy().withStyle(ChatFormatting.GRAY));
+		}
+		if (this.motdLabel != null) {
 			this.motdLabel.setMessage(lanWanted ? Component.translatable("mcwifipnp.gui.motd")
 					: Component.translatable("mcwifipnp.gui.motd").copy().withStyle(ChatFormatting.GRAY));
+		}
+		if (this.getPublicIPButton != null) {
+			this.getPublicIPButton.active = lanWanted;
+		}
+		if (this.useUPnPButton != null) {
+			this.useUPnPButton.active = lanWanted;
+		}
+		if (this.enforceWhitelistButton != null) {
+			this.enforceWhitelistButton.active = lanWanted;
+		}
+		if (this.onlineModeButton != null) {
+			this.onlineModeButton.active = lanWanted;
 		}
 	}
 
@@ -541,38 +651,37 @@ public class MultiplayerOptionsScreenNew extends Screen
 	private Component tryParsePort(final String value) {
 		if (value.isBlank()) {
 			return null;
-		} else {
-			try {
-				int parsed = Integer.parseInt(value);
-				if (parsed < 1024 || parsed > 65535) {
-					return Component.translatable("lanServer.port.invalid", 1024, 65535);
-				} else if (parsed != this.initialPort && !HttpUtil.isPortAvailable(parsed)) {
-					return Component.translatable("lanServer.port.unavailable", 1024, 65535);
-				} else {
-					cfg.port = parsed;
-					return null;
-				}
-			} catch (NumberFormatException var3) {
+		}
+		try {
+			int parsed = Integer.parseInt(value);
+			if (parsed < 1024 || parsed > 65535) {
 				return Component.translatable("lanServer.port.invalid", 1024, 65535);
 			}
+			if (parsed != this.initialPort && !HttpUtil.isPortAvailable(parsed)) {
+				return Component.translatable("lanServer.port.unavailable", 1024, 65535);
+			}
+
+			cfg.port = parsed;
+			return null;
+		} catch (NumberFormatException e) {
+			cfg.port = HttpUtil.getAvailablePort();
+			return Component.translatable("lanServer.port.invalid", 1024, 65535);
 		}
 	}
 
-	private void setPortError(@Nullable final Component errorMessage) {
-		if (portEdit != null) {
-			if (errorMessage == null) {
-				portEdit.setTextColor(-2039584);
-				portEdit.setTooltip(Tooltip.create(Component.translatable("mcwifipnp.gui.port.info")));
-			} else {
-				portEdit.setTextColor(-2142128);
-				portEdit.setTooltip(Tooltip.create(errorMessage));
-			}
+	private void setPortError(final EditBox portEdit, final @Nullable Component errorMessage) {
+		if (errorMessage == null) {
+			portEdit.setTextColor(-2039584);
+			portEdit.setTooltip(Tooltip.create(Component.translatable("mcwifipnp.gui.port.info")));
+		} else {
+			portEdit.setTextColor(-2142128);
+			portEdit.setTooltip(Tooltip.create(errorMessage));
 		}
 	}
 
 	private void updateGuestCommandAccessButton(final IntegratedServer singleplayerServer) {
 		if (this.guestCommandAccessButton != null) {
-			boolean lanScope = cfg.multiplayerScope == MinecraftServer.MultiplayerScope.LAN;
+			boolean lanScope = cfg.multiplayerScope == MultiplayerScope.LAN;
 			boolean allowCommands = Boolean.TRUE.equals(cfg.allowHostCommands);
 			Tooltip tooltip;
 			if (!lanScope) {
@@ -591,6 +700,28 @@ public class MultiplayerOptionsScreenNew extends Screen
 			this.guestCommandAccessButton.setValue(cfg.allowGuestCommands);
 			this.guestCommandAccessButton.setTooltip(tooltip);
 			this.guestCommandAccessButton.active = lanScope && allowCommands;
+		}
+	}
+
+	private void updateForceGameModeButton(final IntegratedServer singleplayerServer) {
+		if (this.forceGameModeButton != null) {
+			boolean lanScope = cfg.multiplayerScope == MultiplayerScope.LAN;
+			boolean guestCommandAccess = Boolean.TRUE.equals(cfg.allowGuestCommands);
+			Tooltip tooltip;
+			if (!lanScope || guestCommandAccess) {
+				cfg.forceGameMode = false;
+				tooltip = Tooltip
+						.create(Component.translatable("options.worldOptions.guest.force_game_mode.off.commands.tooltip"));
+			} else {
+				cfg.forceGameMode = initialForceGameMode ? false : true;
+				tooltip = cfg.forceGameMode
+						? Tooltip.create(Component.translatable("options.worldOptions.guest.force_game_mode.on.tooltip"))
+						: Tooltip.create(Component.translatable("options.worldOptions.guest.force_game_mode.off.tooltip"));
+			}
+
+			this.forceGameModeButton.setValue(cfg.forceGameMode);
+			this.forceGameModeButton.setTooltip(tooltip);
+			this.forceGameModeButton.active = lanScope && !guestCommandAccess;
 		}
 	}
 
@@ -615,7 +746,7 @@ public class MultiplayerOptionsScreenNew extends Screen
 		private static final Component DIFFICULTY_LOCK_TITLE = Component.translatable("difficulty.lock.title");
 
 		public static DifficultyButtons create(final Minecraft minecraft, final Level level,
-				final MultiplayerOptionsScreenNew screen) {
+				final WorldOptionsScreenNew screen) {
 			screen.wantedDifficulty = level.getDifficulty();
 			screen.initialDifficulty = screen.wantedDifficulty;
 			CycleButton<Difficulty> difficultyButton = CycleButton.builder(Difficulty::getDisplayName, level.getDifficulty())
@@ -628,40 +759,46 @@ public class MultiplayerOptionsScreenNew extends Screen
 			LockIconButton lockButton = new LockIconButton(
 					0,
 					0,
-					button -> minecraft.gui
-							.setScreen(
-									new PopupScreen.Builder(screen, DIFFICULTY_LOCK_TITLE)
-											.addMessage(Component.translatable("difficulty.lock.question",
-													level.getLevelData().getDifficulty().getDisplayName()))
-											.addButton(CommonComponents.GUI_YES, var3x -> {
-												minecraft.gui.setScreen(screen);
-												if (button instanceof LockIconButton lockIconButton) {
-													lockIconButton.setLocked(true);
-												}
+					button -> {
+						Component difficultyDisplayName = screen.wantedDifficulty != null ? screen.wantedDifficulty.getDisplayName()
+								: level.getDifficulty().getDisplayName();
+						minecraft.gui
+								.setScreen(
+										new Builder(screen, DIFFICULTY_LOCK_TITLE)
+												.addMessage(Component.translatable("difficulty.lock.question", difficultyDisplayName))
+												.addButton(CommonComponents.GUI_YES, var3x -> {
+													if (button instanceof LockIconButton lockIconButton) {
+														lockIconButton.setLocked(true);
+													}
 
-												screen.wantedDifficultyLocked = true;
-											})
-											.addButton(CommonComponents.GUI_NO, var3x -> {
-												minecraft.gui.setScreen(screen);
-												if (button instanceof LockIconButton lockIconButton) {
-													lockIconButton.setLocked(false);
-												}
+													screen.wantedDifficultyLocked = true;
+													minecraft.gui.setScreen(screen);
+												})
+												.addButton(CommonComponents.GUI_NO, var3x -> {
+													if (button instanceof LockIconButton lockIconButton) {
+														lockIconButton.setLocked(false);
+													}
 
-												screen.wantedDifficultyLocked = false;
-											})
-											.build()));
+													screen.wantedDifficultyLocked = false;
+													minecraft.gui.setScreen(screen);
+												})
+												.build());
+					});
 			difficultyButton.setWidth(difficultyButton.getWidth() - lockButton.getWidth());
 			lockButton.setLocked(isDifficultyLocked(level));
 			updateDifficultyButtonsState(minecraft, level, difficultyButton, lockButton);
-			EqualSpacingLayout linearLayout = new EqualSpacingLayout(150, 0, EqualSpacingLayout.Orientation.HORIZONTAL);
+			EqualSpacingLayout linearLayout = new EqualSpacingLayout(150, 0, Orientation.HORIZONTAL);
 			linearLayout.addChild(difficultyButton);
 			linearLayout.addChild(lockButton);
 			return new DifficultyButtons(linearLayout, difficultyButton, lockButton, level);
 		}
 
-		public void refresh(final Minecraft minecraft) {
-			this.difficultyButton.setValue(this.level.getDifficulty());
-			this.lockButton.setLocked(isDifficultyLocked(this.level));
+		private void refresh(final Minecraft minecraft, final WorldOptionsScreenNew screen) {
+			this.difficultyButton
+					.setValue(screen.wantedDifficulty != null ? screen.wantedDifficulty : this.level.getDifficulty());
+			this.lockButton
+					.setLocked(
+							screen.wantedDifficultyLocked != null ? screen.wantedDifficultyLocked : isDifficultyLocked(this.level));
 			updateDifficultyButtonsState(minecraft, this.level, this.difficultyButton, this.lockButton);
 		}
 
@@ -698,7 +835,8 @@ public class MultiplayerOptionsScreenNew extends Screen
 			this.minecraft.getConnection().send(new ServerboundChangeDifficultyPacket(this.wantedDifficulty));
 		}
 
-		if (this.wantedDifficultyLocked != this.initialDifficultyLocked && this.minecraft.getConnection() != null) {
+		if (this.wantedDifficultyLocked != null && this.wantedDifficultyLocked != this.initialDifficultyLocked
+				&& this.minecraft.getConnection() != null) {
 			this.minecraft.getConnection().send(new ServerboundLockDifficultyPacket(true));
 			this.difficultyButtons.lockButton.setLocked(true);
 			DifficultyButtons.updateDifficultyButtonsState(

@@ -1,4 +1,5 @@
 {
+  "mcwifipnp.gui.applyGeneralChanges": "Apply General",
   "mcwifipnp.gui.port.info": "The port to listen on.",
   "mcwifipnp.gui.port.invalid": "Not a valid port.\nMust be a number between §41024 and 65535§f.",
   "mcwifipnp.gui.port.unavailable": "§4Port not available!",
@@ -50,12 +51,25 @@
   "mcwifipnp.commands.uuidfixer.none": "UUID Fixer's policy list is empty.",
   "mcwifipnp.commands.uuidfixer.policy.not-exist": "%s is not in the UUID Fixer's policy list!",
   "mcwifipnp.commands.uuidfixer.remove.success": "Removed %s from the UUID Fixer's policy list.",
+  "options.worldOptions.button": "World Options...",
+  "options.worldOptions.difficulty.disabled.hardcore.tooltip": "Cannot change the difficulty in a hardcore world.",
+  "options.worldOptions.difficulty.disabled.locked.tooltip": "Difficulty is locked.",
+  "options.worldOptions.difficulty.disabled.operator.tooltip": "Changing the difficulty requires operator permissions.",
+  "options.worldOptions.game_mode": "Default Game Mode",
+  "options.worldOptions.game_mode.disabled.operator.tooltip": "Changing the game mode requires operator permissions.",
+  "options.worldOptions.game_mode.disabled.tooltip": "Cannot change the game mode in a hardcore world.",
+  "options.worldOptions.game_mode.tooltip": "Changes the default game mode of the world.",
   "options.worldOptions.general.title": "General",
   "options.worldOptions.guest.command_access": "Command Access",
   "options.worldOptions.guest.command_access.disabled.commands.tooltip": "Cannot change the command access of players joining your world when commands are not allowed.",
   "options.worldOptions.guest.command_access.disabled.scope.tooltip": "Cannot change the command access of players joining your world when the world's multiplayer scope is set to \"Off\".",
   "options.worldOptions.guest.command_access.tooltip": "Controls whether players that join your world can use commands or not.",
+  "options.worldOptions.guest.force_game_mode": "Force Game Mode",
+  "options.worldOptions.guest.force_game_mode.off.commands.tooltip": "Other players can set their own game mode through commands.",
+  "options.worldOptions.guest.force_game_mode.off.tooltip": "Other players will retain their current game mode regardless of the world's default game mode.",
+  "options.worldOptions.guest.force_game_mode.on.tooltip": "Other players will be forced to play the world's default game mode.",
   "options.worldOptions.multiplayer.title": "Multiplayer",
-  "editGamerule.inGame.disabled.hardcore.tooltip": "Cannot change game rules in a hardcore world.",
-  "editGamerule.inGame.disabled.tooltip": "Updating game rules requires operator permissions."
+  "options.worldOptions.personal_game_mode": "Personal Game Mode",
+  "options.worldOptions.personal_game_mode.tooltip": "Changes your game mode in this world.",
+  "options.worldOptions.title": "World Options"
 }

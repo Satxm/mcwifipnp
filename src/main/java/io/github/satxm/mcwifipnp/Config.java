@@ -38,8 +38,14 @@ public class Config {
 	@SerializedName(value = "max-players", alternate = { "MaxPlayers" })
 	public int maxPlayers = 8;
 
-	@SerializedName(value = "gamemode", alternate = { "GameMode" })
-	public GameType gameMode = GameType.SURVIVAL;
+	@SerializedName(value = "defaultgamemode", alternate = { "DefaultGameMode" })
+	public GameType defaultGameMode = GameType.SURVIVAL;
+
+	@SerializedName(value = "personalgamemode", alternate = { "PersonalGameMode" })
+	public GameType personalGameMode = GameType.SURVIVAL;
+
+	@SerializedName(value = "forcegamemode", alternate = { "ForceGameMode" })
+	public boolean forceGameMode = true;
 
 	@SerializedName(value = "motd", alternate = { "MOTD" })
 	public String motd = Component.translatable("lanServer.title").getString();
@@ -195,8 +201,10 @@ public class Config {
 
 		this.port = server.getPort();
 
+		this.defaultGameMode = server.getDefaultGameType();
+		this.personalGameMode = playerList.getPlayer(server.getSingleplayerProfile().id()).gameMode();
+		this.allowHostCommands = server.getWorldData().isAllowCommands();
 		this.allowGuestCommands = playerList.isAllowCommandsForAllPlayers();
-		this.gameMode = server.getDefaultGameType();
 
 		this.maxPlayers = playerList.getMaxPlayers();
 		this.onlineMode = server.usesAuthentication();
@@ -209,8 +217,13 @@ public class Config {
 
 	public void applyTo(MinecraftServer server) {
 		PlayerList playerList = server.getPlayerList();
-		server.setDefaultGameType(this.gameMode);
+
+		playerList.getPlayer(server.getSingleplayerProfile().id()).setGameMode(this.personalGameMode);
+		server.setDefaultGameType(this.defaultGameMode);
+		server.getWorldData().setAllowCommands(this.allowHostCommands);
 		playerList.setAllowCommandsForAllPlayers(this.allowGuestCommands);
+		if (this.forceGameMode)
+			server.enforceGameTypeForPlayers(this.defaultGameMode);
 
 		server.setUsesAuthentication(this.onlineMode);
 		server.getGameRules().set(GameRules.PVP, this.enablePvP, server);
