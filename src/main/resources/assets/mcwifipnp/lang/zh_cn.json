@@ -1,4 +1,5 @@
 {
+  "mcwifipnp.gui.applyGeneralChanges": "应用通用设置",
   "mcwifipnp.gui.port.info": "多人游戏端口号。",
   "mcwifipnp.gui.port.invalid": "端口无效。\n请输入一个介于§41024至65535§f之间的数字。",
   "mcwifipnp.gui.port.unavailable": "§4端口不可用。",

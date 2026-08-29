@@ -55,6 +55,7 @@ import net.minecraft.util.HttpUtil;
 import net.minecraft.world.Difficulty;
 import net.minecraft.world.level.GameType;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.gamerules.GameRules;
 
 public class WorldOptionsScreenNew extends Screen implements HasGamemasterPermissionReaction, HasDifficultyReaction {
 	private final Config cfg;
@@ -65,7 +66,6 @@ public class WorldOptionsScreenNew extends Screen implements HasGamemasterPermis
 	public final HeaderAndFooterLayout layout = new HeaderAndFooterLayout(this);
 	private @Nullable ScrollableLayout scrollArea;
 	private @Nullable CycleButton<Boolean> guestCommandAccessButton;
-	private @Nullable Button applyChanges;
 	private @Nullable Button gameRulesButton;
 	private @Nullable CycleButton<GameType> defaultGameModeButton;
 	private @Nullable CycleButton<GameType> personalGameModeButton;
@@ -126,12 +126,36 @@ public class WorldOptionsScreenNew extends Screen implements HasGamemasterPermis
 		this.initialForceGameMode = cfg.forceGameMode;
 	}
 
-	protected void onConfirmClicked() {
+	protected void applyGeneralChanges() {
 		IntegratedServer singleplayerServer = Minecraft.getInstance().getSingleplayerServer();
 		PlayerList playerList = singleplayerServer.getPlayerList();
 		NameAndId hostPlayer = new NameAndId(singleplayerServer.getSingleplayerProfile());
-		updateDifficulty();
 		cfg.save(singleplayerServer);
+
+		updateDifficulty();
+		singleplayerServer.setPersonalGameType(cfg.personalGameMode);
+		singleplayerServer.setWorldGameType(cfg.defaultGameMode);
+		singleplayerServer.setWorldAllowCommands(cfg.allowHostCommands);
+		singleplayerServer.getGameRules().set(GameRules.PVP, cfg.enablePvP, singleplayerServer);
+
+		if (cfg.allowHostCommands) {
+			playerList.getOps().add(new ServerOpListEntry(hostPlayer, LevelBasedPermissionSet.OWNER,
+					playerList.canBypassPlayerLimit(hostPlayer)));
+		} else {
+			playerList.getOps().remove(hostPlayer);
+		}
+		for (ServerPlayer serverPlayer : singleplayerServer.getPlayerList().getPlayers()) {
+			playerList.sendPlayerPermissionLevel(serverPlayer);
+		}
+	}
+
+	protected void applyChanges() {
+		IntegratedServer singleplayerServer = Minecraft.getInstance().getSingleplayerServer();
+		PlayerList playerList = singleplayerServer.getPlayerList();
+		NameAndId hostPlayer = new NameAndId(singleplayerServer.getSingleplayerProfile());
+
+		cfg.save(singleplayerServer);
+		updateDifficulty();
 
 		if (cfg.multiplayerScope != initialMultiplayerScope || cfg.port != initialPort
 				|| cfg.allowGuestCommands != initialallowGuestCommands) {
@@ -192,12 +216,18 @@ public class WorldOptionsScreenNew extends Screen implements HasGamemasterPermis
 			this.multiplayerOptions(content, singleplayerServer);
 		}
 
-		LinearLayout footer = this.layout.addToFooter(LinearLayout.horizontal().spacing(8));
-		this.applyChanges = Button
-				.builder(Component.translatable("menu.multiplayerOptions.applyChanges"), button -> this.onConfirmClicked())
-				.build();
-		footer.addChild(this.applyChanges);
-		footer.addChild(Button.builder(CommonComponents.GUI_CANCEL, button -> this.onClose()).build());
+		GridLayout footer = this.layout.addToFooter(new GridLayout().columnSpacing(4).rowSpacing(4));
+		footer.defaultCellSetting().alignHorizontallyCenter();
+		GridLayout.RowHelper rowHelper = footer.createRowHelper(3);
+
+		rowHelper.addChild(Button
+				.builder(Component.translatable("mcwifipnp.gui.applyGeneralChanges"), button -> this.applyGeneralChanges())
+				.width(100).build());
+		rowHelper.addChild(Button
+				.builder(Component.translatable("menu.multiplayerOptions.applyChanges"),
+						button -> this.applyChanges())
+				.width(100).build());
+		rowHelper.addChild(Button.builder(CommonComponents.GUI_CANCEL, button -> this.onClose()).width(100).build());
 
 		this.layout.visitWidgets(this::addRenderableWidget);
 		this.repositionElements();
@@ -206,17 +236,16 @@ public class WorldOptionsScreenNew extends Screen implements HasGamemasterPermis
 	private void generalOptions(final LinearLayout content, final @Nullable IntegratedServer singleplayerServer) {
 		GridLayout grid = content.addChild(new GridLayout());
 		grid.defaultCellSetting().alignHorizontallyCenter();
-		RowHelper helper = grid.columnSpacing(8).rowSpacing(4).createRowHelper(2);
-		helper.defaultCellSetting().alignHorizontallyCenter();
+		RowHelper rowHelper = grid.columnSpacing(8).rowSpacing(4).createRowHelper(2);
+		rowHelper.defaultCellSetting().alignHorizontallyCenter();
 
-		helper
-				.addChild(FocusableTextWidget
-						.builder(Component.translatable("options.worldOptions.general.title").withStyle(ChatFormatting.UNDERLINE,
-								ChatFormatting.BOLD), this.font)
-						.alwaysShowBorder(false).backgroundFill(BackgroundFill.ON_FOCUS).build(), 2);
+		rowHelper.addChild(FocusableTextWidget
+				.builder(Component.translatable("options.worldOptions.general.title").withStyle(ChatFormatting.UNDERLINE,
+						ChatFormatting.BOLD), this.font)
+				.alwaysShowBorder(false).backgroundFill(BackgroundFill.ON_FOCUS).build(), 2);
 
 		// Default GameMode toggle button
-		this.defaultGameModeButton = helper
+		this.defaultGameModeButton = rowHelper
 				.addChild(CycleButton.builder(GameType::getShortDisplayName, cfg.defaultGameMode)
 						.withValues(GameType.values())
 						.create(0, 0, 308, 20, Component.translatable("options.worldOptions.game_mode"),
@@ -226,11 +255,11 @@ public class WorldOptionsScreenNew extends Screen implements HasGamemasterPermis
 						2);
 		this.updateButton(defaultGameModeButton, singleplayerServer,
 				Tooltip.create(Component.translatable("options.worldOptions.game_mode.tooltip")),
-				Tooltip.create(Component.translatable("options.worldOptions.game_mode.disabled.tooltip")),
-				Tooltip.create(Component.translatable("options.worldOptions.game_mode.disabled.operator.tooltip")));
+				Tooltip.create(Component.translatable("options.worldOptions.game_mode.disabled.operator.tooltip")),
+				Tooltip.create(Component.translatable("options.worldOptions.game_mode.disabled.tooltip")));
 
 		// Personal GameMode toggle button
-		this.personalGameModeButton = helper
+		this.personalGameModeButton = rowHelper
 				.addChild(CycleButton.builder(GameType::getShortDisplayName, cfg.personalGameMode)
 						.withValues(GameType.values())
 						.create(0, 0, 308, 20, Component.translatable("options.worldOptions.personal_game_mode"),
@@ -240,11 +269,11 @@ public class WorldOptionsScreenNew extends Screen implements HasGamemasterPermis
 						2);
 		this.updateButton(personalGameModeButton, singleplayerServer,
 				Tooltip.create(Component.translatable("options.worldOptions.personal_game_mode.tooltip")),
-				Tooltip.create(Component.translatable("options.worldOptions.game_mode.disabled.tooltip")),
-				Tooltip.create(Component.translatable("options.worldOptions.game_mode.disabled.operator.tooltip")));
+				Tooltip.create(Component.translatable("options.worldOptions.game_mode.disabled.operator.tooltip")),
+				Tooltip.create(Component.translatable("options.worldOptions.game_mode.disabled.tooltip")));
 
 		// Allow Host Cheat button
-		helper.addChild(CycleButton.onOffBuilder(cfg.allowHostCommands)
+		rowHelper.addChild(CycleButton.onOffBuilder(cfg.allowHostCommands)
 				.create(Component.translatable("selectWorld.allowCommands"), (cycleButton, allowHostCommands) -> {
 					cfg.allowHostCommands = allowHostCommands;
 					this.updateGuestCommandAccessButton(singleplayerServer);
@@ -252,64 +281,61 @@ public class WorldOptionsScreenNew extends Screen implements HasGamemasterPermis
 				}));
 
 		// Difficulty buttons
-		helper.addChild(this.difficultyButtons.layout());
+		rowHelper.addChild(this.difficultyButtons.layout());
 
 		// GameRules button
-		gameRulesButton = Button.builder(Component.translatable("editGamerule.inGame.button"), button -> {
-			if (this.minecraft.player != null) {
-				this.minecraft.gui.setScreen(new InWorldGameRulesScreen(this.minecraft.player.connection,
-						var1x -> this.minecraft.gui.setScreen(this), this));
-			}
-		}).build();
+		gameRulesButton = rowHelper
+				.addChild(Button.builder(Component.translatable("editGamerule.inGame.button"), button -> {
+					if (this.minecraft.player != null) {
+						this.minecraft.gui.setScreen(new InWorldGameRulesScreen(this.minecraft.player.connection,
+								var1x -> this.minecraft.gui.setScreen(this), this));
+					}
+				}).build());
 		this.updateButton(gameRulesButton, singleplayerServer, null,
-				Tooltip.create(Component.translatable("editGamerule.inGame.disabled.hardcore.tooltip")),
-				Tooltip.create(Component.translatable("editGamerule.inGame.disabled.tooltip")));
-		helper.addChild(gameRulesButton);
+				Tooltip.create(Component.translatable("editGamerule.inGame.disabled.tooltip")),
+				Tooltip.create(Component.translatable("editGamerule.inGame.disabled.hardcore.tooltip")));
 
 		// Restrictions button
-		helper.addChild(Button.builder(Component.translatable("restrictions_screen.button"), button -> {
+		rowHelper.addChild(Button.builder(Component.translatable("restrictions_screen.button"), button -> {
 			if (this.minecraft.player != null) {
 				this.minecraft.gui.setScreen(new RestrictionsScreen(this, this.minecraft.player.chatAbilities()));
 			}
 		}).build());
 
 		// Enable PvP button
-		this.pvpButton = helper.addChild(CycleButton.onOffBuilder(cfg.enablePvP)
+		this.pvpButton = rowHelper.addChild(CycleButton.onOffBuilder(cfg.enablePvP)
 				.withTooltip((state) -> Tooltip.create(Component.translatable("mcwifipnp.gui.PvP.info")))
 				.create(Component.translatable("mcwifipnp.gui.PvP"), (cycleButton, PvP) -> {
 					cfg.enablePvP = PvP;
 				}));
-		this.updateButton(this.pvpButton, singleplayerServer, null, null, null);
 
 		// Apply for All World button
-		helper.addChild(CycleButton.onOffBuilder(cfg.applyforallworld)
+		rowHelper.addChild(CycleButton.onOffBuilder(cfg.applyforallworld)
 				.create(Component.translatable("mcwifipnp.gui.applyforallworld"), (cycleButton, applyforallworld) -> {
 					cfg.applyforallworld = applyforallworld;
 				}));
 
 		// Back to Vanilla Screen button
-		helper
-				.addChild(Button.builder(Component.translatable("mcwifipnp.gui.backToVanillaScreen"), button -> {
-					this.minecraft.gui
-							.setScreen(new WorldOptionsScreen(this, minecraft.level));
-				}).build());
+		rowHelper.addChild(Button.builder(Component.translatable("mcwifipnp.gui.backToVanillaScreen"), button -> {
+			this.minecraft.gui
+					.setScreen(new WorldOptionsScreen(this, minecraft.level));
+		}).build());
 
 	}
 
 	private void multiplayerOptions(final LinearLayout content, final @Nullable IntegratedServer singleplayerServer) {
 		GridLayout grid = content.addChild(new GridLayout());
 		grid.defaultCellSetting().alignHorizontallyCenter();
-		RowHelper helper = grid.columnSpacing(8).rowSpacing(4).createRowHelper(2);
-		helper.defaultCellSetting().alignHorizontallyCenter();
+		RowHelper rowHelper = grid.columnSpacing(8).rowSpacing(4).createRowHelper(2);
+		rowHelper.defaultCellSetting().alignHorizontallyCenter();
 
-		helper
-				.addChild(FocusableTextWidget
-						.builder(Component.translatable("options.worldOptions.multiplayer.title")
-								.withStyle(ChatFormatting.UNDERLINE, ChatFormatting.BOLD), this.font)
-						.alwaysShowBorder(false).backgroundFill(BackgroundFill.ON_FOCUS).build(), 2);
+		rowHelper.addChild(FocusableTextWidget
+				.builder(Component.translatable("options.worldOptions.multiplayer.title")
+						.withStyle(ChatFormatting.UNDERLINE, ChatFormatting.BOLD), this.font)
+				.alwaysShowBorder(false).backgroundFill(BackgroundFill.ON_FOCUS).build(), 2);
 
 		// Multiplayer Scope button
-		helper.addChild(CycleButton.builder(MultiplayerScope::getDisplayName, cfg.multiplayerScope)
+		rowHelper.addChild(CycleButton.builder(MultiplayerScope::getDisplayName, cfg.multiplayerScope)
 				.withValues(MultiplayerScope.values()).withTooltip(scope -> Tooltip.create(scope.getTooltip()))
 				.create(Component.translatable("menu.multiplayerOptions.network"), (cycleButton, value) -> {
 					cfg.multiplayerScope = value;
@@ -319,7 +345,7 @@ public class WorldOptionsScreenNew extends Screen implements HasGamemasterPermis
 				}));
 
 		// Guest Command Access button
-		this.guestCommandAccessButton = helper.addChild(CycleButton.onOffBuilder(cfg.allowGuestCommands)
+		this.guestCommandAccessButton = rowHelper.addChild(CycleButton.onOffBuilder(cfg.allowGuestCommands)
 				.withTooltip(
 						(state) -> Tooltip.create(Component.translatable("options.worldOptions.guest.command_access.tooltip")))
 				.create(Component.translatable("options.worldOptions.guest.command_access"),
@@ -340,7 +366,7 @@ public class WorldOptionsScreenNew extends Screen implements HasGamemasterPermis
 		portLabel = portRow
 				.addChild(new StringWidget(Component.translatable("lanServer.port"), this.font));
 		portRow.addChild(portEdit);
-		helper.addChild(portRow);
+		rowHelper.addChild(portRow);
 
 		// Number of players field
 		maxPlayersEdit = new EditBox(this.font,
@@ -361,7 +387,7 @@ public class WorldOptionsScreenNew extends Screen implements HasGamemasterPermis
 		maxPlayersLabel = maxPlayersRow
 				.addChild(new StringWidget(Component.translatable("mcwifipnp.gui.players"), this.font));
 		maxPlayersRow.addChild(maxPlayersEdit);
-		helper.addChild(maxPlayersRow);
+		rowHelper.addChild(maxPlayersRow);
 
 		// Motd field
 		motdEdit = new EditBox(this.font, 308, 20,
@@ -377,10 +403,10 @@ public class WorldOptionsScreenNew extends Screen implements HasGamemasterPermis
 		LinearLayout motdRow = LinearLayout.vertical().spacing(4);
 		motdLabel = motdRow.addChild(new StringWidget(Component.translatable("mcwifipnp.gui.motd"), this.font));
 		motdRow.addChild(motdEdit);
-		helper.addChild(motdRow, 2);
+		rowHelper.addChild(motdRow, 2);
 
 		// Force GameMode button
-		this.forceGameModeButton = helper.addChild(
+		this.forceGameModeButton = rowHelper.addChild(
 				CycleButton.onOffBuilder(cfg.forceGameMode)
 						.withTooltip(value -> value
 								? Tooltip.create(Component.translatable("options.worldOptions.guest.force_game_mode.on.tooltip"))
@@ -392,14 +418,14 @@ public class WorldOptionsScreenNew extends Screen implements HasGamemasterPermis
 		this.updateForceGameModeButton(singleplayerServer);
 
 		// Enforce Whitelist button
-		this.enforceWhitelistButton = helper.addChild(CycleButton.onOffBuilder(cfg.enforceWhitelist)
+		this.enforceWhitelistButton = rowHelper.addChild(CycleButton.onOffBuilder(cfg.enforceWhitelist)
 				.withTooltip((state) -> Tooltip.create(Component.translatable("mcwifipnp.gui.Whitelist.info")))
 				.create(Component.translatable("mcwifipnp.gui.Whitelist"), (cycleButton, enforceWhitelist) -> {
 					cfg.enforceWhitelist = enforceWhitelist;
 				}));
 
 		// Online Mode button
-		this.onlineModeButton = helper
+		this.onlineModeButton = rowHelper
 				.addChild(CycleButton.builder(OnlineMode::getDisplayName, OnlineMode.of(cfg.onlineMode, cfg.enableUUIDFixer))
 						.withValues(OnlineMode.values()).withTooltip((OnlineMode) -> Tooltip.create(OnlineMode.gettoolTip()))
 						.create(0, 0, 308, 20, Component.translatable("mcwifipnp.gui.OnlineMode"), (cycleButton, onlineMode) -> {
@@ -408,14 +434,14 @@ public class WorldOptionsScreenNew extends Screen implements HasGamemasterPermis
 						}), 2);
 
 		// Use UPnP button
-		this.useUPnPButton = helper.addChild(CycleButton.onOffBuilder(cfg.useUPnP)
+		this.useUPnPButton = rowHelper.addChild(CycleButton.onOffBuilder(cfg.useUPnP)
 				.withTooltip((state) -> Tooltip.create(Component.translatable("mcwifipnp.gui.UseUPnP.info")))
 				.create(Component.translatable("mcwifipnp.gui.UseUPnP"), (cycleButton, useUPnP) -> {
 					cfg.useUPnP = useUPnP;
 				}));
 
 		// Get Public IP button
-		this.getPublicIPButton = helper.addChild(CycleButton.onOffBuilder(cfg.getPublicIP)
+		this.getPublicIPButton = rowHelper.addChild(CycleButton.onOffBuilder(cfg.getPublicIP)
 				.withTooltip((state) -> Tooltip.create(Component.translatable("mcwifipnp.gui.CopyIP.info")))
 				.create(Component.translatable("mcwifipnp.gui.CopyIP"), (cycleButton, getPublicIP) -> {
 					cfg.getPublicIP = getPublicIP;
@@ -485,9 +511,8 @@ public class WorldOptionsScreenNew extends Screen implements HasGamemasterPermis
 				Tooltip.create(Component.translatable("options.worldOptions.game_mode.disabled.operator.tooltip")),
 				Tooltip.create(Component.translatable("options.worldOptions.game_mode.disabled.tooltip")));
 		this.updateButton(this.gameRulesButton, singleplayerServer, null,
-				Tooltip.create(Component.translatable("editGamerule.inGame.disabled.hardcore.tooltip")),
+				Tooltip.create(Component.translatable("editGamerule.inGame.disabled.tooltip")),
 				Tooltip.create(Component.translatable("editGamerule.inGame.disabled.hardcore.tooltip")));
-		this.updateButton(this.pvpButton, singleplayerServer, null, null, null);
 		this.difficultyButtons.refresh(this.minecraft, this);
 		if (!hasGamemasterPermission && !this.minecraft.hasSingleplayerServer()) {
 			this.minecraft.gui.setScreen(this.lastScreen);
@@ -761,12 +786,12 @@ public class WorldOptionsScreenNew extends Screen implements HasGamemasterPermis
 			return new DifficultyButtons(linearLayout, difficultyButton, lockButton, level);
 		}
 
-		private void refresh(final Minecraft minecraft, final WorldOptionsScreenNew worldOptionsScreen) {
-			this.difficultyButton.setValue(worldOptionsScreen.wantedDifficulty != null ? worldOptionsScreen.wantedDifficulty
-					: this.level.getDifficulty());
+		private void refresh(final Minecraft minecraft, final WorldOptionsScreenNew screen) {
+			this.difficultyButton
+					.setValue(screen.wantedDifficulty != null ? screen.wantedDifficulty : this.level.getDifficulty());
 			this.lockButton
-					.setLocked(worldOptionsScreen.wantedDifficultyLocked != null ? worldOptionsScreen.wantedDifficultyLocked
-							: isDifficultyLocked(this.level));
+					.setLocked(
+							screen.wantedDifficultyLocked != null ? screen.wantedDifficultyLocked : isDifficultyLocked(this.level));
 			updateDifficultyButtonsState(minecraft, this.level, this.difficultyButton, this.lockButton);
 		}
 

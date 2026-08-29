@@ -1,4 +1,5 @@
 {
+  "mcwifipnp.gui.applyGeneralChanges": "Apply General",
   "mcwifipnp.gui.port.info": "The port to listen on.",
   "mcwifipnp.gui.port.invalid": "Not a valid port.\nMust be a number between §41024 and 65535§f.",
   "mcwifipnp.gui.port.unavailable": "§4Port not available!",
