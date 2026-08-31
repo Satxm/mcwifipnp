@@ -1,8 +1,11 @@
 package io.github.satxm.mcwifipnp.commands;
 
+import java.net.Inet6Address;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.net.SocketException;
+import java.net.StandardProtocolFamily;
+import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.LinkedList;
@@ -17,7 +20,6 @@ import com.mojang.brigadier.context.CommandContext;
 
 import io.github.satxm.mcwifipnp.network.GlobalIPs;
 import io.github.satxm.mcwifipnp.network.UPnPModule;
-import io.netty.channel.socket.InternetProtocolFamily;
 import net.minecraft.ChatFormatting;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
@@ -41,7 +43,7 @@ public class IpCommand {
 				.then(EnumArgument.IP_FAMILY.appendTo(Commands.literal("local").executes(IpCommand::showLocalIPsAll),
 						(enumOption) -> enumOption.executes(IpCommand::showLocalIPs)))
 				.then(EnumArgument.IP_FAMILY.appendTo(Commands.literal("global").executes(IpCommand::showGlobalIPAll),
-						(enumOption) -> enumOption.executes(IpCommand::showGlobalIP)))
+						(enumOption) -> enumOption.executes(IpCommand::showGlobalIPs)))
 				.then(Commands.literal("upnp").executes(IpCommand::showUPnPIP))
 				.executes(IpCommand::showDetail));
 
@@ -52,7 +54,7 @@ public class IpCommand {
 	}
 
 	private static int showLocalIPs(CommandContext<CommandSourceStack> context) {
-		InternetProtocolFamily family = EnumArgument.IP_FAMILY.valueOf(context, 0);
+		StandardProtocolFamily family = EnumArgument.IP_FAMILY.valueOf(context, 0);
 
 		return getAndReply(context, (components) -> getIPComponentLocal(components, family));
 	}
@@ -60,8 +62,8 @@ public class IpCommand {
 	private static void showLocalIPsAllImpl(List<MutableComponent> results) {
 		int labelIndex = results.size();
 
-		int count = getIPComponentLocal(results, InternetProtocolFamily.IPv4);
-		count += getIPComponentLocal(results, InternetProtocolFamily.IPv6);
+		int count = getIPComponentLocal(results, StandardProtocolFamily.INET);
+		count += getIPComponentLocal(results, StandardProtocolFamily.INET6);
 		if (count > 0) {
 			results.add(labelIndex, Component.translatable(LOCAL_IP_KEY, "IP:"));
 		}
@@ -71,19 +73,17 @@ public class IpCommand {
 		return getAndReply(context, IpCommand::showLocalIPsAllImpl);
 	}
 
-	private static int showGlobalIP(CommandContext<CommandSourceStack> context) {
-		InternetProtocolFamily family = EnumArgument.IP_FAMILY.valueOf(context, 0);
+	private static int showGlobalIPs(CommandContext<CommandSourceStack> context) {
+		StandardProtocolFamily family = EnumArgument.IP_FAMILY.valueOf(context, 0);
 
-		return getAndReply(context, (components) -> {
-			getIPComponentGlobal(components, family);
-		});
+		return getAndReply(context, (components) -> getIPComponentGlobal(components, family));
 	}
 
 	private static void showGlobalIPAllImpl(List<MutableComponent> results) {
 		int labelIndex = results.size();
 
-		int count = getIPComponentGlobal(results, InternetProtocolFamily.IPv4);
-		count += getIPComponentGlobal(results, InternetProtocolFamily.IPv6);
+		int count = getIPComponentGlobal(results, StandardProtocolFamily.INET);
+		count += getIPComponentGlobal(results, StandardProtocolFamily.INET6);
 		if (count > 0) {
 			results.add(labelIndex, Component.translatable(GLOBAL_IP_KEY, "IP:"));
 		}
@@ -138,31 +138,70 @@ public class IpCommand {
 		}
 	}
 
-	private static int getIPComponentLocal(List<MutableComponent> results, InternetProtocolFamily family) {
-		List<InetAddress> localIPs = getLocalIPs();
+	private static int getIPComponentLocal(List<MutableComponent> results, StandardProtocolFamily family) {
+		List<InetAddress> localIPs = getHostIPs();
 		if (localIPs.isEmpty()) {
 			return 0;
 		}
+		System.out.println(family.toString());
+		System.out.println(localIPs.toString());
 
 		for (InetAddress addr : localIPs) {
-			if (family == InternetProtocolFamily.of(addr)) {
+			StandardProtocolFamily addrFamily = (addr instanceof Inet6Address)
+					? StandardProtocolFamily.INET6
+					: StandardProtocolFamily.INET;
+			if (family == addrFamily) {
 				String addrString = addr.getHostAddress();
-				addrString = formatIPString(addrString, family);
-				results.add(copyable(addrString));
+				if (addr instanceof Inet6Address) {
+					addrString = formatIPv6(addrString);
+					if (addr.isLinkLocalAddress() || addr.isSiteLocalAddress()) {
+						results.add(copyable(addrString));
+					}
+				} else {
+					results.add(copyable(addrString));
+				}
 			}
 		}
 		return results.size();
 	}
 
-	private static int getIPComponentGlobal(List<MutableComponent> results, InternetProtocolFamily family) {
+	private static int getIPComponentGlobal(List<MutableComponent> results, StandardProtocolFamily family) {
+		List<InetAddress> localIPs = getHostIPs();
 		String ip = GlobalIPs.fetchGlobalIP(family);
-		if (ip == null) {
+
+		System.out.println(family.toString());
+		System.out.println(ip);
+		if (ip != null) {
+			try {
+				InetAddress ipaddr = InetAddress.getByName(ip);
+				if (!localIPs.contains(ipaddr))
+					localIPs.add(ipaddr);
+			} catch (UnknownHostException e) {
+				e.printStackTrace();
+			}
+		}
+		if (localIPs.isEmpty()) {
 			return 0;
 		}
+		System.out.println(localIPs.toString());
 
-		ip = formatIPString(ip, family);
-		results.add(copyable(ip));
-		return 1;
+		for (InetAddress addr : localIPs) {
+			StandardProtocolFamily addrFamily = (addr instanceof java.net.Inet6Address)
+					? StandardProtocolFamily.INET6
+					: StandardProtocolFamily.INET;
+			if (family == addrFamily) {
+				String addrString = addr.getHostAddress();
+				if (!(addr.isLinkLocalAddress() || addr.isSiteLocalAddress())) {
+					if (addr instanceof Inet6Address) {
+						addrString = formatIPv6(addrString);
+						results.add(copyable(addrString));
+					} else {
+						results.add(copyable(addrString));
+					}
+				}
+			}
+		}
+		return results.size();
 	}
 
 	private static int getIPComponentUPnP(List<MutableComponent> results, CommandContext<CommandSourceStack> context) {
@@ -183,23 +222,34 @@ public class IpCommand {
 		List<MutableComponent> IPComponentList = new LinkedList<>();
 		ArrayList<String> IPList = new ArrayList<String>();
 
-		List<InetAddress> localIPs = getLocalIPs();
+		List<InetAddress> localIPs = getHostIPs();
 		for (InetAddress addr : localIPs) {
 			String addrString = addr.getHostAddress();
-			InternetProtocolFamily family = InternetProtocolFamily.of(addr);
-			IPComponentList.add(copyable(LOCAL_IP_KEY, addrString, family, port));
+			StandardProtocolFamily family = (addr instanceof Inet6Address)
+					? StandardProtocolFamily.INET6
+					: StandardProtocolFamily.INET;
+			if (addr instanceof Inet6Address) {
+				addrString = formatIPv6(addrString);
+				if (!(addr.isLinkLocalAddress() || addr.isSiteLocalAddress())) {
+					IPComponentList.add(copyable(GLOBAL_IP_KEY, addrString, family, port));
+				} else {
+					IPComponentList.add(copyable(LOCAL_IP_KEY, addrString, family, port));
+				}
+			} else {
+				IPComponentList.add(copyable(LOCAL_IP_KEY, addrString, family, port));
+			}
 			IPList.add(addrString);
 		}
 
-		String ipv4 = GlobalIPs.fetchGlobalIP(InternetProtocolFamily.IPv4);
+		String ipv4 = GlobalIPs.fetchGlobalIP(StandardProtocolFamily.INET);
 		if (ipv4 != null && !IPList.contains(ipv4)) {
-			IPComponentList.add(copyable(GLOBAL_IP_KEY, ipv4, InternetProtocolFamily.IPv4, port));
+			IPComponentList.add(copyable(GLOBAL_IP_KEY, ipv4, StandardProtocolFamily.INET, port));
 			IPList.add(ipv4);
 		}
 
-		String ipv6 = GlobalIPs.fetchGlobalIP(InternetProtocolFamily.IPv6);
+		String ipv6 = GlobalIPs.fetchGlobalIP(StandardProtocolFamily.INET6);
 		if (ipv6 != null && !IPList.contains(ipv6)) {
-			IPComponentList.add(copyable(GLOBAL_IP_KEY, ipv6, InternetProtocolFamily.IPv6, port));
+			IPComponentList.add(copyable(GLOBAL_IP_KEY, ipv6, StandardProtocolFamily.INET6, port));
 			IPList.add(ipv6);
 		}
 
@@ -219,20 +269,21 @@ public class IpCommand {
 		}
 	}
 
-	public static MutableComponent copyable(String ipTypeKey, String ip, InternetProtocolFamily family, int port) {
+	public static MutableComponent copyable(String ipTypeKey, String ip, StandardProtocolFamily family, int port) {
 		return copyable(ipTypeKey, ip, family, ":" + port);
 	}
 
-	public static String formatIPString(String ip, InternetProtocolFamily family) {
-		if (family == InternetProtocolFamily.IPv6) {
-			ip = "[" + ip + "]";
+	public static String formatIPString(String ip, StandardProtocolFamily family) {
+		if (family == StandardProtocolFamily.INET6) {
+			return "[" + ip + "]";
 		}
 		return ip;
 	}
 
-	public static MutableComponent copyable(String ipTypeKey, String ip, InternetProtocolFamily family, String suffix) {
-		return copyable(ComponentUtils.wrapInSquareBrackets(Component.translatable(ipTypeKey, family.toString())),
-				formatIPString(ip, family) + suffix);
+	public static MutableComponent copyable(String ipTypeKey, String ip, StandardProtocolFamily family, String suffix) {
+		String familystr = (family == StandardProtocolFamily.INET6) ? "IPv6" : "IPv4";
+		return ComponentUtils.wrapInSquareBrackets(copyable(Component.translatable(ipTypeKey, familystr),
+				formatIPString(ip, family) + suffix));
 	}
 
 	public static MutableComponent copyable(String content) {
@@ -247,7 +298,7 @@ public class IpCommand {
 				.withInsertion(content));
 	}
 
-	public static List<InetAddress> getLocalIPs() {
+	public static List<InetAddress> getHostIPs() {
 		List<InetAddress> results = new LinkedList<>();
 
 		Enumeration<NetworkInterface> ifaces = null;
@@ -276,14 +327,22 @@ public class IpCommand {
 			}
 			while (addrs.hasMoreElements()) {
 				InetAddress addr = addrs.nextElement();
-				if (addr.isLinkLocalAddress()) {
-					continue;
-				}
-
 				results.add(addr);
 			}
 		}
 
 		return results;
 	}
+
+	public static String formatIPv6(String addrString) {
+		addrString = addrString.replaceAll("(^|:)(0(:0)+)(:|$)", "$1::$3").replaceAll(":{3,}", "::");
+		if (addrString.startsWith("0:"))
+			addrString = "::" + addrString.substring(2);
+		if (addrString.endsWith(":0"))
+			addrString = addrString.substring(0, addrString.length() - 2) + "::";
+		if (addrString.contains("%"))
+			addrString = addrString.substring(0, addrString.indexOf("%"));
+		return addrString;
+	}
+
 }

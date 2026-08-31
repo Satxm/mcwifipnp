@@ -12,7 +12,7 @@ import net.minecraft.core.UUIDUtil;
 
 @Mixin(UUIDUtil.class)
 public abstract class MixinUUIDUtil {
-	@Inject(method = "createOfflinePlayerUUID", at = @At("HEAD"), cancellable = true, require = 1, allow = 1)
+	@Inject(method = "createOfflinePlayerUUID", at = @At("HEAD"), remap = false, cancellable = true, require = 1, allow = 1)
 	private static void detour_createOfflinePlayerUUID(String playerName, CallbackInfoReturnable<UUID> ci) {
 		UUID uuid = UUIDFixer.hookEntry(playerName);
 

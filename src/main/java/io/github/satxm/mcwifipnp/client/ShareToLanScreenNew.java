@@ -73,7 +73,7 @@ public class ShareToLanScreenNew extends Screen {
 		} else if (this.cfg.usingDefaults) {
 			this.cfg.readFromRunningServer(server);
 			this.cfg.port = HttpUtil.getAvailablePort();
-			this.cfg.allowHostCheat = server.getWorldData().isAllowCommands();
+			this.cfg.allowHostCommands = server.getWorldData().isAllowCommands();
 		}
 
 		this.oldPort = cfg.port;
@@ -86,7 +86,7 @@ public class ShareToLanScreenNew extends Screen {
 		IntegratedServer server = Minecraft.getInstance().getSingleplayerServer();
 		PlayerList playerList = server.getPlayerList();
 		NameAndId hostPlayer = new NameAndId(server.getSingleplayerProfile());
-		this.cfg.save();
+		this.cfg.save(server);
 
 		if (this.serverPublished) {
 			if (!this.oldMotd.equals(this.cfg.motd) || this.cfg.useUPnP ^ oldUPnPEnabled) {
@@ -101,7 +101,7 @@ public class ShareToLanScreenNew extends Screen {
 			}
 		} else {
 			// Publish server
-			MutableComponent message = server.publishServer(this.cfg.gameMode, this.cfg.allowEveryoneCheat, this.cfg.port)
+			MutableComponent message = server.publishServer(this.cfg.gameType, this.cfg.allowGuestCommands, this.cfg.port)
 					? PublishCommand.getSuccessMessage(this.cfg.port)
 					: Component.translatable("commands.publish.failed");
 			this.minecraft.gui.getChat().addClientSystemMessage(message);
@@ -115,10 +115,10 @@ public class ShareToLanScreenNew extends Screen {
 		}
 		this.cfg.applyTo(server);
 
-		if (!this.cfg.allowEveryoneCheat) {
+		if (!this.cfg.allowGuestCommands) {
 			playerList.getOps().clear();
 		}
-		if (this.cfg.allowHostCheat) {
+		if (this.cfg.allowHostCommands) {
 			playerList.getOps().add(new ServerOpListEntry(hostPlayer, LevelBasedPermissionSet.OWNER,
 					playerList.canBypassPlayerLimit(hostPlayer)));
 		} else {
@@ -242,10 +242,10 @@ public class ShareToLanScreenNew extends Screen {
 
 			// Row 1
 			// GameMode toggle button
-			tabContents.addChild(CycleButton.builder(GameType::getShortDisplayName, cfg.gameMode)
+			tabContents.addChild(CycleButton.builder(GameType::getShortDisplayName, cfg.gameType)
 					.withValues(GameType.values())
-					.create(Component.translatable("selectWorld.gameMode"), (cycleButton, gameMode) -> {
-						cfg.gameMode = gameMode;
+					.create(Component.translatable("selectWorld.gameMode"), (cycleButton, gameType) -> {
+						cfg.gameType = gameType;
 					}), 2);
 
 			tabContents.addChild(CycleButton.onOffBuilder(cfg.enablePvP)
@@ -256,16 +256,16 @@ public class ShareToLanScreenNew extends Screen {
 
 			// Row 2
 			// Allow Host Cheat button
-			tabContents.addChild(CycleButton.onOffBuilder(cfg.allowHostCheat)
-					.create(Component.translatable("selectWorld.allowCommands"), (cycleButton, allowHostCheat) -> {
-						cfg.allowHostCheat = allowHostCheat;
+			tabContents.addChild(CycleButton.onOffBuilder(cfg.allowHostCommands)
+					.create(Component.translatable("selectWorld.allowCommands"), (cycleButton, allowHostCommands) -> {
+						cfg.allowHostCommands = allowHostCommands;
 					}), 2);
 
 			// Allow Cheat button (for other joined players)
-			tabContents.addChild(CycleButton.onOffBuilder(cfg.allowEveryoneCheat)
+			tabContents.addChild(CycleButton.onOffBuilder(cfg.allowGuestCommands)
 					.withTooltip((state) -> Tooltip.create(Component.translatable("mcwifipnp.gui.AllPlayersCheats.info")))
-					.create(Component.translatable("mcwifipnp.gui.AllPlayersCheats"), (cycleButton, allowEveryoneCheat) -> {
-						cfg.allowEveryoneCheat = allowEveryoneCheat;
+					.create(Component.translatable("mcwifipnp.gui.AllPlayersCheats"), (cycleButton, allowGuestCommands) -> {
+						cfg.allowGuestCommands = allowGuestCommands;
 					}), 2);
 		}
 	}
@@ -286,6 +286,11 @@ public class ShareToLanScreenNew extends Screen {
 					.withTooltip((state) -> Tooltip.create(Component.translatable("mcwifipnp.gui.CopyIP.info")))
 					.create(Component.translatable("mcwifipnp.gui.CopyIP"), (cycleButton, getPublicIP) -> {
 						cfg.getPublicIP = getPublicIP;
+					}), 2);
+
+			tabContents.addChild(CycleButton.onOffBuilder(cfg.applyforallworld)
+					.create(Component.translatable("mcwifipnp.gui.applyforallworld"), (cycleButton, applyforallworld) -> {
+						cfg.applyforallworld = applyforallworld;
 					}), 2);
 
 			// Row 2

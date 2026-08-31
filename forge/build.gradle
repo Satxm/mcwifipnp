@@ -65,18 +65,10 @@ sourceSets {
   }
 }
 
-tasks.named('jar', Jar).configure {
+tasks.named('jar', Jar) {
   manifest {
-    attributes([
-        "Specification-Title": "LAN World Plug-n-Play",
-        "Specification-Vendor": "Satxm",
-        "Specification-Version": "1",
-        "Implementation-Title": project.name,
-        "Implementation-Version": "${version}",
-        "Implementation-Vendor": "Satxm",
-        "Implementation-Timestamp": new Date().format("yyyy-MM-dd'T'HH:mm:ssZ"),
-        "MixinConfigs": "mcwifipnp.mixins.json"
-    ])
+    // Add our config to the manifest of our jar to have Mixin detect us at runtime.
+    attributes['MixinConfigs'] = "${mod_id}.mixins.json"
   }
 }
 
