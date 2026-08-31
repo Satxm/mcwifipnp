@@ -54,7 +54,7 @@ GitHub : [https://github.com/Satxm/mcwifipnp](https://github.com/Satxm/mcwifipnp
 
 <div align="center">
 
-![GUI](https://cdn.modrinth.com/data/cached_images/f5a01276a9912e2fd7304010393a06cc251569e7.jpeg)
+![GUI](https://cdn.modrinth.com/data/cached_images/fdd810a209ba4eb806ee9d2ddb0d0a609e43ba24.jpeg)
 
 </div>
 

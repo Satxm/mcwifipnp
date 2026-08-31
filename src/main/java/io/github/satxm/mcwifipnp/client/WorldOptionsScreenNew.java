@@ -308,10 +308,6 @@ public class WorldOptionsScreenNew extends Screen implements HasGamemasterPermis
 				.create(Component.translatable("mcwifipnp.gui.PvP"), (cycleButton, PvP) -> {
 					cfg.enablePvP = PvP;
 				}));
-		this.updateButton(pvpButton, singleplayerServer, 
-				Tooltip.create(Component.translatable("mcwifipnp.gui.PvP.info")),
-				Tooltip.create(Component.translatable("editGamerule.inGame.disabled.tooltip")),
-				Tooltip.create(Component.translatable("editGamerule.inGame.disabled.hardcore.tooltip")));
 
 		// Apply for All World button
 		rowHelper.addChild(CycleButton.onOffBuilder(cfg.applyforallworld)
@@ -514,10 +510,6 @@ public class WorldOptionsScreenNew extends Screen implements HasGamemasterPermis
 				Tooltip.create(Component.translatable("options.worldOptions.game_mode.disabled.operator.tooltip")),
 				Tooltip.create(Component.translatable("options.worldOptions.game_mode.disabled.tooltip")));
 		this.updateButton(this.gameRulesButton, singleplayerServer, null,
-				Tooltip.create(Component.translatable("editGamerule.inGame.disabled.tooltip")),
-				Tooltip.create(Component.translatable("editGamerule.inGame.disabled.hardcore.tooltip")));
-		this.updateButton(this.pvpButton, singleplayerServer, 
-				Tooltip.create(Component.translatable("mcwifipnp.gui.PvP.info")),
 				Tooltip.create(Component.translatable("editGamerule.inGame.disabled.tooltip")),
 				Tooltip.create(Component.translatable("editGamerule.inGame.disabled.hardcore.tooltip")));
 		this.difficultyButtons.refresh(this.minecraft, this);

@@ -21,7 +21,7 @@ public abstract class MixinPauseScreen extends Screen {
 		super(title);
 	}
 
-	@Inject(method = "createPauseMenu", at = @At("TAIL"), locals = LocalCapture.CAPTURE_FAILHARD)
+	@Inject(method = "createPauseMenu", at = @At("TAIL"), remap = false, locals = LocalCapture.CAPTURE_FAILHARD)
 	protected void addOrReplaceButton(CallbackInfo ci, GridLayout gridLayout, GridLayout.RowHelper dummy) {
 
 		// Replace the vanilla "Multiplayer" button.
@@ -30,8 +30,10 @@ public abstract class MixinPauseScreen extends Screen {
 			Button newButton = Button.builder(Component.translatable("options.worldOptions.button"), btn -> {
 				this.minecraft.gui.setScreen(new WorldOptionsScreenNew(this, this.minecraft.level));
 			}).bounds(oldButton.getX(), oldButton.getY(), oldButton.getWidth(), oldButton.getHeight()).build();
-			this.removeWidget(oldButton);
-			this.addRenderableWidget(newButton);
+			if (this.minecraft.hasSingleplayerServer() && this.minecraft.getSingleplayerServer().isSingleplayerOwner(this.minecraft.player.nameAndId())) {
+				this.removeWidget(oldButton);
+				this.addRenderableWidget(newButton);
+			}
 		}
 	}
 }
