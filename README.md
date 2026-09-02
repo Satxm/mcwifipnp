@@ -54,7 +54,7 @@ Uses the vanilla Minecraft GUI style, Uses the official mojang mappings.
 
 <div align="center">
 
-![GUI](https://cdn.modrinth.com/data/cached_images/7679311208018ad159099824b623f9ed76292975.jpeg)
+![GUI](https://cdn-alt.modrinth.com/data/cached_images/3c2d2a4a0f0d88bbc79fe654945d7827ccc91aca.jpeg)
 
 </div>
 

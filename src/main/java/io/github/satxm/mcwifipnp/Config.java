@@ -163,7 +163,7 @@ public class Config {
 		}
 		if (this.applyforallworld) {
 			try {
-				Files.createDirectories(globalPath);
+				Files.createDirectories(globalPath.getParent());
 				Files.write(globalPath, jsoncfg, StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
 				LOGGER.info("Config applied to all worlds and saved to config directory.");
 			} catch (IOException e) {
