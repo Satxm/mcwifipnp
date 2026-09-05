@@ -1,7 +1,7 @@
 plugins {
-  id 'java-library'
-  id 'eclipse'
+  id 'java'
   id 'idea'
+  id 'eclipse'
   id 'net.neoforged.moddev' version '2.+'
 }
 
@@ -11,10 +11,7 @@ println "Java: ${System.getProperty 'java.version'}, JVM: ${System.getProperty '
 
 version = project.mod_version + "-" + project.minecraft_version + "-neoforge"
 group = project.mod_group_id
-
-base {
-  archivesName = project.mod_id
-}
+base.archivesName = project.mod_id
 
 repositories {
   mavenLocal()
@@ -24,30 +21,28 @@ neoForge {
   version = project.neo_version
 
   runs {
+    configureEach {
+      systemProperty 'neoforge.enabledGameTestNamespaces', project.mod_id
+      systemProperty 'forge.logging.markers', 'REGISTRIES'
+      logLevel = org.slf4j.event.Level.DEBUG
+    }
+
     client {
       client()
-      systemProperty 'neoforge.enabledGameTestNamespaces', project.mod_id
     }
 
     server {
       server()
       programArgument '--nogui'
-      systemProperty 'neoforge.enabledGameTestNamespaces', project.mod_id
     }
 
     gameTestServer {
       type = "gameTestServer"
-      systemProperty 'neoforge.enabledGameTestNamespaces', project.mod_id
     }
 
     data {
       clientData()
       programArguments.addAll '--mod', project.mod_id, '--all', '--output', file('src/generated/resources/').getAbsolutePath(), '--existing', file('src/main/resources/').getAbsolutePath()
-    }
-
-    configureEach {
-      systemProperty 'forge.logging.markers', 'REGISTRIES'
-      logLevel = org.slf4j.event.Level.DEBUG
     }
   }
 
@@ -58,15 +53,13 @@ neoForge {
   }
 }
 
-sourceSets {
-  main {
-    java {
-      srcDir "../src/main/java"
-    }
-    resources {
-      srcDir "../src/main/resources"
-      srcDir "src/generated/resources"
-    }
+sourceSets.main {
+  java {
+    srcDir "../src/main/java"
+  }
+  resources {
+    srcDir "../src/main/resources"
+    srcDir "src/generated/resources"
   }
 }
 
@@ -76,21 +69,21 @@ configurations {
 
 tasks.withType(ProcessResources).configureEach {
   var replaceProperties = [
+    mod_version: project.mod_version,
+    neo_version_range : project.neo_version_range,
     minecraft_version_min : project.minecraft_version_min,
     minecraft_version_max : project.minecraft_version_max,
-    neo_version_range : project.neo_version_range,
     neo_loader_version_range : project.neo_loader_version_range,
-    mod_version: project.mod_version,
     pack_format_number: project.pack_format_number,
   ]
   inputs.properties replaceProperties
   filesMatching(['META-INF/neoforge.mods.toml', 'pack.mcmeta']) {
-    expand replaceProperties + [project: project]
+    expand replaceProperties
   }
 }
 
 tasks.withType(JavaCompile).configureEach {
-  it.options.encoding = 'UTF-8'
+  options.encoding = 'UTF-8'
 }
 
 java.withSourcesJar()
