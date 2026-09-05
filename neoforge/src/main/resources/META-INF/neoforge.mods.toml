@@ -26,11 +26,11 @@ config="mcwifipnp.mixins.json"
   type="required"
   versionRange="${neo_version_range}"
   ordering="NONE"
-  side="CLIENT"
+  side="BOTH"
 
 [[dependencies.mcwifipnp]]
   modId="minecraft"
   type="required"
   versionRange="[${minecraft_version_min}, ${minecraft_version_max})"
   ordering="NONE"
-  side="CLIENT"
+  side="BOTH"

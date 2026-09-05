@@ -12,7 +12,7 @@ import net.minecraft.client.server.IntegratedServer;
 @Mixin(IntegratedServer.class)
 public abstract class MixinIntegratedServer {
 
-	@Inject(method = "getMaxPlayers", at = @At("HEAD"), cancellable = true, require = 1, allow = 1)
+	@Inject(method = "getMaxPlayers", at = @At("HEAD"), remap = false, cancellable = true, require = 1, allow = 1)
 	private void setMaxPlayers(CallbackInfoReturnable<Integer> ci) {
 		IntegratedServer server = Minecraft.getInstance().getSingleplayerServer();
 		if (Minecraft.getInstance().hasSingleplayerServer()) {
