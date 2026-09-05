@@ -1,7 +1,7 @@
 plugins {
   id 'java'
-  id 'eclipse'
   id 'idea'
+  id 'eclipse'
   id 'net.minecraftforge.gradle' version '[7.0.17,8)'
 }
 
@@ -11,95 +11,90 @@ println "Java: ${System.getProperty 'java.version'}, JVM: ${System.getProperty '
 
 version = project.mod_version + "-" + project.minecraft_version + "-forge"
 group = project.mod_group_id
-
-base {
-  archivesName = project.mod_id
-}
+base.archivesName = project.mod_id
 
 minecraft {
   runs {
     configureEach {
       workingDir = layout.projectDirectory.dir('run')
-      args "--mixin.config=${mod_id}.mixins.json"
+      args "--mixin.config=${project.mod_id}.mixins.json"
       systemProperty 'eventbus.api.strictRuntimeChecks', 'true'
-      systemProperty 'forge.enabledGameTestNamespaces', 'examplemod'
+      systemProperty 'forge.enabledGameTestNamespaces', project.mod_id
     }
 
     register('client')
 
     register('server') {
-        args '--nogui'
+      args '--nogui'
     }
 
     register('gameTestServer')
 
     register('data') {
-        workingDir = layout.projectDirectory.dir('run-data')
-        args '--mod', project.mod_id, '--all', '--output', layout.projectDirectory.dir('src/generated/resources'), '--existing', layout.projectDirectory.dir('src/main/resources')
+      workingDir = layout.projectDirectory.dir('run-data')
+      args '--mod', project.mod_id, '--all', '--output', layout.projectDirectory.dir('src/generated/resources'), '--existing', layout.projectDirectory.dir('src/main/resources')
     }
   }
 }
 
 repositories {
-    minecraft.mavenizer(it) // In Kotlin, it = this
-    maven fg.forgeMaven
-    maven fg.minecraftLibsMaven
-    mavenCentral()
+  minecraft.mavenizer(it)
+  maven fg.forgeMaven
+  maven fg.minecraftLibsMaven
+  mavenCentral()
 }
 
 dependencies {
   implementation minecraft.dependency("net.minecraftforge:forge:${project.minecraft_version}-${project.forge_version}")
-  annotationProcessor 'org.spongepowered:mixin:0.8.7:processor'
   annotationProcessor 'net.minecraftforge:eventbus-validator:7.0.1'
+  annotationProcessor 'org.spongepowered:mixin:0.8.7:processor'
 }
 
-sourceSets {
-  main {
-    java {
-      srcDir "../src/main/java"
-    }
-    resources {
-      srcDir "../src/main/resources"
-      srcDir "src/generated/resources"
-    }
+sourceSets.main {
+  java {
+    srcDir "../src/main/java"
+  }
+  resources {
+    srcDir "../src/main/resources"
+    srcDir "src/generated/resources"
   }
 }
 
 tasks.named('jar', Jar) {
   manifest {
-    // Add our config to the manifest of our jar to have Mixin detect us at runtime.
-    attributes['MixinConfigs'] = "${mod_id}.mixins.json"
+    attributes['MixinConfigs'] = "${project.mod_id}.mixins.json"
   }
 }
 
-tasks.named('processResources', ProcessResources).configure {
+tasks.withType(ProcessResources).configureEach {
   var replaceProperties = [
     mod_version : project.mod_version,
     forge_version_range : project.forge_version_range,
     minecraft_version_min : project.minecraft_version_min,
     minecraft_version_max : project.minecraft_version_max,
     forge_loader_version_range : project.forge_loader_version_range,
-    pack_format_number: pack_format_number,
+    pack_format_number: project.pack_format_number,
   ]
   inputs.properties replaceProperties
   filesMatching(['META-INF/mods.toml', 'pack.mcmeta']) {
-    expand replaceProperties + [project: project]
+    expand replaceProperties
   }
 }
 
 tasks.withType(JavaCompile).configureEach {
-  it.options.encoding = 'UTF-8'
+  options.encoding = 'UTF-8'
+}
+
+java.withSourcesJar()
+
+jar {
+  from("../LICENSE") {
+  }
 }
 
 idea {
   module {
     downloadSources = true
     downloadJavadoc = true
-  }
-}
-java.withSourcesJar()
-
-jar {
-  from("../LICENSE") {
   }
 }
