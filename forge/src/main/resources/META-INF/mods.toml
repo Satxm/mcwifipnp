@@ -24,11 +24,11 @@ Provides a better UI than the vanilla Minecraft \"Open to LAN\" screen, which no
   mandatory=true
   versionRange="${forge_version_range}"
   ordering="NONE"
-  side="CLIENT"
+  side="BOTH"
 
 [[dependencies.mcwifipnp]]
   modId="minecraft"
   mandatory=true
   versionRange="[${minecraft_version_min}, ${minecraft_version_max})"
   ordering="NONE"
-  side="CLIENT"
+  side="BOTH"
