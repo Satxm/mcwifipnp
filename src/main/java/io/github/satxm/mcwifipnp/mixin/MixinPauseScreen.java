@@ -30,7 +30,7 @@ public abstract class MixinPauseScreen extends Screen {
 		super(title);
 	}
 
-	@Inject(method = "createPauseMenu", at = @At("TAIL"), locals = LocalCapture.CAPTURE_FAILHARD)
+	@Inject(method = "createPauseMenu", at = @At("TAIL"), remap = false, locals = LocalCapture.CAPTURE_FAILHARD)
 	protected void addOrReplaceButton(CallbackInfo ci, GridLayout gridLayout, GridLayout.RowHelper dummy) {
 
 		IntegratedServer server = this.minecraft.getSingleplayerServer();
@@ -72,8 +72,10 @@ public abstract class MixinPauseScreen extends Screen {
 						(this.minecraft.hasSingleplayerServer() && this.minecraft.getSingleplayerServer().isPublished())));
 			}).bounds(oldButton.getX(), oldButton.getY(), oldButton.getWidth(), oldButton.getHeight()).build();
 			elements.set(elements.indexOf(oldButton), newButton);
-			this.removeWidget(oldButton);
-			this.addRenderableWidget(newButton);
+			if (this.minecraft.hasSingleplayerServer() && this.minecraft.getSingleplayerServer().isSingleplayerOwner(this.minecraft.player.nameAndId())) {
+				this.removeWidget(oldButton);
+				this.addRenderableWidget(newButton);
+			}
 		}
 	}
 }

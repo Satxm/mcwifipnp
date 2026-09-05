@@ -55,7 +55,7 @@ tasks.withType(ProcessResources).configureEach {
   ]
   inputs.properties replaceProperties
   filesMatching(['quilt.mod.json', 'pack.mcmeta']) {
-    expand replaceProperties + [project: project]
+    expand replaceProperties
   }
 }
 
