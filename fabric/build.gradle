@@ -1,15 +1,12 @@
 plugins {
-  id 'net.fabricmc.fabric-loom-remap' version '1.14+'
+	id 'net.fabricmc.fabric-loom-remap' version "${loom_version}"
 }
 
 println "Java: ${System.getProperty 'java.version'}, JVM: ${System.getProperty 'java.vm.version'} (${System.getProperty 'java.vendor'}), Arch: ${System.getProperty 'os.arch'}"
 
 version = project.mod_version + "-" + project.minecraft_version + "-fabric"
 group = project.mod_group_id
-
-base {
-  archivesName = project.mod_id
-}
+base.archivesName = project.mod_id
 
 dependencies {
   minecraft "com.mojang:minecraft:${project.minecraft_version}"
@@ -42,7 +39,7 @@ tasks.withType(ProcessResources).configureEach {
   ]
   inputs.properties replaceProperties
   filesMatching(['fabric.mod.json', 'pack.mcmeta']) {
-    expand replaceProperties + [project: project]
+    expand replaceProperties
   }
 }
 

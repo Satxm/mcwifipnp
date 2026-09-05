@@ -72,8 +72,10 @@ public abstract class MixinPauseScreen extends Screen {
 						(this.minecraft.hasSingleplayerServer() && this.minecraft.getSingleplayerServer().isPublished())));
 			}).bounds(oldButton.getX(), oldButton.getY(), oldButton.getWidth(), oldButton.getHeight()).build();
 			elements.set(elements.indexOf(oldButton), newButton);
-			this.removeWidget(oldButton);
-			this.addRenderableWidget(newButton);
+			if (this.minecraft.hasSingleplayerServer() && this.minecraft.getSingleplayerServer().isSingleplayerOwner(this.minecraft.player.nameAndId())) {
+				this.removeWidget(oldButton);
+				this.addRenderableWidget(newButton);
+			}
 		}
 	}
 }
