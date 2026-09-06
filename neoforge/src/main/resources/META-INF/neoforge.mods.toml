@@ -9,7 +9,7 @@ version="${mod_version}"
 displayName="LAN World Plug-n-Play"
 #updateJSONURL=""
 displayURL="https://github.com/satxm/mcwifipnp"
-logoFile="mcwifipnp.png"
+iconFile="mcwifipnp.png"
 authors="Satxm, Rikka0w0"
 description='''
 Provides a better UI than the vanilla Minecraft \"Open to LAN\" screen, which now also:
