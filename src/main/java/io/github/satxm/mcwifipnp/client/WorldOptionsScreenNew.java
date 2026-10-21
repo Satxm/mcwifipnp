@@ -10,7 +10,6 @@ import io.github.satxm.mcwifipnp.network.UPnPModule;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
-import net.minecraft.client.gui.components.AbstractSelectionList;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.CycleButton;
@@ -35,7 +34,7 @@ import net.minecraft.client.gui.screens.multiplayer.RestrictionsScreen;
 import net.minecraft.client.gui.screens.options.HasDifficultyReaction;
 import net.minecraft.client.gui.screens.options.HasGamemasterPermissionReaction;
 import net.minecraft.client.gui.screens.options.InWorldGameRulesScreen;
-import net.minecraft.client.renderer.RenderPipelines;
+import net.minecraft.client.renderer.pipeline.RenderPipelines;
 import net.minecraft.client.server.IntegratedServer;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
@@ -485,7 +484,7 @@ public class WorldOptionsScreenNew extends Screen implements HasGamemasterPermis
 		super.extractMenuBackground(graphics);
 		graphics.blit(
 				RenderPipelines.GUI_TEXTURED,
-				AbstractSelectionList.INWORLD_MENU_LIST_BACKGROUND,
+				Screen.INWORLD_MENU_LIST_BACKGROUND,
 				this.layout.getX(),
 				this.layout.getHeaderHeight(),
 				this.width,
@@ -497,22 +496,9 @@ public class WorldOptionsScreenNew extends Screen implements HasGamemasterPermis
 	}
 
 	@Override
-	public void extractRenderState(final GuiGraphicsExtractor graphics, final int xm, final int ym, final float a) {
-		super.extractRenderState(graphics, xm, ym, a);
-		graphics.blit(
-				RenderPipelines.GUI_TEXTURED, Screen.INWORLD_HEADER_SEPARATOR, this.layout.getX(),
-				this.layout.getHeaderHeight() - 2, 0.0F, 0.0F, this.width, 2, 32, 2);
-		graphics.blit(
-				RenderPipelines.GUI_TEXTURED,
-				Screen.INWORLD_FOOTER_SEPARATOR,
-				this.layout.getX(),
-				this.height - this.layout.getFooterHeight(),
-				0.0F,
-				0.0F,
-				this.width,
-				2,
-				32,
-				2);
+	public void extractRenderState(final GuiGraphicsExtractor graphics) {
+		super.extractRenderState(graphics);
+		this.extractListSeparators(graphics, this.layout, 2);
 	}
 
 	@Override
@@ -775,7 +761,6 @@ public class WorldOptionsScreenNew extends Screen implements HasGamemasterPermis
 				Component.translatable("options.worldOptions.difficulty.disabled.locked.tooltip"));
 		private static final Tooltip DIFFICULTY_DISABLED_OPERATOR_TOOLTIP = Tooltip.create(
 				Component.translatable("options.worldOptions.difficulty.disabled.operator.tooltip"));
-		private static final Component DIFFICULTY_LOCK_TITLE = Component.translatable("difficulty.lock.title");
 
 		public static DifficultyButtons create(final Minecraft minecraft, final Level level,
 				final WorldOptionsScreenNew screen) {
